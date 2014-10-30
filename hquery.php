@@ -1,107 +1,15 @@
 <?php
+// ------------------------------------------------------------------------
 /**
  *  Copyright (C) 2014 Dumitru Uzun
- *  @author DUzun.ME
- *  @ver 1.0.1
- */
-/* ------------------------------------------------------------------------ */
-/// Normalize a CSS selector pseudo-class string.
-/// ( int, string or array(name => value) )
-function html_normal_pseudoClass($p) {
-    if(is_int($p)) return $p;
-    $i = (int)$p;
-    if((string)$i === $p) return $i;
-
-    static $map = array(
-        'lt'       => '<',
-        'gt'       => '>',
-        'prev'     => '-',
-        'next'     => '+',
-        'parent'   => '|',
-        'children' => '*',
-        '*'        => '*'
-    );
-    $p = explode('(', $p, 2);
-    $p[1] = isset($p[1]) ? trim(rtrim($p[1], ')')) : NULL;
-    switch($p[0]) {
-        case 'first'      :
-        case 'first-child': return 0;
-        case 'last'       :
-        case 'last-child' : return -1;
-        case 'eq'         : return (int)$p[1];
-        default:
-            if(isset($map[$p[0]])) {
-                $p[0] = $map[$p[0]];
-                if(isset($p[1])) $p[1] = (int)$p[1];
-            } else {
-            // ??? unknown ps
-            }
-    }
-    return array($p[0]=>$p[1]);
-}
-
-/* ------------------------------------------------------------------------ */
-/*! Parse a selector string into an array structure.
  *
- * tn1#id1 .cl1.cl2:first tn2:5 , tn3.cl3 tn4#id2:eq(-1) > tn5:last-child > tn6:lt(3)
- *  -->
- *   [
- *      [
- *          [{ n: "tn1", i: "id1", c: [],            p: []  }],
- *          [{ n: NULL,  i: NULL,  c: ["cl1","cl2"], p: [0] }],
- *          [{ n: "tn2", i: NULL,  c: [],            p: [5] }]
- *      ]
- *    , [
- *          [{ n: "tn3", i: NULL, c: ["cl3"], p: [] }],
- *          [
- *              { n: "tn4", i: "id2", c: [], p: [-1]   },
- *              { n: "tn5", i: NULL , c: [], p: [-1]   },
- *              { n: "tn6", i: NULL , c: [], p: ["<3"] }
- *          ]
- *      ]
- *   ]
+ *  @author Dumitru Uzun (DUzun.ME)
+ *  @ver 1.0.2
  */
-function html_selector2struc($sel) {
-    $sc = '#.:';
-    $n = NULL; $a = array();
-    $def = array('n'=>$n, 'i'=>$n, 'c'=>$a, 'p'=>$a);
-    $sel = rtrim(trim(preg_replace('/\\s*(>|,)\\s*/', '$1', $sel), " \t\n\r,>"), $sc);
-    $sel = explode(',', $sel);
-    foreach($sel as &$a) {
-       $a = preg_split('|\\s+|', $a);
-       foreach($a as &$b) {
-          $b = explode('>', $b);
-          foreach($b as &$c) {
-             $d = $def;
-             $l=strlen($c);
-             $j = strcspn($c, $sc, 0, $l);
-             if($j) $d['n'] = substr($c, 0, $j);
-             $i = $j;
-             while($i<$l) {
-                $k = $c[$i++];
-                $j = strcspn($c, $sc, $i, $l);
-                if($j) {
-                   $e = substr($c, $i, $j);
-                   switch($k) {
-                      case '.': $d['c'][] = $e; break;
-                      case '#': $d['i']   = $e; break;
-                      case ':': $d['p'][] = html_normal_pseudoClass($e); break;
-                   }
-                   $i+=$j;
-                }
-             }
-             if(empty($d['c'])) $d['c'] = $n;
-             if(empty($d['p'])) $d['p'] = $n;
-             $c = $d;
-          }
-       }
-    }
-    return $sel;
-}
-/* ------------------------------------------------------------------------ */
-/* ------------------------------------------------------------------------ */
-/* HTML Parser Class */
-/* ------------------------------------------------------------------------ */
+// ------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------
+
 /// Base class for all HTML Elements
 abstract class ADOM_Node implements Iterator, Countable {
     static $_ar_ = array()     ;
@@ -111,7 +19,7 @@ abstract class ADOM_Node implements Iterator, Countable {
     static $_tr_ = true        ;
 
     static $selected_doc = NULL;
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
     protected $_prop; // Properties
     protected $doc; // Parent doc
     protected $ids; // contained elements' IDs
@@ -131,7 +39,7 @@ abstract class ADOM_Node implements Iterator, Countable {
         $this->ids = self::$_nl_; // If any reference exists, destroy its contents! P.S. Might be buggy, but hey, I own this property. Sincerly yours, ADOM_Node class.
         unset($this->doc, $this->ids);
     }
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
     // The magic of properties
     function __get($name) {
         if(array_key_exists($name, $this->_prop)) return $this->_prop[$name];
@@ -147,7 +55,7 @@ abstract class ADOM_Node implements Iterator, Countable {
     function __unset($name) {
         unset($this->_prop[$name]);
     }
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
     function attr($attr=NULL, $to_str=false) {
         $k = key($this->ids);
         if($k === NULL) {
@@ -156,10 +64,10 @@ abstract class ADOM_Node implements Iterator, Countable {
         }
         return isset($k) ? $this->doc()->get_attr_byId($k, $attr, $to_str) : NULL;
     }
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
     // Countable
     public function count() { return isset($this->ids) ? count($this->ids) : 0; }
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
     // Iterable
     function current() {
         $k = key($this->ids);
@@ -171,7 +79,7 @@ abstract class ADOM_Node implements Iterator, Countable {
     function next()    { return next($this->ids) !== false ? $this->current() : false; }
     function prev()    { return prev($this->ids) !== false ? $this->current() : false; }
     function rewind()  { reset($this->ids); return $this->current(); }
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
 
     /**
      *  Get string offset of the first/current element
@@ -191,9 +99,17 @@ abstract class ADOM_Node implements Iterator, Countable {
     }
 
 
-    function is_empty() { return empty($this->ids); }
-    function isDoc() { return !isset($this->doc) || $this === $this->doc; }
-    function doc() { return isset($this->doc) ? $this->doc : $this; }
+    function is_empty() {
+        return empty($this->ids);
+    }
+
+    function isDoc() {
+        return !isset($this->doc) || $this === $this->doc;
+    }
+
+    function doc() {
+        return isset($this->doc) ? $this->doc : $this;
+    }
 
     function find($sel, $attr=NULL) {
         return $this->doc()->find($sel, $attr, $this);
@@ -263,7 +179,7 @@ abstract class ADOM_Node implements Iterator, Countable {
         else ksort($id);
         return $keys ? array_keys($id) : $id;
     }
-    /* ------------------------------------------------------------------------ */
+    // ------------------------------------------------------------------------
     function _parent($ids=NULL, $n=0) {
         $ret = self::$_ar_;
         $ids = $this->_my_ids($ids);
@@ -356,69 +272,6 @@ abstract class ADOM_Node implements Iterator, Countable {
 
       $pt = $st = $ret;                // stacks: $pt - parents, $st - siblings limits
 
-//       while($e) {
-//          $b = key($dids);
-//
-// /* 1) */ if($kb < $b) {
-//            // iterate next siblings
-//            $i = 0;
-//            while($b < $ke) {
-//              if($n == $i) { $ret[$b] = $e; break; } else ++$i;
-//              $lie = $e < $ke ? $e : $ke;
-//              while($b <= $lie && ($e = next($dids))) $b = key($dids);
-//              if(!$e) { $e = end($dids); break; }
-//            }
-//
-//            if(empty($st) && $ie < $ib) break; // stack empty, no more children, search done!
-//
-//            // pop from stack, if not empty
-//            if($ke = end($st)) unset($st[$kb = key($st)]); else $kb = self::$_mi_; // $ke < $kb === context empy
-//
-//            // rewind back
-//            while($lb <= $b && ($e = prev($dids))) $b = key($dids);
-//            if(!$e) $e = reset($dids);
-//            // $b < $ib
-// // $e = reset($dids);
-// // $b = key($dids);
-//          }
-//
-// /* 3) */ if($b < $ib && $ib < $e) { // push the parents to their stack
-//            $pt[$lb] = $le;
-//            $lb = $b;
-//            $le = $e;
-//          } else
-//
-// /* 4) */ if($ib <= $b) { // if current element is past our child, then its siblings context is found
-//
-//       $a = array();
-//       foreach($pt as $i => $j) if($i>0) $a[$i] = $this->nodeName(NULL, $i).':'.$i;
-//       $a[$lb] = $this->nodeName(NULL, $lb).':'.$lb;
-//       $a[$ib] = $this->nodeName(NULL, $ib).':'.$ib;
-//       debug(implode(' -> ', $a), 'parents');
-// //
-//       $a = array($this->nodeName(NULL, $lb) => htmlspecialchars($this->outerHtml($ib)));
-//       $a = array($this->nodeName(NULL, $lb) => $this->nodeName(NULL, $ib));
-//       debug($a);
-//
-//            if($kb < $ke) $st[$kb] = $ke;
-//            $kb = $ie;
-//            $ke = $le;
-//
-//            $ib = ($ie = next($ids)) ? key($ids) : self::$_mi_; // $ie < $ib === no more children
-//            if($ie < $ib && $ke < $kb) break; // no more children, empty siblings context, search done!
-//
-//            // pop from stack, if not empty
-//            while($le < $ib && $pt) { // if past current parent, pop another one from the stack
-//               $le = end($pt);
-//               unset($pt[$lb = key($pt)]); // there must be something in the stack anyway
-//            }
-//          } else {
-//          }
-//
-//          $e = next($dids);
-//
-//       } // while
-
       while($e) {
          $b = key($dids);
 /* 4) */ if($ib <= $b) { // if current element is past our child, then its siblings context is found
@@ -472,18 +325,20 @@ abstract class ADOM_Node implements Iterator, Countable {
    }
 
    function _prev($ids=NULL, $n=0) {
-      $ret = self::$_ar_;              // array()
-      $ids = $this->_my_ids($ids);     // ids to search siblings for
-      if(!$ids) return $ret;
+        $ret = self::$_ar_;              // array()
+        $ids = $this->_my_ids($ids);     // ids to search siblings for
+        if(!$ids) return $ret;
 
-      $dids = &$this->doc()->ids;      // all elements in the doc
-      $kb = $le = self::$_mi_;         // [$lb=>$le] (last parent) now is 100% parent for any element
-      $ke = $lb = -1;                  // last parent
-      $ie = reset($ids);               // current child
-      $ib = key($ids);
-      $e = current($dids);             // traverse starting from current position
-      if($e !== false) do { $b = key($dids); } while( ($ib <= $b || $e < $ib) && ($e = prev($dids)) ) ;
-      if(empty($e)) $e = reset($dids); // current element
+        $dids = &$this->doc()->ids;      // all elements in the doc
+        $kb = $le = self::$_mi_;         // [$lb=>$le] (last parent) now is 100% parent for any element
+        $ke = $lb = -1;                  // last parent
+        $ie = reset($ids);               // current child
+        $ib = key($ids);
+        $e = current($dids);             // traverse starting from current position
+        if($e !== false) do {
+            $b = key($dids);
+        } while( ($ib <= $b || $e < $ib) && ($e = prev($dids)) ) ;
+        if(empty($e)) $e = reset($dids); // current element
 
       $pt = $st = $ret;                // stacks: $pt - parents, $st - siblings limits
       while($e) {
@@ -550,7 +405,8 @@ abstract class ADOM_Node implements Iterator, Countable {
            if(empty($st)) break; // stack empty, no more children, search done!
 
            // pop from stack, if not empty
-           if($kb = reset($st)) unset($st[$ke = key($st)]); else $kb = self::$_mi_; // $ke < $kb === context empy
+           if($kb = reset($st)) unset($st[$ke = key($st)]);
+           else $kb = self::$_mi_; // $ke < $kb === context empy
 
            // rewind back
            while($kb < $b && ($e = prev($dids))) $b = key($dids);
@@ -617,7 +473,7 @@ abstract class ADOM_Node implements Iterator, Countable {
       }
       return $ret;
     }
-   /* ------------------------------------------------------------------------ */
+   // ------------------------------------------------------------------------
 
    /// innerHTML
    function html($id=NULL) {
@@ -654,8 +510,10 @@ abstract class ADOM_Node implements Iterator, Countable {
       return $ret;
    }
 
-   /// innerText
-   function text($id=NULL) { return html_entity_decode(strip_tags($this->html($id)), ENT_QUOTES);/* ??? */ }
+    /// innerText
+    function text($id=NULL) {
+        return html_entity_decode(strip_tags($this->html($id)), ENT_QUOTES);/* ??? */
+    }
 
    function nodeName($caseFolding = NULL, $id=NULL) {
       if(!isset($caseFolding)) $caseFolding = CHTML_Parser_Doc::$case_folding;
@@ -664,7 +522,7 @@ abstract class ADOM_Node implements Iterator, Countable {
       else {
          $id = $this->_my_ids($id, true);
          if($id === false) return self::$_fl_;
-         $ret = array_select_($this->doc()->tags, $id);
+         $ret = self::array_select($this->doc()->tags, $id);
       }
       if($caseFolding) {
          foreach($ret as &$n) $n = strtolower($n);
@@ -687,8 +545,276 @@ abstract class ADOM_Node implements Iterator, Countable {
 //       return new HTML_Node($doc, array($p=>$q));
 //    }
 
+// - Helpers ------------------------------------------------
+
+    /// Normalize a CSS selector pseudo-class string.
+    /// ( int, string or array(name => value) )
+    static function html_normal_pseudoClass($p) {
+        if(is_int($p)) return $p;
+        $i = (int)$p;
+        if((string)$i === $p) return $i;
+
+        static $map = array(
+            'lt'       => '<',
+            'gt'       => '>',
+            'prev'     => '-',
+            'next'     => '+',
+            'parent'   => '|',
+            'children' => '*',
+            '*'        => '*'
+        );
+        $p = explode('(', $p, 2);
+        $p[1] = isset($p[1]) ? trim(rtrim($p[1], ')')) : NULL;
+        switch($p[0]) {
+            case 'first'      :
+            case 'first-child': return 0;
+            case 'last'       :
+            case 'last-child' : return -1;
+            case 'eq'         : return (int)$p[1];
+            default:
+                if(isset($map[$p[0]])) {
+                    $p[0] = $map[$p[0]];
+                    if(isset($p[1])) $p[1] = (int)$p[1];
+                } else {
+                // ??? unknown ps
+                }
+        }
+        return array($p[0]=>$p[1]);
+    }
+
+    // ------------------------------------------------------------------------
+    /*! Parse a selector string into an array structure.
+     *
+     * tn1#id1 .cl1.cl2:first tn2:5 , tn3.cl3 tn4#id2:eq(-1) > tn5:last-child > tn6:lt(3)
+     *  -->
+     *   [
+     *      [
+     *          [{ n: "tn1", i: "id1", c: [],            p: []  }],
+     *          [{ n: NULL,  i: NULL,  c: ["cl1","cl2"], p: [0] }],
+     *          [{ n: "tn2", i: NULL,  c: [],            p: [5] }]
+     *      ]
+     *    , [
+     *          [{ n: "tn3", i: NULL, c: ["cl3"], p: [] }],
+     *          [
+     *              { n: "tn4", i: "id2", c: [], p: [-1]   },
+     *              { n: "tn5", i: NULL , c: [], p: [-1]   },
+     *              { n: "tn6", i: NULL , c: [], p: ["<3"] }
+     *          ]
+     *      ]
+     *   ]
+     */
+    static function html_selector2struc($sel) {
+        $sc = '#.:';
+        $n = NULL; $a = array();
+        $def = array('n'=>$n, 'i'=>$n, 'c'=>$a, 'p'=>$a);
+        $sel = rtrim(trim(preg_replace('/\\s*(>|,)\\s*/', '$1', $sel), " \t\n\r,>"), $sc);
+        $sel = explode(',', $sel);
+        foreach($sel as &$a) {
+           $a = preg_split('|\\s+|', $a);
+           foreach($a as &$b) {
+              $b = explode('>', $b);
+              foreach($b as &$c) {
+                 $d = $def;
+                 $l = strlen($c);
+                 $j = strcspn($c, $sc, 0, $l);
+                 if($j) $d['n'] = substr($c, 0, $j);
+                 $i = $j;
+                 while($i<$l) {
+                    $k = $c[$i++];
+                    $j = strcspn($c, $sc, $i, $l);
+                    if($j) {
+                       $e = substr($c, $i, $j);
+                       switch($k) {
+                          case '.': $d['c'][] = $e; break;
+                          case '#': $d['i']   = $e; break;
+                          case ':': $d['p'][] = self::html_normal_pseudoClass($e); break;
+                       }
+                       $i+=$j;
+                    }
+                 }
+                 if(empty($d['c'])) $d['c'] = $n;
+                 if(empty($d['p'])) $d['p'] = $n;
+                 $c = $d;
+              }
+           }
+        }
+        return $sel;
+    }
+
+    // ------------------------------------------------------------------------
+    static function html_findTagClose($str, $p) {
+        if($i = strpos($str, '>', $p)) {
+            $p += strcspn($str, $qs="\"'", $p, $i);
+            $l = strlen($str);
+            while($p < $i) {
+                $q = $str[$p];
+                ++$p;
+                $p += strcspn($str, $q, $p, $l);
+                if(++$p > $i) {
+                    $i = strpos($str, '>', $p);
+                    if(!$i) break;
+                }
+                $p += strcspn($str, $qs, $p, $i);
+            }
+        }
+        return $i;
+    }
+    // ------------------------------------------------------------------------
+    static function html_parseAttrStr($str, $case_folding = true, $extended = false) {
+        static $_attrName_firstLet = NULL;
+        if(!$_attrName_firstLet) $_attrName_firstLet = self::str_range('a-zA-Z_');
+
+        $ret = array();
+        for($i = strspn($str, " \t\n\r"), $len = strlen($str); $i < $len;) {
+           $i += strcspn($str, $_attrName_firstLet, $i);
+           if($i>=$len) break;
+           $b = $i;
+           $i += strcspn($str, " \t\n\r=\"\'", $i);
+           $attrName = rtrim(substr($str, $b, $i-$b));
+           if($case_folding) $attrName = strtolower($attrName);
+           $i += strspn($str, " \t\n\r", $i);
+           $attrValue = NULL;
+           if($i<$len && $str[$i]=='=') {
+             ++$i;
+             $i += strspn($str, " \t\n\r", $i);
+             if($i < $len) {
+               $q = substr($str, $i, 1);
+               if($q=='"' || $q=="'") {
+                  $b = ++$i;
+                  $e = strpos($str, $q, $i);
+                  if($e !== false) {
+                     $attrValue = substr($str, $b, $e-$b);
+                     $i = $e+1;
+                  }
+                  else {
+                     /*??? no closing quote */
+                  }
+               }
+               else {
+                  $b = $i;
+                  $i += strcspn($str, " \t\n\r\"\'", $i);
+                  $attrValue = substr($str, $b, $i-$b);
+               }
+             }
+           }
+           if($extended && $attrValue) switch($case_folding ? $attrName : strtolower($attrName)) {
+              case 'class':
+                $attrValue = preg_split("|\\s+|", trim($attrValue));
+                if(count($attrValue) == 1) $attrValue = reset($attrValue);
+                else sort($attrValue);
+                break;
+
+              case 'style':
+                $attrValue = self::parseCSStr($attrValue, $case_folding);
+                break;
+           }
+
+           $ret[$attrName] = $attrValue;
+        }
+        return $ret;
+    }
+    // ------------------------------------------------------------------------
+    static function html_attr2str($attr, $quote='"') {
+        $sq = htmlspecialchars($quote);
+        if($sq == $quote) $sq = false;
+        ksort($attr);
+        if(isset($attr['class']) && is_array($attr['class'])) { sort($attr['class']); $attr['class'] = implode(' ', $attr['class']); }
+        if(isset($attr['style']) && is_array($attr['style'])) $attr['style'] = self::CSSArr2Str($attr['style']);
+        $ret = array();
+        foreach($attr as $n => $v) {
+            $ret[] = $n . '=' . $quote . ($sq ? str_replace($quote, $sq, $v) : $v) . $quote;
+        }
+        return implode(' ', $ret);
+    }
+    // ------------------------------------------------------------------------
+    static function parseCSStr($str, $case_folding = true) {
+      $ret = array();
+      $a = explode(';', $str); // ??? what if ; in "" ?
+      foreach($a as $v) {
+         $v = explode(':', $v, 2);
+         $n = trim(reset($v));
+         if($case_folding) $n = strtolower($n);
+         $ret[$n] = count($v) == 2 ? trim(end($v)) : NULL;
+      }
+      unset($ret['']);
+      return $ret;
+    }
+
+    static function CSSArr2Str($css) {
+       if(is_array($css)) {
+          ksort($css);
+          $ret = array();
+          foreach($css as $n => $v) $ret[] = $n.':'.$v;
+          return implode(';', $ret);
+       }
+       return $css;
+    }
+    // ------------------------------------------------------------------------
+    static function str_range($comp, $pos=0, $len=NULL) {
+        $ret = array();
+        $b = strlen($comp);
+        if(!isset($len) || $len > $b) $len = $b;
+        $b = "\x0";
+        while($pos < $len) {
+            switch($c = $comp[$pos++]) {
+                case '\\': {
+                    $b = substr($comp, $pos, 1);
+                    $ret[$b] = $pos++;
+                } break;
+
+                case '-': {
+                    $c_ = ord($c=substr($comp, $pos, 1));
+                    $b = ord($b);
+                    while($b++ < $c_) $ret[chr($b)] = $pos;
+                    while($b-- > $c_) $ret[chr($b)] = $pos;
+                } break;
+
+                default: {
+                    $ret[$b=$c] = $pos;
+                }
+            }
+        }
+        return implode('', array_keys($ret));
+    }
+    // ------------------------------------------------------------------------
+    static function array_select($arr, $keys, $force_null=false) {
+        $ret = array();
+        is_array($keys) or is_object($keys) or $keys = array($keys);
+        foreach($keys as $k)
+            if(isset($arr[$k])) $ret[$k] = $arr[$k];
+            elseif($force_null) $ret[$k] = NULL;
+        return $ret;
+    }
+    // ------------------------------------------------------------------------
+    static function convert_encoding($a, $to, $from=NULL) {
+        static $meth = NULL;
+        isset($meth) or $meth = function_exists('mb_convert_encoding');
+        isset($from) or $from = $meth ? mb_internal_encoding() : iconv_get_encoding('internal_encoding');
+
+        if(is_array($a)) {
+            $ret = array();
+            foreach($a as $n => $v) {
+                $ret[is_string($n)?self::convert_encoding($n,$to,$from):$n] = is_string($v) || is_array($v) || $v instanceof stdClass
+                    ? self::convert_encoding($v, $to, $from)
+                    : $v;
+            }
+            return $ret;
+        }
+        elseif($a instanceof stdClass) {
+            $ret = (object)array();
+            foreach($a as $n => $v) {
+                $ret->{is_string($n)?self::convert_encoding($n,$to,$from):$n} = is_string($v) || is_array($v) || $v instanceof stdClass
+                    ? self::convert_encoding($v, $to, $from)
+                    : $v;
+            }
+            return $ret;
+        }
+        return is_string($a) ? $meth ? mb_convert_encoding($a, $to, $from) : iconv($from, $to, $a) : $a;
+    }
+    // ------------------------------------------------------------------------
 }
-/* ------------------------------------------------------------------------ */
+// ------------------------------------------------------------------------
+
 class IDOM_Context extends ADOM_Node {
     function __construct($doc=NULL, $el_arr=NULL) {
         if($el_arr instanceof parent) {
@@ -708,8 +834,9 @@ class IDOM_Context extends ADOM_Node {
        return new self($el, $this->doc);
     }
 }
-/* ------------------------------------------------------------------------ */
-/// The Main Class for HTML document
+
+// ------------------------------------------------------------------------
+/// HTML Parser Class
 class CHTML_Parser_Doc extends ADOM_Node {
     static $del_spaces          = false;
     static $case_folding        = true;
@@ -722,8 +849,9 @@ class CHTML_Parser_Doc extends ADOM_Node {
     static $_url_attribs        = array('href'=>'href', 'src'=>'src');
     static $_tagID_first_letter = 'a-zA-Z_';
     static $_tagID_letters      = 'a-zA-Z_0-9:\-';
+    static $_icharset           = 'UTF-8'; // Internal charset
 
-    protected $html      = ''; // html string
+    protected $html = ''; // html string
 
     // Indexed data
     protected $tags          ; // id        => nodeName
@@ -739,7 +867,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
     protected $indexed = false; // completely indexed
 
 
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
     // The magic of properties
     function __get($name) {
         if(array_key_exists($name, $this->_prop)) return $this->_prop[$name];
@@ -779,7 +907,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
         if(isset($value)) return $this->_prop[$name] = $value;
         $this->__unset($name);
     }
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
 
     function location($href=NULL) {
         if(func_num_args() < 1) {
@@ -815,11 +943,11 @@ class CHTML_Parser_Doc extends ADOM_Node {
 
     function __construct($html, $idx=true) {
         if(!is_string($html)) $html = (string)$html;
-        $c = self::detect_charset($html);
+        $c = self::detect_charset($html) or $c = NULL;
         if($c) {
-            $ic = mb_internal_encoding();
-            if($c != $ic) $html = mb_convert_encoding($html, $ic, $c);
-        } else $c = NULL;
+            $ic = self::$_icharset;
+            if($c != $ic) $html = self::convert_encoding($html, $ic, $c);
+        }
         $this->_prop['charset'] = $c;
         if(self::$del_spaces) {
             $html = preg_replace('#(>)?\\s+(<)?#', '$1 $2', $html); // reduce the size
@@ -829,11 +957,11 @@ class CHTML_Parser_Doc extends ADOM_Node {
         parent::__construct($this, self::$_ar_);
         $this->html = $html;
         unset($html);
-        
+
         $this->_prop['baseURI'] =
         $this->_prop['baseURL'] =
         $this->_prop['hostURL'] = NULL;
-        
+
         if($this->html && $idx) $this->_index_all();
     }
 
@@ -889,14 +1017,14 @@ class CHTML_Parser_Doc extends ADOM_Node {
             if($q < $p) $q = strlen($str_);
             $a = substr($str, $p, $q-$p);
             $p = $q+2;
-            $a = html_parseAttrStr($a, true);
+            $a = self::html_parseAttrStr($a, true);
             if(!empty($a['charset'])) {
-                return $a['charset'];
+                return strtoupper($a['charset']);
             }
-            if(strtolower($a['http-equiv']) == 'content-type') {
+            if(isset($a['http-equiv']) && strtolower($a['http-equiv']) === 'content-type') {
                 if(empty($a['content'])) return false;
                 $a = explode('charset=', $a['content']);
-                return empty($a) || empty($a[1]) ? false : trim($a[1]);
+                return empty($a) || empty($a[1]) ? false : strtoupper(trim($a[1]));
             }
         }
         return false;
@@ -906,41 +1034,42 @@ class CHTML_Parser_Doc extends ADOM_Node {
         return isset($this->html) ? strlen($this->html) : 0;
     }
 
+    /// This method is for debug only
+    function _info() {
+        $inf = array();
+        $ar = array();
+        foreach($this->attribs as $i => $a) $ar[$i] = self::html_attr2str($a);
+        $inf['attribs']   = $ar   ;
+        $inf['attrs']     = $attrs     ;
+        $inf['idx_attr']  = $this->idx_attr  ;
+        $inf['tag_idx']   = $this->tag_idx   ;
+        $inf['attr_idx']  = $this->attr_idx  ;
+        $inf['class_idx'] = $this->class_idx ;
 
-   function _info() {
-      $inf = array();
-      $ar = array();
-      foreach($this->attribs as $i => $a) $ar[$i] = html_attr2str($a);
-      $inf['attribs']   = $ar   ;
-      $inf['attrs']     = $attrs     ;
-      $inf['idx_attr']  = $this->idx_attr  ;
-      $inf['tag_idx']   = $this->tag_idx   ;
-      $inf['attr_idx']  = $this->attr_idx  ;
-      $inf['class_idx'] = $this->class_idx ;
-
-      $lev = array();
-      $nm = array();
-      $st = array();
-      $pb = -1; $pe = PHP_INT_MAX;
-      $l = 0;
-      foreach($this->ids as $b => $e) {
-         if($pb < $b && $b < $pe) {
-             $st[]  = array($pb, $pe);
-             list($pb, $pe) = array($b, $e);
-         } else while($pe < $b && $st) {
-             list($pb, $pe) = array_pop($st);
-         }
-         $nm[$b] = $this->tags[$b];
-         $lev[$b] = count($st);
-      }
-      foreach($nm as $b => &$n) {
-         $n = str_repeat(' -', $lev[$b]) . ' < ' . $n . ' ' . $this->get_attr_byId($b, NULL, true) . ' >';
-      }
-      $nm = implode("\n", $nm);
-      $inf['struc'] = $nm;
-      unset($lev, $st, $nm);
-      return $inf;
-   }
+        $lev = array();
+        $nm = array();
+        $st = array();
+        $pb = -1; $pe = PHP_INT_MAX;
+        $l = 0;
+        foreach($this->ids as $b => $e) {
+            if($pb < $b && $b < $pe) {
+                $st[]  = array($pb, $pe);
+                list($pb, $pe) = array($b, $e);
+            }
+            else while($pe < $b && $st) {
+                list($pb, $pe) = array_pop($st);
+            }
+            $nm[$b] = $this->tags[$b];
+            $lev[$b] = count($st);
+        }
+        foreach($nm as $b => &$n) {
+            $n = str_repeat(' -', $lev[$b]) . ' < ' . $n . ' ' . $this->get_attr_byId($b, NULL, true) . ' >';
+        }
+        $nm = implode("\n", $nm);
+        $inf['struc'] = $nm;
+        unset($lev, $st, $nm);
+        return $inf;
+    }
 
     /// Index comment tags position in source HTML
     protected function _index_comments_html($o) {
@@ -960,24 +1089,27 @@ class CHTML_Parser_Doc extends ADOM_Node {
         return $o;
     }
 
-   /// index all tags by tagname at ids
-   private function _index_tags() {
-      $s = $nix = $ix = self::$_ar_;
-      $ids = $this->ids;
-      foreach($this->tags as $id => $n) { if(!isset($ix[$n])) $ix[$n] = array(); $ix[$n][$id] = $ids[$id]; }
-      foreach($ix as $n => $v) {
-         foreach($v as $id => $e) $this->tags[$id] = $n;
-         if(isset($nix[$n])) continue;
-         $_n = strtolower($n);
-         if(!isset($nix[$_n])) $nix[$_n] = $v;
-         else {
-             foreach($v as $id => $e) $nix[$_n][$id] = $e;
-             $s[] = $_n;
-         }
-      }
-      foreach($s as $_n) asort($nix[$_n]);
-      return $this->tag_idx = $nix;
-   }
+    /// index all tags by tagname at ids
+    private function _index_tags() {
+        $s = $nix = $ix = self::$_ar_;
+        $ids = $this->ids;
+        foreach($this->tags as $id => $n) {
+            if(!isset($ix[$n])) $ix[$n] = array();
+            $ix[$n][$id] = $ids[$id];
+        }
+        foreach($ix as $n => $v) {
+            foreach($v as $id => $e) $this->tags[$id] = $n;
+            if(isset($nix[$n])) continue;
+            $_n = strtolower($n);
+            if(!isset($nix[$_n])) $nix[$_n] = $v;
+            else {
+                foreach($v as $id => $e) $nix[$_n][$id] = $e;
+                $s[] = $_n;
+            }
+        }
+        foreach($s as $_n) asort($nix[$_n]);
+        return $this->tag_idx = $nix;
+    }
 
    /// make attribute ids (aids) and index all attributes by aid at ids
    private function _index_attribs($attrs) {
@@ -986,7 +1118,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
       $ian = self::$_index_attribs;
       foreach($ian as $atn) if(!isset($iax[$atn])) $iax[$atn] = self::$_ar_;
       foreach($attrs as $str => $v) {
-         $a = html_parseAttrStr($str, true, false);
+         $a = self::html_parseAttrStr($str, true, false);
          unset($attrs[$str]);
          foreach($ian as $atn) {
              if(isset($a[$atn])) { // href attribute has a separate index
@@ -996,7 +1128,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
              }
          }
          if(empty($a)) continue;
-         $str = html_attr2str($a);
+         $str = self::html_attr2str($a);
          $aid = $i;
          if(isset($six[$str])) {
             $aid = $six[$str];
@@ -1057,74 +1189,98 @@ class CHTML_Parser_Doc extends ADOM_Node {
 
     protected function _index_all() {
         if($this->indexed) return $this->tag_idx;
+
         $this->o = $o = (object)array();
-        $o->h  = ($this->html);
-        $o->l  = strlen($o->h);
-        $o->i  = 0;
-        $o->tg = self::$_ar_;
-        $fl    = str_range(self::$_tagID_first_letter); // first letter chars
-        $tl    = str_range(self::$_tagID_letters);      // tag name chars
-        $i     = $o->i;
-        $one   = 1;
-        $st    = array('!'=>$one, '?'=>2); // special tags
-        $ct    = '/';
-        $stack = $a = self::$_ar_;
+        $o->h   = $this->html;
+        $o->l   = strlen($o->h);
+        $o->i   = 0;
+        $o->tg  = self::$_ar_;
+        $fl     = self::str_range(self::$_tagID_first_letter); // first letter chars
+        $tl     = self::str_range(self::$_tagID_letters);      // tag name chars
+        $i      = $o->i;
+        $st     = array('!'=>1, '?'=>2); // special tags
+        $ut     = array_flip(self::$_unparsedTags);
+        $utn    = NULL;
+        $ct     = '/';
+        $stack  = $a = self::$_ar_;
         $this->_index_comments_html($o);
 
         while($i < $o->l) {
-            $w = false;
             $i = strpos($o->h, '<', $i);
             if($i === false) break;
             ++$i;
             $b = $i;
             $c = $o->h[$i];
-            if($c == $ct) {              // close tags
-                $w = true;
+
+            // if close tags
+            if($w = $c === $ct) {
                 ++$i;
                 $c = $o->h[$i];
             }
-            if(strpos($fl, $c) !== false) { // usual tags
-                ++$i; // posibly second leter of tagName
+            
+
+            // usual tags
+            if(strpos($fl, $c) !== false) {
+                ++$i; // posibly second letter of tagName
                 $j = strspn($o->h, $tl, $i);
                 $n = substr($o->h, $i-1, $j+1);
                 $i += $j;
-                $i = html_findTagClose($o->h, $i);
+                if($utn) {
+                    $n = strtolower($n);
+                    if($utn !== $n || !$w) {
+                        continue;
+                    }
+                    $utn = NULL;
+                }
+                $i = self::html_findTagClose($o->h, $i);
                 if($i === false) break;
                 $e = $i++;
-                if(!$w) {                                      // open tag
-                    $this->ids[$e] = $e;                        // the end of the teg contents (>)
+                // open tag
+                if(!$w) {
+                    $this->ids[$e] = $e;  // the end of the teg contents (>)
                     $this->tags[$e] = $n;
                     $b += $j+1;
                     $b += strspn($o->h, " \n\r\t", $b);
-                    if($b<$e) {
+                    if( $b < $e ) {
                         $at = trim(substr($o->h, $b, $e-$b));
                         if($at) {
-                        if(!isset($a[$at])) $a[$at] = $e;
-                        elseif(!is_array($a[$at])) $a[$at] = array($a[$at], $e);
-                        else $a[$at][] = $e;
+                            if(!isset($a[$at])) $a[$at] = $e;
+                            elseif(!is_array($a[$at])) $a[$at] = array($a[$at], $e);
+                            else $a[$at][] = $e;
                         };
                     }
                     if($o->h[$e-1] != $ct) {
                         $n = strtolower($n);
+                        if(isset($ut[$n])) {
+                            $utn = $n;
+                        }
                         $stack[$n][$b] = $e; // put in stack
                     }
-                } else {                                       // close tag
+                }
+                // close tag
+                else {
                     $n = strtolower($n);
                     $s = &$stack[$n];
-                    if(empty($s)) ;                             // error - tag not opened - ???
+                    if(empty($s)) ;                             // error - tag not opened, but closed - ???
                     else {
                         $q = end($s);
                         $p = key($s);
                         unset($s[$p]);
-                        $this->ids[$q] = $b-1;                   // the end of the teg contents (<)
+                        $this->ids[$q] = $b-1;                  // the end of the teg contents (<)
                     }
                 }
-            } elseif(!$w) {
-                if(isset($st[$c])) {      // special tags
+            }
+            elseif(!$w) {
+                // special tags
+                if(isset($st[$c])) {  
                     $b--;
-                    if(isset($o->tg[$b])) { $i = $o->tg[$b]; continue; }
+                    if(isset($o->tg[$b])) {
+                        $i = $o->tg[$b];
+                        continue;
+                    }
                     // ???
-                } else continue;          // not a tag
+                }
+                else continue;          // not a tag
                 $i = strpos($o->h, '>', $i);
                 if($i === false) break;
                 $e = $i++;
@@ -1160,7 +1316,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
         return $this->tag_idx;
     }
 
-   /* ------------------------------------------------------------------------ */
+   // ------------------------------------------------------------------------
     function _get_ctx($ctx) {
          if(!($ctx instanceof parent)) {
             if(is_array($ctx) || is_int($ctx))
@@ -1169,8 +1325,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
          }
          return $ctx && count($ctx) ? $ctx : self::$_fl_; // false for error - something is not ok
     }
-   /* ------------------------------------------------------------------------ */
-//    protected
+   // ------------------------------------------------------------------------
     function _find($name, $class=NULL, $attr=NULL, $ctx=NULL, $rec=true) {
       // if(!in_array($name, array('meta', 'head'))) debug(compact('name', 'class', 'attr','ctx', 'rec'));
 
@@ -1179,7 +1334,8 @@ class CHTML_Parser_Doc extends ADOM_Node {
          if($attr)    $aids = $this->get_aids_byClassAttr($class, $attr, true);
          else         $aids = $this->get_aids_byClass($class, true);
          if(!$aids) return self::$_nl_;
-      } elseif($attr) {
+      }
+      elseif($attr) {
          $aids = $this->get_aids_byAttr($attr, true);
          if(!$aids) return self::$_nl_;
       }
@@ -1200,11 +1356,13 @@ class CHTML_Parser_Doc extends ADOM_Node {
          if($ni && $ctx) $ni = $ctx->_filter($ni);
          if(!$ni) return self::$_nl_;
          if($name) $ni = array_intersect_key($ni, $this->tag_idx[$name]);
-      } else {
+      }
+      else {
          if($name) {
             $ni = $this->tag_idx[$name];
             if($ni && $ctx) $ni = $ctx->_filter($ni);
-         } else {
+         }
+         else {
             if($ctx) $ni = $ctx->_sub_ids(false);
             else $ni = $this->ids; // all tags
          }
@@ -1244,31 +1402,36 @@ class CHTML_Parser_Doc extends ADOM_Node {
          if($attr)    $aids = $this->get_aids_byClassAttr($class, $attr, true);
          else         $aids = $this->get_aids_byClass($class, true);
          if(!$aids) return self::$_nl_;
-      } elseif($attr) {
+      }
+      elseif($attr) {
          $aids = $this->get_aids_byAttr($attr, true);
          if(!$aids) return self::$_nl_;
-      }  unset($class, $attr);
+      }
+      unset($class, $attr);
       if($aids) {
          foreach($ids as $b => $e) if(!isset($this->attrs[$b], $aids[$this->attrs[$b]])) unset($ids[$b]);
          if(!$ids) return self::$_nl_;
-      }  unset($aids);
+      }
+      unset($aids);
 
       if(is_string($name) && $name !== '' && $name != '*') {
          $name = strtolower(trim($name));
          if(empty($this->tag_idx[$name])) return self::$_nl_; // no such tag-name
          foreach($ids as $b => $e) if(!isset($this->tag_idx[$name][$b])) unset($ids[$b]);
          if(!$ids) return self::$_nl_;
-      }  unset($name);
+      }
+      unset($name);
 
       if(isset($ctx)) {
          $ctx = $this->_get_ctx($ctx);
          if(!$ctx) throw new Exception(__CLASS__.'->'.__FUNCTION__.': Invalid context!');
          $ids = $ctx->_filter($ids);
          if(!$ids) return $ids;
-      }  unset($ctx);
+      }
+      unset($ctx);
       return $ids;
    }
-   /* ------------------------------------------------------------------------ */
+   // ------------------------------------------------------------------------
 
    /*!
     * @return [aids]
@@ -1276,7 +1439,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
    function get_aids_byAttr($attr, $as_keys=false, $actx=NULL) {
       $aids = self::$_ar_;
       if(isset($actx) && !$actx) return $aids;
-      if(is_string($attr)) $attr = html_parseAttrStr($attr);
+      if(is_string($attr)) $attr = self::html_parseAttrStr($attr);
       if($actx)
       foreach($actx as $aid => $a) {
          if(!isset($this->attribs[$aid])) continue;
@@ -1304,24 +1467,31 @@ class CHTML_Parser_Doc extends ADOM_Node {
       if(!$cl) $cl = array_keys($this->class_idx); // efectul multimii vide
       foreach($cl as $cl) if(isset($this->class_idx[$cl])) {
          $aid = $this->class_idx[$cl];
-         if(!$actx)
-           if(is_array($aid)) foreach($aid as $aid => $cl) $aids[$aid] = $cl;
-           else $aids[$aid] = $this->attr_idx[$aid];
-         else
-           if(is_array($aid)) foreach($aid as $aid => $cl) if(isset($actx[$aids])) $aids[$aid] = $cl;
-           else if(isset($actx[$aids])) $aids[$aid] = $this->attr_idx[$aid];
-      } else return self::$_ar_; // no such class
+         if(!$actx) {
+            if(is_array($aid)) foreach($aid as $aid => $cl) $aids[$aid] = $cl;
+            else $aids[$aid] = $this->attr_idx[$aid];
+         }
+         else {
+            if(is_array($aid)) foreach($aid as $aid => $cl) if(isset($actx[$aids])) $aids[$aid] = $cl;
+            else if(isset($actx[$aids])) $aids[$aid] = $this->attr_idx[$aid];
+         }
+      }
+      else return self::$_ar_; // no such class
       return $as_keys ? $aids : array_keys($aids);
    }
 
    function get_aids_byClassAttr($cl, $attr, $as_keys=false, $actx=NULL) {
       $aids = $this->get_aids_byClass($cl, true, $actx);
-      if(is_string($attr)) $attr = html_parseAttrStr($attr);
+      if(is_string($attr)) $attr = self::html_parseAttrStr($attr);
       if($attr) foreach($aids as $aid => $ix) {
          $a = $this->attribs[$aid];
          $good = count($a) > 1; // has only 'class' attribute
-         if($good) foreach($attr as $n => $v)
-           if(!isset($a[$n]) || $a[$n] !== $v) { $good = false; break; }
+         if($good) foreach($attr as $n => $v) {
+            if(!isset($a[$n]) || $a[$n] !== $v) {
+                $good = false;
+                break;
+            }
+         }
          if(!$good) unset($aids[$aid]);
       }
       return $as_keys ? $aids : array_keys($aids);
@@ -1333,7 +1503,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
     */
    function get_ids_byAid($aid, $sort=true, $has_keys=false) {
         $ret = self::$_ar_;
-        if(!$has_keys) $aid = array_select_($this->attr_idx, $aid);
+        if(!$has_keys) $aid = self::array_select($this->attr_idx, $aid);
         foreach($aid as $aid => $aix) {
            if(!is_array($aix)) $aix =array($aix=>$this->ids[$aix]);
            if(empty($ret)) $ret = $aix;
@@ -1345,7 +1515,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
 
    function get_ids_byAttr($attr, $sort=true) {
       $ret = self::$_ar_;
-      if(is_string($attr)) $attr = html_parseAttrStr($attr);
+      if(is_string($attr)) $attr = self::html_parseAttrStr($attr);
       if(!$attr) return $ret;
       $sat = $ret;
       foreach(self::$_index_attribs as $atn) {
@@ -1359,16 +1529,19 @@ class CHTML_Parser_Doc extends ADOM_Node {
         $aids = $this->get_aids_byAttr($attr, true);
         if(!$aids) return $ret;
         foreach($aids as $aid => $aix) {
-           if(!is_array($aix)) $aix =array($aix=>$this->ids[$aix]);
+           if(!is_array($aix)) $aix = array($aix=>$this->ids[$aix]);
            foreach($aix as $id => $e) {
               if($sat) {
                  $good = true;
-                 foreach($sat as $n => $v)
-                   if(!isset($this->idx_attr[$n][$id]) || $this->idx_attr[$n][$id] !== $v) {
-                      $good = false; break;
-                   }
+                 foreach($sat as $n => $v) {
+                     if(!isset($this->idx_attr[$n][$id]) || $this->idx_attr[$n][$id] !== $v) {
+                        $good = false;
+                        break;
+                     }
+                 }
                  if($good) $ret[$id] = $e;
-              } else  $ret[$id] = $e;
+              }
+              else  $ret[$id] = $e;
            }
         }
       } else { // !$attr && $sat
@@ -1378,13 +1551,18 @@ class CHTML_Parser_Doc extends ADOM_Node {
            if($v !== $av) continue;
            $e = $this->ids[$id];
            if($sat) {
-              $good = true;
-              foreach($sat as $n => $v)
-                if(!isset($this->idx_attr[$n][$id]) || $this->idx_attr[$n][$id] !== $v) {
-                   $good = false; break;
+                $good = true;
+                foreach($sat as $n => $v) {
+                    if(!isset($this->idx_attr[$n][$id]) || $this->idx_attr[$n][$id] !== $v) {
+                        $good = false;
+                        break;
+                    }
                 }
-              if($good) $ret[$id] = $e;
-           } else  $ret[$id] = $e;
+                if($good) $ret[$id] = $e;
+           }
+           else {
+                $ret[$id] = $e;
+           }
         }
       }
       if($sort) ksort($ret);
@@ -1408,7 +1586,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
       } else {
          if(!isset($this->attribs[$aid])) return self::$_fl_;
          $ret = $this->attribs[$aid];
-         if($to_str) $ret = html_attr2str($ret);
+         if($to_str) $ret = self::html_attr2str($ret);
       }
       return $ret;
    }
@@ -1417,186 +1595,54 @@ class CHTML_Parser_Doc extends ADOM_Node {
       $ret = self::$_ar_;
       if(is_array($id)) {
          foreach($id as $id => $e) $ret[$id] = $this->get_attr_byId($id, $attr, $to_str);
-      } else {
+      }
+      else {
          if(!isset($this->ids[$id])) return self::$_fl_;
          $bu = isset($this->_prop['baseURL']);
          if(isset($attr)) {
             if(isset($this->idx_attr[$attr])) $ret = @$this->idx_attr[$attr][$id];
             else $ret = isset($this->attrs[$id], $this->attribs[$ret=$this->attrs[$id]]) ? @$this->attribs[$ret][$attr] : self::$_nl_;
             if($ret && $bu && isset(self::$_url_attribs[$attr])) {
-                  $ret = $this->url2abs($ret);
+                $ret = $this->url2abs($ret);
             }
-         } else {
+         }
+         else {
             if(isset($this->attrs[$id])) $ret = $this->attribs[$this->attrs[$id]];
-            foreach(self::$_index_attribs as $atn)
+            foreach(self::$_index_attribs as $atn) {
                if(isset($this->idx_attr[$atn][$id])) $ret[$atn] = $this->idx_attr[$atn][$id];
+            }
 
             if(!empty($bu)) {
               foreach(self::$_url_attribs as $n) {
                  if(isset($ret[$n])) $ret[$n] = $this->url2abs($ret[$n]);
               }
             }
-            if($to_str) $ret = html_attr2str($ret);
+            if($to_str) $ret = self::html_attr2str($ret);
          }
       }
       return $ret;
    }
 };
 
-/* ------------------------------------------------------------------------ */
-function html_findTagClose($str, $p) {
-    if($i = strpos($str, '>', $p)) {
-        $p += strcspn($str, $qs="\"\'", $p, $i);
-        $l = strlen($str);
-        while($p < $i) {
-              $q = $str[$p];
-              ++$p;
-              $p += strcspn($str, $q, $p, $l);
-              if(++$p > $i) {
-                 $i = strpos($str, '>', $p);
-                 if(!$i) break;
-              }
-              $p += strcspn($str, $qs, $p, $i);
-        }
-    }
-    return $i;
-}
+// ------------------------------------------------------------------------
 
-function html_parseAttrStr($str, $case_folding = true, $extended = false)
-{
-    static $_attrName_firstLet = NULL;
-    if(!$_attrName_firstLet) $_attrName_firstLet = str_range('a-zA-Z_');
-
-    $ret = array();
-    for($i = strspn($str, " \t\n\r"), $len = strlen($str); $i < $len;)
-    {
-       $i += strcspn($str, $_attrName_firstLet, $i);
-       if($i>=$len) break;
-       $b = $i;
-       $i += strcspn($str, " \t\n\r=\"\'", $i);
-       $attrName = rtrim(substr($str, $b, $i-$b));
-       if($case_folding) $attrName = strtolower($attrName);
-       $i += strspn($str, " \t\n\r", $i);
-       $attrValue = NULL;
-       if($i<$len && $str[$i]=='=')
-       {
-         ++$i;
-         $i += strspn($str, " \t\n\r", $i);
-         if($i < $len) {
-           $q = substr($str, $i, 1);
-           if($q=='"' || $q=="'")
-           {
-              $b = ++$i;
-              $e = strpos($str, $q, $i);
-              if($e !== false) {
-                 $attrValue = substr($str, $b, $e-$b);
-                 $i = $e+1;
-              } else {
-                 /*??? no closing quote */
-              }
-           }
-           else
-           {
-              $b = $i;
-              $i += strcspn($str, " \t\n\r\"\'", $i);
-              $attrValue = substr($str, $b, $i-$b);
-           }
-         }
-       }
-       if($extended && $attrValue) switch($case_folding ? $attrName : strtolower($attrName)) {
-          case 'class':
-            $attrValue = preg_split("|\\s+|", trim($attrValue));
-            if(count($attrValue) == 1) $attrValue = reset($attrValue); else sort($attrValue);
-            break;
-
-          case 'style':
-            $attrValue = parseCSStr($attrValue, $case_folding);
-            break;
-       }
-
-       $ret[$attrName] = $attrValue;
-    }
-    return $ret;
-}
-
-function html_attr2str($attr, $quote='"') {
-    $sq = htmlspecialchars($quote);
-    if($sq == $quote) $sq = false;
-    ksort($attr);
-    if(isset($attr['class']) && is_array($attr['class'])) { sort($attr['class']); $attr['class'] = implode(' ', $attr['class']); }
-    if(isset($attr['style']) && is_array($attr['style'])) $attr['style'] = CSSArr2Str($attr['style']);
-    $ret = array();
-    foreach($attr as $n => $v) {
-        $ret[] = $n . '=' . $quote . ($sq ? str_replace($quote, $sq, $v) : $v) . $quote;
-    }
-    return implode(' ', $ret);
-}
-/* ------------------------------------------------------------------------ */
-function parseCSStr($str, $case_folding = true) {
-  $ret = array();
-  $a = explode(';', $str); // ??? what if ; in "" ?
-  foreach($a as $v) {
-     $v = explode(':', $v, 2);
-     $n = trim(reset($v));
-     if($case_folding) $n = strtolower($n);
-     $ret[$n] = count($v) == 2 ? trim(end($v)) : NULL;
-  }
-  unset($ret['']);
-  return $ret;
-}
-
-function CSSArr2Str($css) {
-   if(is_array($css)) {
-      ksort($css);
-      $ret = array();
-      foreach($css as $n => $v) $ret[] = $n.':'.$v;
-      return implode(';', $ret);
-   }
-   return $css;
-}
-/* ------------------------------------------------------------------------ */
-if(!function_exists('str_range')) {
-    function str_range($comp, $p=0, $l=NULL) {
-       $ret = array();
-       $b = strlen($comp);
-       if(!isset($l)) $l = $b; else if($l > $b) $l = $b;
-       $b = "\x0";
-       while($p < $l) {
-          switch($c = $comp[$p++]) {
-             case '\\': $b = substr($comp, $p, 1); $ret[$b] = $p++; break;
-             case '-':  $c_ = ord($c=substr($comp, $p, 1)); $b = ord($b);
-                        while($b++ < $c_) $ret[chr($b)] = $p;
-                        while($b-- > $c_) $ret[chr($b)] = $p;
-             break;
-             default: $ret[$b=$c] = $p;
-          }
-       }
-       return implode('', array_keys($ret));
-    }
-}
-/* ------------------------------------------------------------------------ */
-function value_merge(&$v1, $v2) {
-   if(!is_array($v1)) $v1 = array($v1);
-   if(is_array($v2)) {
-      foreach($v2 as $v) $v1[] = $v;
-   } else {
-      $v1[] = $v2;
-   }
-   return $v1;
-}
-/* ------------------------------------------------------------------------ */
-
-
-/* ------------------------------------------------------------------------ */
+// ------------------------------------------------------------------------
 /// The Main Class for HTML document
-/* ------------------------------------------------------------------------ */
+// ------------------------------------------------------------------------
 class hQuery extends CHTML_Parser_Doc {
 
-    public $headers; // Has to be set by HTTP method
-    
+    // Response headers when using self::fromURL()
+    public $headers;
+
     static public $cache_path;
     static public $cache_expires = 3600;
 
+    // ------------------------------------------------------------------------
+    /**
+     *  Parse and HTML string.
+     *
+     *  @return (hQuery)$doc
+     */
     static function fromHTML($html, $url=NULL) {
         $doc = new self($html, false);
         if($url) {
@@ -1606,13 +1652,28 @@ class hQuery extends CHTML_Parser_Doc {
         return $doc;
     }
 
+    /**
+     *  Read the HTML document from a file.
+     *
+     *  @return (hQuery)$doc
+     */
     static function fromFile($filename, $use_include_path=false, $context=NULL) {
-        $html = file_get_contentx($filename, $use_include_path, $context);
+        $html = file_get_contents($filename, $use_include_path, $context);
         if($html === false) return $html;
         return self::fromHTML($html, $filename);
     }
 
-    static function fromURL($url, $head=NULL, $body=NULL, $options=NULL) {
+    /**
+     *  Fetch the HTML document from remote $url.
+     *
+     *  @param (string)       $url     - the URL of the document
+     *  @param (array)        $headers - request headers
+     *  @param (array|string) $body    - body of the request (for POST or PUT)
+     *  @param (array)        $options - request options
+     *
+     *  @return (hQuery)$doc
+     */
+    static function fromURL($url, $headers=NULL, $body=NULL, $options=NULL) {
         $opt = array(
             'timeout'   => 7,
             'redirects' => 7,
@@ -1621,12 +1682,13 @@ class hQuery extends CHTML_Parser_Doc {
             'expires'   => self::$cache_expires,
         );
         $hd = array('Accept-Charset' => 'UTF-8,*');
-        
+
         if($options) $opt = $options + $opt;
-        if($head) $hd = $head + $hd;
-        
-        $expires = $opt['expires']; unset($opt['expires']);
-        
+        if($headers) $hd  = $headers + $hd;
+
+        $expires = $opt['expires'];
+        unset($opt['expires']);
+
         if(0 < $expires and $dir = self::$cache_path) {
             ksort($opt);
             $t = realpath($dir) and $dir = $t or mkdir($dir, 0766, true);
@@ -1640,38 +1702,45 @@ class hQuery extends CHTML_Parser_Doc {
                 $cch_fn .= $ext;
             }
             $cch_fn .= '.gz';
-            $ret = get_cchp($cch_fn, $expires, false);
+            $ret = self::get_cache($cch_fn, $expires, false);
             if($ret) {
                 $html = $ret[0];
                 $hdrs = $ret[1]['hdr'];
                 $code = $ret[1]['code'];
+                $url  = $ret[1]['url'];
                 $cch_meta = $ret[1];
-            } 
+            }
         }
         else {
             $ret = NULL;
         }
-        
+
         if(empty($ret)) {
-            $ret = http_wr($url, $hd, $body, $opt);
-            list($html, $hdrs, $code, $status_msg) = $ret;
+            $ret = self::http_wr($url, $hd, $body, $opt);
+            list($html, $hdrs, $code, $status_msg, $host, $port, $path) = $ret;
+            // Catch the redirects
+            switch($port) {
+                case 80 : $url = 'http://' .$host.$path; break;
+                case 443: $url = 'https://'.$host.$path; break;
+            }
             if(!empty($cch_fn)) {
-                $save = set_cchp($cch_fn, $html, array('hdr' => $hdrs, 'code' => $code));
+                $save = self::set_cache($cch_fn, $html, array('hdr' => $hdrs, 'code' => $code, 'url' => $url));
             }
         }
         if($code != 200) {
             return false;
         }
-        
+
         $doc = self::fromHTML($html, $url);
         if($doc) {
             $doc->headers = $hdrs;
             if(!empty($cch_meta)) $doc->cch_meta = $cch_meta;
         }
-        
+
         return $doc;
     }
-    
+
+    // ------------------------------------------------------------------------
 
     function index() { return $this->_index_all(); }
 
@@ -1707,7 +1776,7 @@ class hQuery extends CHTML_Parser_Doc {
             $a = func_get_arg($i);
             if(is_int($a)) $pos = $a;
             elseif(is_array($a))  $attr = array_merge($attr, $a);
-            elseif(is_string($a)) $attr = array_merge($attr, html_parseAttrStr($a));
+            elseif(is_string($a)) $attr = array_merge($attr, self::html_parseAttrStr($a));
             elseif(is_object($a)) {
                 if($a instanceof ADOM_Node) $ctx = $a;
                 else throw new Exception('Wrong context in ' . __METHOD__);
@@ -1716,7 +1785,7 @@ class hQuery extends CHTML_Parser_Doc {
         if(isset($ctx)) $ctx = $this->_get_ctx($ctx);
         if(!isset($attr)) $attr = array();
 
-        $sel = html_selector2struc($sel);
+        $sel = self::html_selector2struc($sel);
 
         $ra = NULL;
         // , //
@@ -1780,14 +1849,355 @@ class hQuery extends CHTML_Parser_Doc {
         return NULL;
     }
 
+    // - Helpers ------------------------------------------------
+
+    /// Read data from a cache file
+    protected static function get_cache($fn, $expire=false, $meta_only=false) {
+        $meta = $cnt = NULL;
+        if( $fm = @filemtime($fn) and (!$expire || $fm + $expire > time()) ) {
+            $cnt = self::flock_get_contents($fn);
+        }
+        $t = strlen($cnt);
+        if(!empty($cnt)) {
+            if($gz = !strncmp($cnt, "\x1F\x8B", 2)) {
+                $cnt = function_exists('gzdecode') ? gzdecode($cnt) : NULL;
+            }
+            if($cnt[0] == '#') {
+                $n = (int)substr($cnt, 1, 0x10);
+                $l = strlen($n) + 2;
+                if($n) {
+                    $meta = substr($cnt, $l, $n);
+                    if($meta !== '') $meta = unserialize($meta);
+                }
+                if($meta_only) $cnt = '';
+                else {
+                    $l += $n;
+                    if($cnt[$l] == "\n") {
+                        $cnt = substr($cnt, ++$l);
+                        if($cnt !== '') $cnt = unserialize($cnt);
+                    }
+                    else {
+                        $cnt = substr($cnt, $l);
+                    }
+                }
+            }
+            else {
+                if($meta_only) $cnt = '';
+            }
+        }
+        return $cnt || $meta ? array($cnt, $meta) : false;
+    }
+
+    /// Save data to a cache file
+    protected static function set_cache($fn, $cnt, $meta=NULL, $gzip=true) {
+        if($cnt === false) return !file_exists($fn) || unlink($fn);
+        $n = 0;
+        if(isset($meta)) {
+           $meta = serialize($meta);
+           $n += strlen($meta);
+        }
+        $meta = '#'.$n . "\n" . $meta;
+        if(!is_string($cnt) || $cnt[0] == "\n") { $cnt = "\n" . serialize($cnt); ++$n; }
+        if($n) $cnt = $meta . $cnt;
+        unset($meta);
+        @mkdir(dirname($fn), 0777, true);
+        if($gzip) {
+            $gl = is_int($gzip) ? $gzip : 1024;
+            strlen($cnt) > $gl && function_exists('gzdecode') and
+            $cnt = gzencode($cnt);
+        }
+        return self::flock_put_contents($fn, $cnt);
+    }
+
+    /**
+     * Lock with retries
+     *
+     * @param (resource)$fp         - Open file pointer
+     * @param (int)     $lock       - Lock type
+     * @param (int)     $timeout_ms - Timeout to wait for unlock in miliseconds
+     *
+     * @return true on success, false on fail
+     *
+     * @author Dumitru Uzun
+     *
+     */
+    static function do_flock($fp, $lock, $timeout_ms=384) {
+        $l = flock($fp, $lock);
+        if(!$l && ($lock & LOCK_UN) != LOCK_UN && ($lock & LOCK_NB) != LOCK_NB ) {
+            $st = microtime(true);
+            $m = min( 1e3, $timeout_ms*1e3);
+            $n = min(64e3, $timeout_ms*1e3);
+            if($m == $n) $m = ($n >> 1) + 1;
+            $timeout_ms = (float)$timeout_ms / 1000;
+            // If lock not obtained sleep for 0 - 64 milliseconds, to avoid collision and CPU load
+            do {
+                usleep($t = rand($m, $n));
+                $l = flock($fp, $lock);
+            } while ( !$l && (microtime(true)-$st) < $timeout_ms );
+        }
+        return $l;
+    }
+
+    static function flock_put_contents($fn, $cnt, $block=false) {
+       // return file_put_contents($fn, $cnt, $block & FILE_APPEND);
+       $ret = false;
+       if( $f = fopen($fn, 'c+') ) {
+           $app = $block & FILE_APPEND and $block ^= $app;
+           if( $block ? self::do_flock($f, LOCK_EX) : flock($f, LOCK_EX | LOCK_NB) ) {
+              if(is_array($cnt) || is_object($cnt)) $cnt = serialize($cnt);
+              if($app) fseek($f, 0, SEEK_END);
+              if(false !== ($ret = fwrite($f, $cnt))) ftruncate($f, ftell($f));
+              flock($f, LOCK_UN);
+           }
+           fclose($f);
+       }
+       return $ret;
+    }
+
+    static function flock_get_contents($fn, $block=false) {
+       // return file_get_contents($fn);
+       $ret = false;
+       if( $f = fopen($fn, 'r') ) {
+           if( flock($f, LOCK_SH | ($block ? 0 : LOCK_NB)) ) {
+              $s = 1 << 14 ;
+              do $ret .= $r = fread($f, $s); while($r !== false && !feof($f));
+              if($ret == NULL && $r === false) $ret = $r;
+              // filesize result is cached
+              flock($f, LOCK_UN);
+           }
+           fclose($f);
+       }
+       return $ret;
+    }
+    // ------------------------------------------------------------------------
+    /**
+     * Executes a HTTP write-read session.
+     *
+     * @param (string)$host - IP/HOST address or URL
+     * @param (array) $head - list off HTTP headers to be sent along with the request to $host
+     * @param (mixed) $body - data to be sent as the contents of the request. If is array or object, a http query is built.
+     * @param (array) $options - list of option as key-value:
+     *                              timeout - connection timeout in seconds
+     *                              host    - goes in headers, overrides $host (ex. $host == '127.0.0.1', $options['host'] == 'www.example.com')
+     *                              scheme  - ssl, tls, udp, ...
+     *                              close   - whether to close connection o not
+     *
+     * @return (array)response: [contents, headers, http-status-code, http-status-message]
+     *
+     * @author Dumitru Uzun
+     *
+     */
+    static function http_wr($host, $head=NULL, $body=NULL, $options=NULL) {
+        empty($options) and $options = array();
+        if($p = strpos($host, '://') and $p < 7) {
+            $p = parse_url($host);
+            if(!$p) throw new Exception('Wrong host specified'); // error
+            $host = $p['host'];
+            $path = @$p['path'];
+            if(isset($p['query'])) $path .= '?' . $p['query'];
+            if(isset($p['port'])) $port = $p['port'];
+            unset($p['path'], $p['query']);
+            $options += $p;
+        }
+        else {
+            $p = explode('/', $host, 2); list($host, $path) = $p;
+            $p = explode(':', $host, 2); list($host, $port) = $p;
+        }
+        if(strncmp($path, '/', 1)) $path = '/' . $path;
+        // isset($path) or $path = '/';
+
+        if(!isset($port)) {
+            if(isset($options['port'])) $port = $options['port']; else
+            switch($options['scheme']) {
+                case 'tls'  :
+                case 'ssl'  :
+                case 'https': $port = 443; break;
+                case 'ftp'  : $port = 21; break;
+                case 'sftp' : $port = 22; break;
+                case 'http' :
+                default     : $port = 80;
+            }
+        }
+
+        $_h = array('host'=>isset($options['host']) ? $options['host'] : $host);
+        if(@$options['scheme']) {
+            if(false === strpos('~http~ftp~', '~'.$p['scheme'].'~')) $host = $options['scheme'] . '://' . $host;
+        }
+
+        $boundary = "\r\n\r\n";
+        $blen = strlen($boundary);
+        if($body) {
+           if(is_array($body) || is_object($body)) {
+              $body = http_build_query($body);
+              $_h['content-type'] = 'application/x-www-form-urlencoded';
+           }
+           $body = (string)$body;
+           $_h['content-length'] = strlen($body);
+           $body .= $boundary;
+           empty($options['method']) and $options['method'] = 'POST';
+        }
+        else $body = NULL;
+
+        $meth = @$options['method'] and $meth = strtoupper($meth) or $meth = 'GET';
+
+        if($head) {
+           if(!is_array($head)) $head = explode("\r\n", $head);
+           foreach($head as $i => $v) {
+              if(is_int($i)) {
+                 $v = explode(':', $v, 2);
+                 if(count($v) != 2) continue; // Invalid header
+                 list($i, $v) = $v;
+              }
+              $i = strtolower(strtr($i, ' _', '--'));
+              $_h[$i] = trim($v);
+           }
+        }
+
+        if(@$options['decode'] == 'gzip') {
+            if(function_exists('gzdecode')) {
+                $_h['accept-encoding'] = 'gzip';
+            }
+            else {
+                $options['decode'] = NULL;
+            }
+        }
+
+        if(!isset($options['close']) || @$options['close']) {
+            $_h['connection'] = 'close';
+        }
+        else {
+            $_h['connection'] = 'keep-alive';
+        }
+
+        $prot = @$options['protocol'] or $prot = 'HTTP/1.1';
+
+        $head = array("$meth $path $prot");
+        foreach($_h as $i => $v) {
+            $i = explode('-', $i);
+            foreach($i as &$j) $j = ucfirst($j);
+            $i = implode('-', $i);
+            $head[] = $i . ': ' . $v;
+        }
+        $rqst = implode("\r\n", $head) . $boundary . $body;
+        $head = $body = NULL;
+
+        $timeout = isset($options['timeout']) ? $options['timeout'] : @ini_get("default_socket_timeout");
+
+       // ------------------- Connection and data transfer -------------------
+       $errno  =
+       $errstr =
+       $rsps   = '';
+       $h = $_rh = NULL;
+       $fs = @fsockopen($host, $port, $errno, $errstr, $timeout);
+       if(!$fs) throw new Exception('unable to create socket "'.$host.':'.$port.'"'.$errstr, $errno);
+       if(!fwrite($fs, $rqst)) {
+          throw new Exception("unable to write");
+       }
+       else {
+          $l = $blen - 1;
+          // read headers
+          while($open = !feof($fs) && ($p = @fgets($fs, 1024))) {
+             if($p == "\r\n") break;
+             $rsps .= $p;
+          }
+
+          if($rsps) {
+               $h = explode("\r\n", rtrim($rsps));
+               list($rprot, $rcode, $rmsg) = explode(' ', array_shift($h), 3);
+               foreach($h as $v) {
+                  $v = explode(':', $v, 2);
+                  $_rh[strtoupper(strtr($v[0], '- ', '__'))] = isset($v[1]) ? trim($v[1]) : NULL;
+               }
+               $rsps = NULL;
+               switch($rcode) {
+                  case 301:
+                  case 302:
+                     if( @$options['redirects'] > 0 && $loc = @$_rh['LOCATION'] ) {
+                         if(!is_abs_path($loc)) {
+                            $loc = $host.':'.$port.'/'.ltrim($loc, '/');
+                         }
+                         else {
+                            unset($_h['host'], $options['host'], $options['port']);
+                         }
+                         unset($options['method']);
+                         --$options['redirects'];
+                         // ??? could save cookies for redirect
+                         return self::http_wr($loc, $_h, NULL, $options);
+                     }
+                  break;
+               }
+               // Detect body length
+               if(@!$open || $rcode < 200 || $rcode == 204 || $rcode == 304 || $meth == 'HEAD') {
+                  $te = 1;
+               }
+               elseif(strtolower($_rh['TRANSFER_ENCODING']) == 'chunked') {
+                  $te = 3;
+               }
+               elseif(isset($_rh['CONTENT_LENGTH'])) {
+                  $bl = (int)$_rh['CONTENT_LENGTH'];
+                  $te = 2;
+               }
+               switch($te) {
+                  case 1:
+                     break;
+                  case 2:
+                     while($bl > 0 and $open &= !feof($fs) && ($p = @fread($fs, $bl))) {
+                        $rsps .= $p;
+                        $bl -= strlen($p);
+                     }
+                     break;
+                  case 3:
+                     while($open &= !feof($fs) && ($p = @fgets($fs, 1024))) {
+                        $cs = reset(explode(';', rtrim($p)));
+                        $bl = hexdec($cs);
+                        if(!$bl) break; // empty chunk
+                         while($bl > 0 and $open &= !feof($fs) && ($p = @fread($fs, $bl))) {
+                            $rsps .= $p;
+                            $bl -= strlen($p);
+                         }
+                         @fgets($fs, 3); // \r\n
+                     }
+                     if($open &= !feof($fs) && ($p = @fgets($fs, 1024))) {
+                        if($p = rtrim($p)) {
+                            // ??? Trailer Header
+                            $v = explode(':', $p, 2);
+                            $_rh[strtoupper(strtr($v[0], '- ', '__'))] = isset($v[1]) ? trim($v[1]) : NULL;
+                            @fgets($fs, 3); // \r\n
+                        }
+                     }
+                     break;
+                  default:
+                         while($open &= !feof($fs) && ($p = @fread($fs, 1024))) { // ???
+                            $rsps .= $p;
+                         }
+                     break;
+               }
+
+               if($rsps != '' && @$options['decode'] == 'gzip' && @$_rh['CONTENT_ENCODING'] == 'gzip' && function_exists('gzdecode')) {
+                  $r = gzdecode($rsps);
+                  if($r !== false) {
+                     unset($_rh['CONTENT_ENCODING']);
+                     $rsps = $r;
+                  }
+               }
+                      //     contents  headers  status-code  status-message
+               return array( $rsps,    @$_rh,   $rcode,      $rmsg,           $host, $port, $path, $rqst  );
+          }
+       }
+       fclose($fs);
+
+       return false; // no response
+    }
+    // ------------------------------------------------------------------------
+
 };
 
-/* ------------------------------------------------------------------------ */
+// ------------------------------------------------------------------------
 class HTML_Node extends ADOM_Node {
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
     // Iterator
     protected $_ich = NULL; // Iterator Cache
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
     function toArray($cch=true) {
         if($cch && isset($this->_ich) && count($this->ids) === count($this->_ich)) return $this->_ich;
         $ret = array();
@@ -1804,7 +2214,7 @@ class HTML_Node extends ADOM_Node {
         return $ret;
     }
 
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
     function __get($name) {
         switch($name) {
             case 'html'     : return $this->html();
@@ -1838,7 +2248,7 @@ class HTML_Node extends ADOM_Node {
                 return $this->attr($name);
         }
     }
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
     public function offsetSet($offset, $value) {
         if(is_null($offset)) {
             // $this->_data[] = $value; // ???
@@ -1879,7 +2289,7 @@ class HTML_Node extends ADOM_Node {
             unset($this->_prop[$offset]);
         }
     }
-    /* ----------------------------------------- */
+    // ------------------------------------------------------------------------
 
     function val() {
         switch(strtoupper($this->nodeName(false))) {
@@ -1967,5 +2377,6 @@ class HTML_Node extends ADOM_Node {
 
 };
 
+// ------------------------------------------------------------------------
 
 ?>
