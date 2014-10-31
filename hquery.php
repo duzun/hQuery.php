@@ -4,7 +4,7 @@
  *  Copyright (C) 2014 Dumitru Uzun
  *
  *  @author Dumitru Uzun (DUzun.ME)
- *  @ver 1.0.2
+ *  @ver 1.0.3
  */
 // ------------------------------------------------------------------------
 
@@ -872,6 +872,9 @@ class CHTML_Parser_Doc extends ADOM_Node {
     function __get($name) {
         if(array_key_exists($name, $this->_prop)) return $this->_prop[$name];
         switch($name) {
+            case 'size':
+                return $this->strlen();
+
             case 'baseURI':
                 return $this->baseURI();
 
@@ -888,6 +891,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
                     $c = self::detect_charset($this->html);
                     return $c;
                 }
+            break;
         }
     }
 
@@ -932,7 +936,10 @@ class CHTML_Parser_Doc extends ADOM_Node {
                 $t = self::get_url_base($href, true);
                 if(!$t) return false;
                 list($bh, $bu) = $t;
-            } else $bh = $bu = NULL;
+            }
+            else {
+                $bh = $bu = NULL;
+            }
             $this->_prop['hostURL'] = $bh;
             $this->_prop['baseURL'] = $bu;
             $this->_prop['baseURI'] = $href;
@@ -1217,7 +1224,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
                 ++$i;
                 $c = $o->h[$i];
             }
-            
+
 
             // usual tags
             if(strpos($fl, $c) !== false) {
@@ -1272,7 +1279,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
             }
             elseif(!$w) {
                 // special tags
-                if(isset($st[$c])) {  
+                if(isset($st[$c])) {
                     $b--;
                     if(isset($o->tg[$b])) {
                         $i = $o->tg[$b];
@@ -1717,12 +1724,13 @@ class hQuery extends CHTML_Parser_Doc {
 
         if(empty($ret)) {
             $ret = self::http_wr($url, $hd, $body, $opt);
-            list($html, $hdrs, $code, $status_msg, $host, $port, $path) = $ret;
+            $html = $ret->body;
+            $code = $ret->code;
+            $hdrs = $ret->headers;
+
             // Catch the redirects
-            switch($port) {
-                case 80 : $url = 'http://' .$host.$path; break;
-                case 443: $url = 'https://'.$host.$path; break;
-            }
+            if($ret->url) $url = $ret->url;
+
             if(!empty($cch_fn)) {
                 $save = self::set_cache($cch_fn, $html, array('hdr' => $hdrs, 'code' => $code, 'url' => $url));
             }
@@ -1970,6 +1978,47 @@ class hQuery extends CHTML_Parser_Doc {
        return $ret;
     }
     // ------------------------------------------------------------------------
+    static function is_url_path($path) {
+        return preg_match('/^[a-zA-Z]+\:\/\//', $path);
+    }
+
+    static function is_abs_path($path) {
+        $ds = array('\\'=>1,'/'=>2);
+        if( isset($ds[substr($path, 0, 1)]) ||
+            substr($path, 1, 1) == ':' && isset($ds[substr($path, 2, 1)])
+        ) {
+            return true;
+        }
+        if(($l=strpos($path, '://')) && $l < 32) return $l;
+        return false;
+    }
+
+    static function abs_url($url, $base) {
+        if(!self::is_url_path($url)) {
+            $t = parse_url($base);
+            if(substr($url, 0, 2) == '//') {
+                $url = (empty($t['scheme']) ? 'http' : $t['scheme']) . ':' . $url;
+            }
+            else {
+                $base = $t['scheme'] . '://' . $t['host'] . (empty($t['port'])?'':':'.$t['port']);
+                if(!empty($t['path'])) {
+                    $s = dirname($t['path']);
+                    if($s && $s !== '.' && $s !== '/' && substr($url, 0, 1) !== '/') {
+                        $base .= '/' . ltrim($s, '/');
+                    }
+                }
+                $url = rtrim($base, '/') . '/' . ltrim($url, '/');
+            }
+        }
+        else {
+            $p = strpos($url, ':');
+            if( substr($url, $p+3, 1) === '/' && in_array(substr($url, 0, $p), array('http','https')) ) {
+                $url = substr($url, 0, $p+3) . ltrim(substr($url, $p+3), '/');
+            }
+        }
+        return $url;
+    }
+    // ------------------------------------------------------------------------
     /**
      * Executes a HTTP write-read session.
      *
@@ -1988,8 +2037,10 @@ class hQuery extends CHTML_Parser_Doc {
      *
      */
     static function http_wr($host, $head=NULL, $body=NULL, $options=NULL) {
+        $ret = (object)(array());
         empty($options) and $options = array();
         if($p = strpos($host, '://') and $p < 7) {
+            $ret->url = $host;
             $p = parse_url($host);
             if(!$p) throw new Exception('Wrong host specified'); // error
             $host = $p['host'];
@@ -2019,9 +2070,22 @@ class hQuery extends CHTML_Parser_Doc {
             }
         }
 
-        $_h = array('host'=>isset($options['host']) ? $options['host'] : $host);
-        if(@$options['scheme']) {
-            if(false === strpos('~http~ftp~', '~'.$p['scheme'].'~')) $host = $options['scheme'] . '://' . $host;
+        $ret->host = $host;
+        $_h = array(
+            'host'   => isset($options['host']) ? $options['host'] : $host,
+            'accept' => 'text/html,application/xhtml+xml,application/xml;q =0.9,*/*;q=0.8',
+        );
+        if(!empty($options['scheme'])) {
+            switch($p['scheme']) {
+                case 'http':
+                case 'ftp':
+                break;
+                case 'https':
+                    $host = 'tls://' . $host;
+                break;
+                default:
+                    $host = $options['scheme'] . '://' . $host;
+            }
         }
 
         $boundary = "\r\n\r\n";
@@ -2069,7 +2133,7 @@ class hQuery extends CHTML_Parser_Doc {
             $_h['connection'] = 'keep-alive';
         }
 
-        $prot = @$options['protocol'] or $prot = 'HTTP/1.1';
+        $prot = empty($options['protocol']) ? 'HTTP/1.1' : $options['protocol'];
 
         $head = array("$meth $path $prot");
         foreach($_h as $i => $v) {
@@ -2082,6 +2146,8 @@ class hQuery extends CHTML_Parser_Doc {
         $head = $body = NULL;
 
         $timeout = isset($options['timeout']) ? $options['timeout'] : @ini_get("default_socket_timeout");
+
+        $ret->options = $options;
 
        // ------------------- Connection and data transfer -------------------
        $errno  =
@@ -2112,17 +2178,13 @@ class hQuery extends CHTML_Parser_Doc {
                switch($rcode) {
                   case 301:
                   case 302:
+                  case 303:
                      if( @$options['redirects'] > 0 && $loc = @$_rh['LOCATION'] ) {
-                         if(!is_abs_path($loc)) {
-                            $loc = $host.':'.$port.'/'.ltrim($loc, '/');
-                         }
-                         else {
-                            unset($_h['host'], $options['host'], $options['port']);
-                         }
-                         unset($options['method']);
-                         --$options['redirects'];
-                         // ??? could save cookies for redirect
-                         return self::http_wr($loc, $_h, NULL, $options);
+                        $loc = self::abs_url($loc, (empty($options['scheme'])?'':$options['scheme'].'//').$host.':'.$port.(empty($options['path'])?'':$options['path']));
+                        unset($_h['host'], $options['host'], $options['port'], $options['scheme'], $options['method']);
+                        --$options['redirects'];
+                        // ??? could save cookies for redirect
+                        return self::http_wr($loc, $_h, NULL, $options);
                      }
                   break;
                }
@@ -2130,7 +2192,7 @@ class hQuery extends CHTML_Parser_Doc {
                if(@!$open || $rcode < 200 || $rcode == 204 || $rcode == 304 || $meth == 'HEAD') {
                   $te = 1;
                }
-               elseif(strtolower($_rh['TRANSFER_ENCODING']) == 'chunked') {
+               elseif(isset($_rh['TRANSFER_ENCODING']) && strtolower($_rh['TRANSFER_ENCODING']) === 'chunked') {
                   $te = 3;
                }
                elseif(isset($_rh['CONTENT_LENGTH'])) {
@@ -2180,8 +2242,21 @@ class hQuery extends CHTML_Parser_Doc {
                      $rsps = $r;
                   }
                }
+               $ret->code    = $rcode;
+               $ret->msg     = $rmsg;
+               $ret->headers = isset($_rh) ? $_rh : NULL;
+               $ret->body    = $rsps;
+               $ret->method  = $meth;
+               // $ret->host    = $host;
+               $ret->port    = $port;
+               $ret->path    = $path;
+               $ret->request = $rqst;
+
+               return $ret;
+
+               // Old return:
                       //     contents  headers  status-code  status-message
-               return array( $rsps,    @$_rh,   $rcode,      $rmsg,           $host, $port, $path, $rqst  );
+               // return array( $rsps,    @$_rh,   $rcode,      $rmsg,           $host, $port, $path, $rqst  );
           }
        }
        fclose($fs);
