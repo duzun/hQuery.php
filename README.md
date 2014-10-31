@@ -5,12 +5,14 @@ An extremely fast and efficient HTML parser that parses megabytes of HTML in a b
 
 # Features
 
+  - Very fast parsing and lookup  
   - Parses broken HTML
   - jQuery-like style of DOM traversal
-  - Very fast parsing and lookup
   - Low memory usage
   - Can handle big HTML documents (I have tested up to 20Mb, but the limit is the amount of RAM you have)
   - Doesn't require cURL to be installed
+  - Automatically handles redirects (301, 302, 303)
+  - Caches response for multiple processing tasks
   - PHP 5+
   
   
@@ -18,6 +20,9 @@ An extremely fast and efficient HTML parser that parses megabytes of HTML in a b
   
     include '/path/to/libs/hquery.php';
   
+    // Set the cache path - must be a writable folder
+    hQuery::$cache_path = "/path/to/cache";
+
     // Open a remote HTML document
     $doc = hQuery::fromUrl('http://example.com/someDoc.html');
   
