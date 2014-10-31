@@ -1,7 +1,8 @@
 hQuery.php
 ==========
 
-An extremely fast and efficient HTML parser that parses megabytes of HTML in a blink of an eye.
+An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye.
+
 
 # Features
 
