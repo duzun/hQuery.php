@@ -4,7 +4,7 @@
  *  Copyright (C) 2014 Dumitru Uzun
  *
  *  @author Dumitru Uzun (DUzun.ME)
- *  @ver 1.0.3
+ *  @ver 1.0.4
  */
 // ------------------------------------------------------------------------
 
@@ -820,7 +820,8 @@ class IDOM_Context extends ADOM_Node {
         if($el_arr instanceof parent) {
            if(!$doc) $doc = $el_arr->doc();
            $el_arr = $el_arr->ids;
-        } elseif(is_array($el_arr)) ksort($el_arr);
+        }
+        elseif(is_array($el_arr)) ksort($el_arr);
         parent::__construct($doc, $el_arr, true);
     }
 
@@ -1638,6 +1639,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
 // ------------------------------------------------------------------------
 class hQuery extends CHTML_Parser_Doc {
 
+    // ------------------------------------------------------------------------
     // Response headers when using self::fromURL()
     public $headers;
 
@@ -1651,11 +1653,14 @@ class hQuery extends CHTML_Parser_Doc {
      *  @return (hQuery)$doc
      */
     static function fromHTML($html, $url=NULL) {
+        $index_time = microtime(true);
         $doc = new self($html, false);
         if($url) {
             $doc->location($url);
         }
         $doc->index();
+        $index_time = microtime(true) - $index_time;
+        $doc->index_time = $index_time * 1000;
         return $doc;
     }
 
@@ -1665,9 +1670,14 @@ class hQuery extends CHTML_Parser_Doc {
      *  @return (hQuery)$doc
      */
     static function fromFile($filename, $use_include_path=false, $context=NULL) {
+        $read_time = microtime(true);
         $html = file_get_contents($filename, $use_include_path, $context);
+        $read_time = microtime(true) - $read_time;
         if($html === false) return $html;
-        return self::fromHTML($html, $filename);
+        $doc = self::fromHTML($html, $filename);
+        $doc->source_type = 'file';
+        $doc->read_time = $read_time * 1000;
+        return $doc;
     }
 
     /**
@@ -1709,8 +1719,11 @@ class hQuery extends CHTML_Parser_Doc {
                 $cch_fn .= $ext;
             }
             $cch_fn .= '.gz';
+            $read_time = microtime(true);
             $ret = self::get_cache($cch_fn, $expires, false);
+            $read_time = microtime(true) - $read_time;
             if($ret) {
+                $source_type = 'cache';
                 $html = $ret[0];
                 $hdrs = $ret[1]['hdr'];
                 $code = $ret[1]['code'];
@@ -1723,7 +1736,10 @@ class hQuery extends CHTML_Parser_Doc {
         }
 
         if(empty($ret)) {
+            $source_type = 'url';
+            $read_time = microtime(true);
             $ret = self::http_wr($url, $hd, $body, $opt);
+            $read_time = microtime(true) - $read_time;
             $html = $ret->body;
             $code = $ret->code;
             $hdrs = $ret->headers;
@@ -1742,6 +1758,8 @@ class hQuery extends CHTML_Parser_Doc {
         $doc = self::fromHTML($html, $url);
         if($doc) {
             $doc->headers = $hdrs;
+            $doc->source_type = $source_type;
+            isset($read_time) and $doc->read_time = $read_time * 1000;
             if(!empty($cch_meta)) $doc->cch_meta = $cch_meta;
         }
 
