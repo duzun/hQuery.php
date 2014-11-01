@@ -57,6 +57,9 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
     $size = $doc->size;
   
   
+# Demo
+  On [DUzun.Me](https://duzun.me/playground/hquery#sel=%20a%20%3E%20img%3Aparent&url=https%3A%2F%2Fgithub.com%2Fduzun)
+  
 #TODO
 
   - Document everything
