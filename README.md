@@ -18,7 +18,7 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
   
   
 # Usage
-  
+  ```php
     include '/path/to/libs/hquery.php';
   
     // Set the cache path - must be a writable folder
@@ -55,13 +55,14 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
   
     // Get the size of the document ( strlen($heml) )
     $size = $doc->size;
-  
+  ```
   
 # Demo
   On [DUzun.Me](https://duzun.me/playground/hquery#sel=%20a%20%3E%20img%3Aparent&url=https%3A%2F%2Fgithub.com%2Fduzun)
   
 #TODO
 
+  - Add Unit tests
   - Document everything
   - Add more selectors
   - Improve selectors to be able to select by attributes
