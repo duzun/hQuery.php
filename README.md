@@ -53,7 +53,7 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
     // Read charset of the original document (internally it is converted to UTF-8)
     $charset = $doc->charset;
   
-    // Get the size of the document ( strlen($heml) )
+    // Get the size of the document ( strlen($html) )
     $size = $doc->size;
   ```
   
