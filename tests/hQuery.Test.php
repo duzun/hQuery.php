@@ -71,7 +71,7 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
     public function testFind() {
         // 1)
         $a = self::$inst->find('.test-class #test-div.test-div > a');
-        
+
         $this->assertNotEmpty($a);
         $this->assertTrue($a instanceof HTML_Node);
         $this->assertEquals('a', $a->nodeName);
@@ -79,12 +79,14 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
         $this->assertEquals('https://DUzun.Me/path', $a->attr('href'));
         $this->assertEquals('div', $a->parent->nodeName);
         $this->assertEquals('test-div', $a->parent->attr('id'));
-        
+
         // 2)
     }
 
     // -----------------------------------------------------
-    
+    public function testHttp_wr() {
+        // @TODO
+    }
 
     // -----------------------------------------------------
     // -----------------------------------------------------
