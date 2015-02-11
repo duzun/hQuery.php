@@ -1,0 +1,26 @@
+# Enforce LF line endings (notepad++ can handle it)
+* text eol=lf
+
+# Text file extensions
+*.php  text  eol=lf
+*.js   text  eol=lf
+*.json text  eol=lf
+*.css  text  eol=lf
+*.less text  eol=lf
+*.inf  text  eol=lf
+*.txt  text
+*.html text  eol=lf
+*.htm  text  eol=lf
+
+
+# Binary file extensions
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.dat binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.phar binary
+

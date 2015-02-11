@@ -1,0 +1,38 @@
+{
+ "name": "hQuery",
+ "description": "Peer to Peer Entropy Generator (or Random numbers generator with p2p seeding)",
+ "version": "1.0.4",
+ "author": {
+    "name": "Dumitru Uzun",
+    "email": "contact@duzun.me",
+    "url": "https://DUzun.Me"
+ },
+ "homepage": "https://duzun.me/playground/hquery",
+ "keywords": [
+  "HTML",
+  "web",
+  "scraper",
+  "scraping",
+  "crawling",
+  "PHP"
+ ],
+ "main": "hQuery.php",
+ "repository": {
+  "type": "git",
+  "url": "https://github.com/duzun/hQuery.php.git"
+ },
+ "engines": {},
+ "scripts": {
+  "test": "phpunit ./tests/",
+  "test-dev": "node tests/test_watcher.js"
+ },
+ "license": [
+  {
+   "type": "MIT",
+   "url": "http://github.com/duzun/hQuery.php/raw/master/LICENSE"
+  }
+ ],
+ "devDependencies": {
+  "watch": "^0.13.0"
+ }
+}
