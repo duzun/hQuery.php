@@ -1,4 +1,4 @@
-hQuery.php
+hQuery.php   [![Build Status](https://travis-ci.org/duzun/hQuery.php.svg?branch=master)](https://travis-ci.org/duzun/hQuery.php)
 ==========
 
 An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye.
