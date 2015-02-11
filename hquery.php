@@ -2228,7 +2228,8 @@ class hQuery extends CHTML_Parser_Doc {
                      break;
                   case 3:
                      while($open &= !feof($fs) && ($p = @fgets($fs, 1024))) {
-                        $cs = reset(explode(';', rtrim($p)));
+                        $_re = explode(';', rtrim($p)); 
+                        $cs = reset($_re);
                         $bl = hexdec($cs);
                         if(!$bl) break; // empty chunk
                          while($bl > 0 and $open &= !feof($fs) && ($p = @fread($fs, $bl))) {
