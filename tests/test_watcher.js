@@ -68,10 +68,9 @@ function check_phpunit_phar(cb) {
         var file = fs.createWriteStream(_phpunit_path);
         http.get(_phpunit_url, function(response) {
             response.pipe(file);
-            response.on('done', function (err) {
-                console.log('done', arguments);
+            response.on('end', function (err) {
                 cb(err);
-            })
+            });
         });
     }
     else {
