@@ -104,6 +104,9 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
         $this->assertEquals('test-div', $a->parent->attr('id'));
 
         // 2)
+        $ff = TestHQueryTests::fromFile(__DIR__ . '/data/attr.html');
+        $aa = $ff->find('a.aa');
+        $this->assertEquals(3, count($aa));
     }
 
     // -----------------------------------------------------

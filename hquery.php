@@ -643,44 +643,33 @@ abstract class ADOM_Node implements Iterator, Countable {
 
     // ------------------------------------------------------------------------
     static function html_findTagClose($str, $p) {
-        if($i = strpos($str, '>', $p)) {
-            $qs = "\"'"; // quotes
+        $l = strlen($str);
+        while ( $i = $p < $l ? strpos($str, '>', $p) : $l ) {
             $e = $p; // save pos
-            $p += strcspn($str, $qs, $p, $i);
-            // If closest quote is after '>', return quickly
+            $p += strcspn($str, '"\'', $p, $i);
+            
+            // If closest quote is after '>', return pos of '>'
             if ( $p >= $i ) return $i;
 
             // If there is any quote before '>', make sure '>' is outside an attribute string
-            $l = strlen($str);
-            do {
-                $q = $str[$p]; // " | ' ?
-                ++$p; // next char after the quote
+            $q = $str[$p]; // " | ' ?
+            ++$p; // next char after the quote
 
-                $e += strcspn($str, '=', $e, $p); // is there a '=' before first quote?
-                $is_attr_name = $e >= $p; // if no, this is the attribute name
-                
-                // "attr_name"="attr_value"
-                if ( $is_attr_name ) {
-                    // Attribute name should not have '>'
-                    $p += strcspn($str, '>' . $q, $p, $l);
-                    // but if it has '>', it is the tag closing char
-                    if ( $str[$p] == '>' ) return $p;
-                }
-                // is attr_value
-                else {
-                    $p += strcspn($str, $q, $p, $l);
-                }
-                
-                ++$p; // next char after the quote
-                
-                // If previous '>' is inside "attr>ibute", find next '>'
-                if ( $p > $i ) {
-                    $i = strpos($str, '>', $p);
-                    if(!$i) break;
-                }
-                $e = $p; // save pos
-                $p += strcspn($str, $qs, $p, $i);
-            } while($p < $i);
+            $e += strcspn($str, '=', $e, $p); // is there a '=' before first quote?
+            
+            // is this the attr_name (like in "attr_name"="attr_value") ?
+            if ( $e >= $p ) {
+                // Attribute name should not have '>'
+                $p += strcspn($str, '>' . $q, $p, $l);
+                // but if it has '>', it is the tag closing char
+                if ( $str[$p] == '>' ) return $p;
+            }
+            // else, its attr_value
+            else {
+                $p += strcspn($str, $q, $p, $l);
+            }
+            
+            ++$p; // next char after the quote
         }
         return $i;
     }
