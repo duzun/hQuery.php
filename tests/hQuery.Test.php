@@ -10,7 +10,7 @@ require_once dirname(dirname(__FILE__)) . '/hquery.php';
 // -----------------------------------------------------
 // Surogate class for testing, to access protected attributes of hQuery
 class TestHQueryTests extends hQuery {
-
+    public $class_idx;
 }
 // -----------------------------------------------------
 
@@ -65,6 +65,29 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
         $this->assertMehodExists('fromHTML', self::$className);
         $this->assertMehodExists('fromFile', self::$className);
         $this->assertMehodExists('fromURL' , self::$className);
+    }
+
+    // -----------------------------------------------------
+    public function test_static_html_findTagClose() {
+        // A string with misplaced quotes inside a tag
+        $str1 = '<img class="map>Img" "src"="https://cdn.duzun.lh/images/logo.png"">
+                 <div class="overlayLowlightoverlayBottom">abra-kadabra</div>
+               ';
+        $str2 = '<img "class"="mapImg" title="What <br>a nice day for testing!!!" ">
+                 <div class="overlayLowlightoverlayBottom">abra-kadabra</div>
+               ';
+        $str3 = "<img 'class 4 mapImg' title='What <br>a nice day for testing!!' ''>
+                 <div class='overlayLowlightoverlayBottom'>abra-kadabra</div>
+               ";
+
+        $r = hQuery::html_findTagClose($str1, 1);
+        $this->assertEquals(66, $r);
+
+        $r = hQuery::html_findTagClose($str2, 1);
+        $this->assertEquals(66, $r);
+
+        $r = hQuery::html_findTagClose($str3, 1);
+        $this->assertEquals(66, $r);
     }
 
     // -----------------------------------------------------

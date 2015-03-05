@@ -644,18 +644,43 @@ abstract class ADOM_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
     static function html_findTagClose($str, $p) {
         if($i = strpos($str, '>', $p)) {
-            $p += strcspn($str, $qs="\"'", $p, $i);
+            $qs = "\"'"; // quotes
+            $e = $p; // save pos
+            $p += strcspn($str, $qs, $p, $i);
+            // If closest quote is after '>', return quickly
+            if ( $p >= $i ) return $i;
+
+            // If there is any quote before '>', make sure '>' is outside an attribute string
             $l = strlen($str);
-            while($p < $i) {
-                $q = $str[$p];
-                ++$p;
-                $p += strcspn($str, $q, $p, $l);
-                if(++$p > $i) {
+            do {
+                $q = $str[$p]; // " | ' ?
+                ++$p; // next char after the quote
+
+                $e += strcspn($str, '=', $e, $p); // is there a '=' before first quote?
+                $is_attr_name = $e >= $p; // if no, this is the attribute name
+                
+                // "attr_name"="attr_value"
+                if ( $is_attr_name ) {
+                    // Attribute name should not have '>'
+                    $p += strcspn($str, '>' . $q, $p, $l);
+                    // but if it has '>', it is the tag closing char
+                    if ( $str[$p] == '>' ) return $p;
+                }
+                // is attr_value
+                else {
+                    $p += strcspn($str, $q, $p, $l);
+                }
+                
+                ++$p; // next char after the quote
+                
+                // If previous '>' is inside "attr>ibute", find next '>'
+                if ( $p > $i ) {
                     $i = strpos($str, '>', $p);
                     if(!$i) break;
                 }
+                $e = $p; // save pos
                 $p += strcspn($str, $qs, $p, $i);
-            }
+            } while($p < $i);
         }
         return $i;
     }
@@ -1127,11 +1152,15 @@ class CHTML_Parser_Doc extends ADOM_Node {
       foreach($ian as $atn) if(!isset($iax[$atn])) $iax[$atn] = self::$_ar_;
       foreach($attrs as $str => $v) {
          $a = self::html_parseAttrStr($str, true, false);
-         unset($attrs[$str]);
+         unset($attrs[$str]); // free mem
          foreach($ian as $atn) {
              if(isset($a[$atn])) { // href attribute has a separate index
-                if(is_array($v)) foreach($v as $e) $iax[$atn][$e] = $a[$atn];
-                else $iax[$atn][$v] = $a[$atn];
+                if(is_array($v)) {
+                    foreach($v as $e) $iax[$atn][$e] = $a[$atn];
+                }
+                else {
+                    $iax[$atn][$v] = $a[$atn];
+                }
                 unset($a[$atn]);
              }
          }
@@ -1143,18 +1172,22 @@ class CHTML_Parser_Doc extends ADOM_Node {
             if(!is_array($iix[$aid])) $iix[$aid] = array($iix[$aid]);
             if(is_array($v)) foreach($v as $v_) $iix[$aid][] = $v_;
             else $iix[$aid][] = $v;
-         } else {
+         }
+         else {
             $six[$str] = $aid;
             $aix[$aid] = $a;
             $iix[$aid] = $v;
             ++$i;
          }
       }
-      unset($six, $attrs, $i);
+      unset($six, $attrs, $i); // free mem
       foreach($aix as $aid => $a) {
          $v = $iix[$aid];
          if(is_array($v)) {
-            if(count($v) == 1) $v = reset($v); elseif($v) {
+            if(count($v) == 1) {
+              $v = reset($v);
+            }
+            elseif($v) {
               $u = array();
               foreach($v as $e) {
                  $u[$e] = $this->ids[$e];
@@ -1170,23 +1203,25 @@ class CHTML_Parser_Doc extends ADOM_Node {
       $this->idx_attr = $iax;
       $this->attribs = $aix;
 
-      // debug($this->attribs);
-      // debug($this->idx_attr);
       return $this->attr_idx;
    }
 
    /// index all classes by class-name at aids
    private function _index_classes() {
-      $ix = array(); $aix = $this->attr_idx;
+      $ix = array();
+      $aix = $this->attr_idx;
       foreach($this->attribs as $aid => &$a) {
          if(!empty($a['class'])) {
            $cl = $a['class'];
-           if(!is_array($cl)) $cl = preg_split('|\\s+|',trim($cl));
+           if(!is_array($cl)) {
+                $cl = preg_split('|\\s+|',trim($cl));
+           }
            foreach($cl as $cl) {
               if(isset($ix[$cl])) {
                 if(!is_array($ix[$cl])) $ix[$cl] = array($ix[$cl]=>$this->attr_idx[$ix[$cl]]);
                 $ix[$cl][$aid] = $this->attr_idx[$aid];
-              } else {
+              }
+              else {
                 $ix[$cl] = $aid;
               }
            }
@@ -1225,7 +1260,6 @@ class CHTML_Parser_Doc extends ADOM_Node {
                 ++$i;
                 $c = $o->h[$i];
             }
-
 
             // usual tags
             if(strpos($fl, $c) !== false) {
@@ -1472,7 +1506,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
       $aids = self::$_ar_;
       if(isset($actx) && !$actx) return $aids;
       if(!is_array($cl)) $cl = preg_split('|\\s+|',trim($cl));
-      if(!$cl) $cl = array_keys($this->class_idx); // efectul multimii vide
+      if(!$cl) $cl = array_keys($this->class_idx); // the empty set effect
       foreach($cl as $cl) if(isset($this->class_idx[$cl])) {
          $aid = $this->class_idx[$cl];
          if(!$actx) {
@@ -1654,7 +1688,7 @@ class hQuery extends CHTML_Parser_Doc {
      */
     static function fromHTML($html, $url=NULL) {
         $index_time = microtime(true);
-        $doc = new self($html, false);
+        $doc = new static($html, false); // Return an instance of actual class
         if($url) {
             $doc->location($url);
         }
