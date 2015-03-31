@@ -4,7 +4,7 @@
  *  Copyright (C) 2014 Dumitru Uzun
  *
  *  @author Dumitru Uzun (DUzun.ME)
- *  @ver 1.0.4
+ *  @ver 1.1.0
  */
 // ------------------------------------------------------------------------
 
@@ -19,6 +19,8 @@ abstract class ADOM_Node implements Iterator, Countable {
     static $_tr_ = true        ;
 
     static $selected_doc = NULL;
+    // ------------------------------------------------------------------------
+    static $last_http_result;
     // ------------------------------------------------------------------------
     protected $_prop; // Properties
     protected $doc; // Parent doc
@@ -647,7 +649,7 @@ abstract class ADOM_Node implements Iterator, Countable {
         while ( $i = $p < $l ? strpos($str, '>', $p) : $l ) {
             $e = $p; // save pos
             $p += strcspn($str, '"\'', $p, $i);
-            
+
             // If closest quote is after '>', return pos of '>'
             if ( $p >= $i ) return $i;
 
@@ -656,7 +658,7 @@ abstract class ADOM_Node implements Iterator, Countable {
             ++$p; // next char after the quote
 
             $e += strcspn($str, '=', $e, $p); // is there a '=' before first quote?
-            
+
             // is this the attr_name (like in "attr_name"="attr_value") ?
             if ( $e >= $p ) {
                 // Attribute name should not have '>'
@@ -668,7 +670,7 @@ abstract class ADOM_Node implements Iterator, Countable {
             else {
                 $p += strcspn($str, $q, $p, $l);
             }
-            
+
             ++$p; // next char after the quote
         }
         return $i;
@@ -1752,6 +1754,13 @@ class hQuery extends CHTML_Parser_Doc {
                 $code = $ret[1]['code'];
                 $url  = $ret[1]['url'];
                 $cch_meta = $ret[1];
+                self::$last_http_result = (object)array(
+                    'body'    => $html,
+                    'code'    => $code,
+                    'url'     => $url,
+                    'headers' => $hdrs,
+                    'cached'  => true,
+                );
             }
         }
         else {
@@ -2078,7 +2087,8 @@ class hQuery extends CHTML_Parser_Doc {
      *
      */
     static function http_wr($host, $head=NULL, $body=NULL, $options=NULL) {
-        $ret = (object)(array());
+        self::$last_http_result =
+        $ret = new stdClass;
         empty($options) and $options = array();
         if($p = strpos($host, '://') and $p < 7) {
             $ret->url = $host;
@@ -2184,7 +2194,7 @@ class hQuery extends CHTML_Parser_Doc {
             $head[] = $i . ': ' . $v;
         }
         $rqst = implode("\r\n", $head) . $boundary . $body;
-        $head = $body = NULL;
+        $head = NULL; // free mem
 
         $timeout = isset($options['timeout']) ? $options['timeout'] : @ini_get("default_socket_timeout");
 
@@ -2220,12 +2230,13 @@ class hQuery extends CHTML_Parser_Doc {
                   case 301:
                   case 302:
                   case 303:
+                  case 307: // repeat request using the same method and post data
                      if( @$options['redirects'] > 0 && $loc = @$_rh['LOCATION'] ) {
                         $loc = self::abs_url($loc, (empty($options['scheme'])?'':$options['scheme'].'//').$host.':'.$port.(empty($options['path'])?'':$options['path']));
                         unset($_h['host'], $options['host'], $options['port'], $options['scheme'], $options['method']);
                         --$options['redirects'];
                         // ??? could save cookies for redirect
-                        return self::http_wr($loc, $_h, NULL, $options);
+                        return self::http_wr($loc, $_h, $body, $options);
                      }
                   break;
                }
