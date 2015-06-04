@@ -1,5 +1,5 @@
 {
-  "name": "hquery",
+  "name": "hquery.php",
   "description": "An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye",
   "version": "1.1.0",
   "author": {
@@ -19,6 +19,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/duzun/hQuery.php.git"
+  },
+  "bugs": {
+    "url": "https://github.com/duzun/hQuery.php/issues"
   },
   "scripts": {
     "verup": "node ./node_modules/verup",
@@ -45,5 +48,8 @@
   "devDependencies": {
     "watch": "^0.13.0",
     "verup": "*"
+  },
+  "directories": {
+    "test": "tests"
   }
 }
