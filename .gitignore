@@ -1,7 +1,22 @@
-
-node_modules
+# Generic temp files
+.DS_store
+Desktop.ini
+.dropbox
+.dropbox.attr
+## - Thumbnail cache files
+._*
+Thumbs.db
+## - Files that might appear on external disks
+.Spotlight-V100
+.Trashes
+## - Node.js
+*node_modules*
 npm-debug.log
-
+*.log
 phpunit.phar
 
 *.url
+
+.grunt
+.lock-wscript
+*.bak

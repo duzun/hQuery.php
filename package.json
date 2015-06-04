@@ -1,38 +1,50 @@
 {
- "name": "hQuery",
- "description": "Peer to Peer Entropy Generator (or Random numbers generator with p2p seeding)",
- "version": "1.1.0",
- "author": {
+  "name": "hQuery",
+  "description": "An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye",
+  "version": "1.1.0",
+  "author": {
     "name": "Dumitru Uzun",
     "email": "contact@duzun.me",
     "url": "https://DUzun.Me"
- },
- "homepage": "https://duzun.me/playground/hquery",
- "keywords": [
-  "HTML",
-  "web",
-  "scraper",
-  "scraping",
-  "crawling",
-  "PHP"
- ],
- "main": "hQuery.php",
- "repository": {
-  "type": "git",
-  "url": "https://github.com/duzun/hQuery.php.git"
- },
- "engines": {},
- "scripts": {
-  "test": "phpunit ./tests/",
-  "test-dev": "node tests/test_watcher.js"
- },
- "license": [
-  {
-   "type": "MIT",
-   "url": "http://github.com/duzun/hQuery.php/raw/master/LICENSE"
+  },
+  "homepage": "https://duzun.me/playground/hquery",
+  "keywords": [
+    "HTML",
+    "web",
+    "scraper",
+    "scraping",
+    "crawling",
+    "PHP"
+  ],
+  "main": "hquery.php",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/duzun/hQuery.php.git"
+  },
+  "scripts": {
+    "verup": "node ./node_modules/verup",
+    "test": "php ./tests/phpunit.phar ./tests/",
+    "test-dev": "node tests/test_watcher.js"
+  },
+  "verup": {
+    "files": [
+      "composer.json",
+      "hquery.php",
+      "README.md"
+    ],
+    "regs": [
+      "((?:\\$|(\\s*\\*?\\s*@)|(^\\s*(?:var|,)?\\s+))ver(?:sion)?[\\s\\:='\"]+)([0-9]+(?:\\.[0-9]+){2,2})",
+      "^(\\s?\\*.*v)([0-9]+(?:\\.[0-9]+){2,2})"
+    ]
+  },
+  "license": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/duzun/hQuery.php/raw/master/LICENSE"
+    }
+  ],
+  "devDependencies": {
+    "watch": "^0.13.0",
+    "verup": "*"
   }
- ],
- "devDependencies": {
-  "watch": "^0.13.0"
- }
 }

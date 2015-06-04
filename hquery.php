@@ -4,7 +4,7 @@
  *  Copyright (C) 2014 Dumitru Uzun
  *
  *  @author Dumitru Uzun (DUzun.ME)
- *  @ver 1.1.0
+ *  @version 1.1.0
  */
 // ------------------------------------------------------------------------
 
@@ -12,6 +12,9 @@
 
 /// Base class for all HTML Elements
 abstract class ADOM_Node implements Iterator, Countable {
+    // ------------------------------------------------------------------------
+    static $version = '1.1.0';
+    // ------------------------------------------------------------------------
     static $_ar_ = array()     ;
     static $_mi_ = PHP_INT_MAX ;
     static $_nl_ = NULL        ;

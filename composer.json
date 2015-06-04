@@ -1,0 +1,28 @@
+{
+  "name": "duzun/hquery",
+  "description": "An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye",
+  "version": "1.1.0",
+  "author": {
+    "name": "Dumitru Uzun",
+    "email": "contact@duzun.me",
+    "url": "https://DUzun.Me"
+  },
+  "homepage": "https://duzun.me/playground/hquery",
+  "keywords": [
+    "HTML",
+    "web",
+    "scraper",
+    "scraping",
+    "crawling",
+    "PHP"
+  ],
+  "main": "hquery.php",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/duzun/hQuery.php.git"
+  },
+  "license": "MIT",
+  "require": {
+    "php": ">=5.3.0"
+  }
+}

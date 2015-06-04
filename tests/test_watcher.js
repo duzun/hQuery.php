@@ -9,8 +9,9 @@ var _to      = null;
 var _delay   = 300;
 var _running = null;
 var _dir     = path.join(__dirname, '..');
+var _test_dir = path.join(_dir, 'tests');
 var _phpunit_url = 'https://phar.phpunit.de/phpunit.phar';
-var _phpunit_path = path.join(_dir, 'tests/phpunit.phar');
+var _phpunit_path = path.join(__dirname, 'phpunit.phar');
 
 
 function run_test() {
@@ -23,11 +24,17 @@ function run_test() {
 
     console.log('\n\x1b[36m --- Running PHPUnit ... ---\x1b[0m\n');
 
-    _running = spawn(
-      'php'
-      , [_phpunit_path, 'tests/']
-      , { cwd: _dir, env: process.env }
-    );
+    var args = [_phpunit_path];
+
+    var phpunit_xml = path.join(_test_dir, 'phpunit.xml');
+
+    if ( fs.existsSync(phpunit_xml) ) {
+        args.push('-c');
+        args.push(phpunit_xml);
+    }
+    args.push(_test_dir);
+
+    _running = spawn( 'php', args, { cwd: _dir, env: process.env } );
 
     _running.stdout.pipe(process.stdout);
     _running.stderr.pipe(process.stderr);
@@ -105,6 +112,5 @@ check_phpunit_phar(function () {
       }
     );
 });
-
 
 
