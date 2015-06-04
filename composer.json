@@ -1,5 +1,6 @@
 {
   "name": "duzun/hquery",
+  "type": "library",
   "description": "An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye",
   "version": "1.1.0",
   "author": {
