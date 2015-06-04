@@ -16,7 +16,6 @@
     "crawling",
     "PHP"
   ],
-  "main": "hquery.php",
   "repository": {
     "type": "git",
     "url": "https://github.com/duzun/hQuery.php.git"
