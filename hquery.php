@@ -25,10 +25,10 @@ class hQuery extends CHTML_Parser_Doc {
     /**
      *  Parse and HTML string.
      *
-     *  @param (string)$html - source of some HTML document
-     *  @param (string)$url - (optional) location of the document. Used for relative URLs inside the document.
+     *  @param string $html - source of some HTML document
+     *  @param string $url  - OPTIONAL location of the document. Used for relative URLs inside the document.
      *
-     *  @return (hQuery)$doc
+     *  @return hQuery $doc
      */
     static function fromHTML($html, $url=NULL) {
         $index_time = microtime(true);
@@ -45,11 +45,11 @@ class hQuery extends CHTML_Parser_Doc {
     /**
      *  Read the HTML document from a file.
      *
-     *  @param (string)$filename - a valid filename
-     *  @param (bool)$use_include_path - (optional) passed to file_get_contents()
-     *  @param (resource)$context - (optional) A valid context resource created with stream_context_create().
+     *  @param string   $filename         - a valid filename
+     *  @param bool     $use_include_path - OPTIONAL passed to file_get_contents()
+     *  @param resource $context          - OPTIONAL A valid context resource created with stream_context_create().
      *
-     *  @return (hQuery)$doc
+     *  @return hQuery $doc
      */
     static function fromFile($filename, $use_include_path=false, $context=NULL) {
         $read_time = microtime(true);
@@ -65,12 +65,12 @@ class hQuery extends CHTML_Parser_Doc {
     /**
      *  Fetch the HTML document from remote $url.
      *
-     *  @param (string)       $url     - the URL of the document
-     *  @param (array)        $headers - request headers
-     *  @param (array|string) $body    - body of the request (for POST or PUT)
-     *  @param (array)        $options - request options
+     *  @param string        $url     - the URL of the document
+     *  @param array         $headers - OPTIONAL request headers
+     *  @param array|string  $body    - OPTIONAL body of the request (for POST or PUT)
+     *  @param array         $options - OPTIONAL request options
      *
-     *  @return (hQuery)$doc
+     *  @return hQuery $doc
      */
     static function fromURL($url, $headers=NULL, $body=NULL, $options=NULL) {
         $opt = array(
@@ -159,11 +159,11 @@ class hQuery extends CHTML_Parser_Doc {
     /**
      *  Finds a collection of nodes inside current document/context (similar to jQuery.fn.find()).
      *
-     *  @param (string)$sel - A valid CSS selector.
-     *  @param (array|string)$attr - (optional) attributes as string or key-value pairs.
-     *  @param (ADOM_Node)$ctx - (optional) the context where to search. If omitted, $this is used.
+     *  @param string       $sel  - A valid CSS selector.
+     *  @param array|string $attr - OPTIONAL attributes as string or key-value pairs.
+     *  @param ADOM_Node    $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
      *
-     *  @return (HTML_Node) collection of matched elements
+     *  @return HTML_Node collection of matched elements
      */
     function find($sel, $attr=NULL, $ctx=NULL) {
         $c = func_num_args();
@@ -438,7 +438,7 @@ class hQuery extends CHTML_Parser_Doc {
     /**
      * Executes a HTTP write-read session.
      *
-     * @param (string)$host - IP/HOST address or URL
+     * @param string $host - IP/HOST address or URL
      * @param (array) $head - list off HTTP headers to be sent along with the request to $host
      * @param (mixed) $body - data to be sent as the contents of the request. If is array or object, a http query is built.
      * @param (array) $options - list of option as key-value:
