@@ -72,6 +72,9 @@
 	<h1>Class hQuery</h1>
 
 
+	<div class="description">
+	<p>The Main Class for HTML document</p>
+	</div>
 
 	<dl class="tree well">
 		<dd style="padding-left:0px">
@@ -114,7 +117,7 @@
 
 				<b>Author:</b>
 				Dumitru Uzun (DUzun.ME)<br>
-			<b>Located at</b> <a href="source-class-hQuery.html#1668-2324" title="Go to source code"></a>
+			<b>Located at</b> <a href="source-class-hQuery.html#12-687" title="Go to source code"></a>
 		<br>
 	</div>
 
@@ -134,7 +137,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_fromHTML">#</a>
-			<code><a href="source-class-hQuery.html#1678-1693" title="Go to source code">fromHTML</a>( <span> <var>$html</var></span>, <span> <var>$url</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery.html#25-43" title="Go to source code">fromHTML</a>( <span>(string)$html <var>$html</var></span>, <span>(string)$url <var>$url</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				<p>Parse and HTML string.</p>
@@ -144,6 +147,13 @@
 				<p>Parse and HTML string.</p>
 
 
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$html</var></dt>
+						<dd>source of some HTML document</dd>
+						<dt><var>$url</var></dt>
+						<dd>(optional) location of the document. Used for relative URLs inside the document.</dd>
+					</dl></div>
 
 					<h4>Returns</h4>
 					<div class="list">
@@ -167,7 +177,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_fromFile">#</a>
-			<code><a href="source-class-hQuery.html#1695-1709" title="Go to source code">fromFile</a>( <span> <var>$filename</var></span>, <span> <var>$use_include_path</var> = <span class="php-keyword1">false</span></span>, <span> <var>$context</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery.html#45-63" title="Go to source code">fromFile</a>( <span>(string)$filename <var>$filename</var></span>, <span>(bool)$use_include_path <var>$use_include_path</var> = <span class="php-keyword1">false</span></span>, <span>(resource)$context <var>$context</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				<p>Read the HTML document from a file.</p>
@@ -177,6 +187,15 @@
 				<p>Read the HTML document from a file.</p>
 
 
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$filename</var></dt>
+						<dd>a valid filename</dd>
+						<dt><var>$use_include_path</var></dt>
+						<dd>(optional) passed to file_get_contents()</dd>
+						<dt><var>$context</var></dt>
+						<dd>(optional) A valid context resource created with stream_context_create().</dd>
+					</dl></div>
 
 					<h4>Returns</h4>
 					<div class="list">
@@ -200,7 +219,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_fromURL">#</a>
-			<code><a href="source-class-hQuery.html#1711-1802" title="Go to source code">fromURL</a>( <span>(string) <var>$url</var></span>, <span>(array) <var>$headers</var> = <span class="php-keyword1">NULL</span></span>, <span>(array|string) <var>$body</var> = <span class="php-keyword1">NULL</span></span>, <span>(array) <var>$options</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery.html#65-156" title="Go to source code">fromURL</a>( <span>(string) <var>$url</var></span>, <span>(array) <var>$headers</var> = <span class="php-keyword1">NULL</span></span>, <span>(array|string) <var>$body</var> = <span class="php-keyword1">NULL</span></span>, <span>(array) <var>$options</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				<p>Fetch the HTML document from remote $url.</p>
@@ -241,6 +260,50 @@
 			</div>
 			</div></td>
 		</tr>
+		<tr data-order="find" id="_find">
+
+			<td class="attributes"><code>
+				 public 
+				(HTML_Node)
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_find">#</a>
+			<code><a href="source-class-hQuery.html#159-245" title="Go to source code">find</a>( <span>(string)$sel <var>$sel</var></span>, <span>(array|string)$attr <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span>(ADOM_Node)$ctx <var>$ctx</var> = <span class="php-keyword1">NULL</span></span> )</code>
+
+			<div class="description short">
+				<p>Finds a collection of nodes inside current document/context (similar to jQuery.fn.find()).</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Finds a collection of nodes inside current document/context (similar to jQuery.fn.find()).</p>
+
+
+					<h4>Parameters</h4>
+					<div class="list"><dl>
+						<dt><var>$sel</var></dt>
+						<dd>A valid CSS selector.</dd>
+						<dt><var>$attr</var></dt>
+						<dd>(optional) attributes as string or key-value pairs.</dd>
+						<dt><var>$ctx</var></dt>
+						<dd>(optional) the context where to search. If omitted, $this is used.</dd>
+					</dl></div>
+
+					<h4>Returns</h4>
+					<div class="list">
+						(HTML_Node)<br>collection of matched elements
+					</div>
+
+
+
+					<h4>Overrides</h4>
+					<div class="list"><code><a href="class-ADOM_Node.html#_find">ADOM_Node::find</a></code></div>
+
+			</div>
+			</div></td>
+		</tr>
 		<tr data-order="index" id="_index">
 
 			<td class="attributes"><code>
@@ -252,7 +315,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_index">#</a>
-			<code><a href="source-class-hQuery.html#1806" title="Go to source code">index</a>( )</code>
+			<code><a href="source-class-hQuery.html#248" title="Go to source code">index</a>( )</code>
 
 			<div class="description short">
 				
@@ -281,7 +344,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_find_html">#</a>
-			<code><a href="source-class-hQuery.html#1808-1813" title="Go to source code">find_html</a>( <span> <var>$sel</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$ctx</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery.html#250-255" title="Go to source code">find_html</a>( <span> <var>$sel</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$ctx</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -310,7 +373,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_find_text">#</a>
-			<code><a href="source-class-hQuery.html#1815-1820" title="Go to source code">find_text</a>( <span> <var>$sel</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$ctx</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery.html#257-262" title="Go to source code">find_text</a>( <span> <var>$sel</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$ctx</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -339,7 +402,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_exclude">#</a>
-			<code><a href="source-class-hQuery.html#1822-1832" title="Go to source code">exclude</a>( <span> <var>$sel</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery.html#264-274" title="Go to source code">exclude</a>( <span> <var>$sel</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -353,37 +416,6 @@
 
 
 
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="find" id="_find">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_find">#</a>
-			<code><a href="source-class-hQuery.html#1834-1911" title="Go to source code">find</a>( <span> <var>$sel</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$ctx</var> = <span class="php-keyword1">NULL</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-ADOM_Node.html#_find">ADOM_Node::find</a></code></div>
 
 			</div>
 			</div></td>
@@ -399,7 +431,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_cache">#</a>
-			<code><a href="source-class-hQuery.html#1916-1950" title="Go to source code">get_cache</a>( <span> <var>$fn</var></span>, <span> <var>$expire</var> = <span class="php-keyword1">false</span></span>, <span> <var>$meta_only</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery.html#279-313" title="Go to source code">get_cache</a>( <span> <var>$fn</var></span>, <span> <var>$expire</var> = <span class="php-keyword1">false</span></span>, <span> <var>$meta_only</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				
@@ -428,7 +460,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_set_cache">#</a>
-			<code><a href="source-class-hQuery.html#1953-1971" title="Go to source code">set_cache</a>( <span> <var>$fn</var></span>, <span> <var>$cnt</var></span>, <span> <var>$meta</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$gzip</var> = <span class="php-keyword1">true</span></span> )</code>
+			<code><a href="source-class-hQuery.html#316-334" title="Go to source code">set_cache</a>( <span> <var>$fn</var></span>, <span> <var>$cnt</var></span>, <span> <var>$meta</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$gzip</var> = <span class="php-keyword1">true</span></span> )</code>
 
 			<div class="description short">
 				
@@ -457,7 +489,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_do_flock">#</a>
-			<code><a href="source-class-hQuery.html#1973-2000" title="Go to source code">do_flock</a>( <span>(resource)$fp <var>$fp</var></span>, <span>(int) <var>$lock</var></span>, <span>(int) <var>$timeout_ms</var> = <span class="php-num">384</span></span> )</code>
+			<code><a href="source-class-hQuery.html#336-363" title="Go to source code">do_flock</a>( <span>(resource)$fp <var>$fp</var></span>, <span>(int) <var>$lock</var></span>, <span>(int) <var>$timeout_ms</var> = <span class="php-num">384</span></span> )</code>
 
 			<div class="description short">
 				<p>Lock with retries</p>
@@ -507,7 +539,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_flock_put_contents">#</a>
-			<code><a href="source-class-hQuery.html#2002-2016" title="Go to source code">flock_put_contents</a>( <span> <var>$fn</var></span>, <span> <var>$cnt</var></span>, <span> <var>$block</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery.html#365-379" title="Go to source code">flock_put_contents</a>( <span> <var>$fn</var></span>, <span> <var>$cnt</var></span>, <span> <var>$block</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				
@@ -536,7 +568,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_flock_get_contents">#</a>
-			<code><a href="source-class-hQuery.html#2018-2032" title="Go to source code">flock_get_contents</a>( <span> <var>$fn</var></span>, <span> <var>$block</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery.html#381-395" title="Go to source code">flock_get_contents</a>( <span> <var>$fn</var></span>, <span> <var>$block</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				
@@ -565,7 +597,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_is_url_path">#</a>
-			<code><a href="source-class-hQuery.html#2034-2036" title="Go to source code">is_url_path</a>( <span> <var>$path</var></span> )</code>
+			<code><a href="source-class-hQuery.html#397-399" title="Go to source code">is_url_path</a>( <span> <var>$path</var></span> )</code>
 
 			<div class="description short">
 				
@@ -594,7 +626,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_is_abs_path">#</a>
-			<code><a href="source-class-hQuery.html#2038-2047" title="Go to source code">is_abs_path</a>( <span> <var>$path</var></span> )</code>
+			<code><a href="source-class-hQuery.html#401-410" title="Go to source code">is_abs_path</a>( <span> <var>$path</var></span> )</code>
 
 			<div class="description short">
 				
@@ -623,7 +655,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_abs_url">#</a>
-			<code><a href="source-class-hQuery.html#2049-2073" title="Go to source code">abs_url</a>( <span> <var>$url</var></span>, <span> <var>$base</var></span> )</code>
+			<code><a href="source-class-hQuery.html#412-436" title="Go to source code">abs_url</a>( <span> <var>$url</var></span>, <span> <var>$base</var></span> )</code>
 
 			<div class="description short">
 				
@@ -652,7 +684,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_http_wr">#</a>
-			<code><a href="source-class-hQuery.html#2075-2321" title="Go to source code">http_wr</a>( <span>(string)$host <var>$host</var></span>, <span>(array) <var>$head</var> = <span class="php-keyword1">NULL</span></span>, <span>(mixed) <var>$body</var> = <span class="php-keyword1">NULL</span></span>, <span>(array) <var>$options</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery.html#438-684" title="Go to source code">http_wr</a>( <span>(string)$host <var>$host</var></span>, <span>(array) <var>$head</var> = <span class="php-keyword1">NULL</span></span>, <span>(mixed) <var>$body</var> = <span class="php-keyword1">NULL</span></span>, <span>(array) <var>$options</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				<p>Executes a HTTP write-read session.</p>
@@ -799,7 +831,7 @@
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-hQuery.html#1672" title="Go to source code"><var>$headers</var></a>
+					<a href="source-class-hQuery.html#19" title="Go to source code"><var>$headers</var></a>
 
 				<div class="description short">
 					
@@ -824,7 +856,7 @@
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-hQuery.html#1674" title="Go to source code"><var>$cache_path</var></a>
+					<a href="source-class-hQuery.html#21" title="Go to source code"><var>$cache_path</var></a>
 
 				<div class="description short">
 					
@@ -849,7 +881,7 @@
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-hQuery.html#1675" title="Go to source code"><var>$cache_expires</var></a>
+					<a href="source-class-hQuery.html#22" title="Go to source code"><var>$cache_expires</var></a>
 
 				<div class="description short">
 					
