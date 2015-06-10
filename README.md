@@ -15,11 +15,11 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
   - Automatically handles redirects (301, 302, 303)
   - Caches response for multiple processing tasks
   - PHP 5+
-  
-# API Documentation
-  https://duzun.github.io/hQuery.php/docs/class-hQuery.html
-  
+
 # Usage
+
+[API Documentation](https://duzun.github.io/hQuery.php/docs/class-hQuery.html)
+
   ```php
     include '/path/to/libs/hquery.php';
   
