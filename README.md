@@ -16,6 +16,8 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
   - Caches response for multiple processing tasks
   - PHP 5+
   
+# API Documentation
+  https://duzun.github.io/hQuery.php/docs/class-hQuery.html
   
 # Usage
   ```php
