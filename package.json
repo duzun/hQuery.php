@@ -25,6 +25,7 @@
   },
   "scripts": {
     "verup": "node ./node_modules/verup",
+    "apigen": "php ./tools/apigen.phar generate -d ./docs --template-theme bootstrap -s ./hquery.php",
     "test": "php ./tests/phpunit.phar ./tests/",
     "test-dev": "node tests/test_watcher.js"
   },
