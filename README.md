@@ -20,25 +20,41 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
 
 [API Documentation](https://duzun.github.io/hQuery.php/docs/class-hQuery.html)
 
+### Basic setup:
 ```php
 include '/path/to/libs/hquery.php';
 
 // Set the cache path - must be a writable folder
 hQuery::$cache_path = "/path/to/cache";
+```
+### Open a remote HTML document
+#### [hQuery::fromUrl](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL)( string `$url`, array `$headers` = NULL, array|string `$body` = NULL, array `$options` = NULL )
+```php
+$doc = hQuery::fromUrl('http://example.com/someDoc.html', ['Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8']);
 
-// Open a remote HTML document
-$doc = hQuery::fromUrl('http://example.com/someDoc.html');
+var_dump($doc->headers); // See response headers
+var_dump(hQuery::$last_http_result); // See response details of last request
+```
+For building advanced requests (POST, parameters etc) see [hQuery::http_wr()](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_http_wr)
 
-// Open a local HTML document
+### Open a local HTML document
+#### [hQuery::fromFile](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromFile)( string `$filename`, boolean `$use_include_path` = false, resource `$context` = NULL )
+```php
 $doc = hQuery::fromFile('/path/to/filesystem/doc.html');
-
-// Load HTML from a string
+```
+### Load HTML from a string
+#### [hQuery::fromHTML](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromHTML)( string `$html`, string `$url` = NULL )
+```php
 $doc = hQuery::fromHTML('<html><head><title>Sample HTML Doc</title><body>Contents...</body></html>');
 
 // Set base_url, in case the document is loaded from local source.
 // Note: The base_url is used to retrive absolute URLs from relative ones
 $doc->base_url = 'http://desired-host.net/path';
+```
 
+### Processing the results
+#### [hQuery::find](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_find)( string `$sel`, array|string `$attr` = NULL, ADOM_Node `$ctx` = NULL )
+```php
 // Find all banners (images inside anchors)
 $banners = $doc->find('a > img:parent');
 
