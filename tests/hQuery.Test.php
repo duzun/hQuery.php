@@ -11,6 +11,10 @@ require_once dirname(dirname(__FILE__)) . '/hquery.php';
 // Surogate class for testing, to access protected attributes of hQuery
 class TestHQueryTests extends hQuery {
     public $class_idx;
+
+    public static function html_findTagClose($str, $p) {
+        return parent::html_findTagClose($str, $p);
+    }
 }
 // -----------------------------------------------------
 
@@ -80,13 +84,13 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
                  <div class='overlayLowlightoverlayBottom'>abra-kadabra</div>
                ";
 
-        $r = hQuery::html_findTagClose($str1, 1);
+        $r = TestHQueryTests::html_findTagClose($str1, 1);
         $this->assertEquals(66, $r);
 
-        $r = hQuery::html_findTagClose($str2, 1);
+        $r = TestHQueryTests::html_findTagClose($str2, 1);
         $this->assertEquals(66, $r);
 
-        $r = hQuery::html_findTagClose($str3, 1);
+        $r = TestHQueryTests::html_findTagClose($str3, 1);
         $this->assertEquals(66, $r);
     }
 

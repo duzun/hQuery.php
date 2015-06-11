@@ -18,10 +18,10 @@ abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
     const VERSION = '1.2.0';
     // ------------------------------------------------------------------------
-    static $last_http_result; // Response details of last request
+    public static $last_http_result; // Response details of last request
 
     // ------------------------------------------------------------------------
-    static $selected_doc = NULL;
+    public static $selected_doc = NULL;
     // ------------------------------------------------------------------------
     protected $_prop; // Properties
     protected $doc; // Parent doc
@@ -44,13 +44,13 @@ abstract class hQuery_Node implements Iterator, Countable {
         }
     }
 
-    function __destruct() {
+    public function __destruct() {
         if(self::$selected_doc === $this) self::$selected_doc = self::$_nl_;
         $this->ids = self::$_nl_; // If any reference exists, destroy its contents! P.S. Might be buggy, but hey, I own this property. Sincerly yours, hQuery_Node class.
         unset($this->doc, $this->ids);
     }
     // ------------------------------------------------------------------------
-    function attr($attr=NULL, $to_str=false) {
+    public function attr($attr=NULL, $to_str=false) {
         $k = key($this->ids);
         if($k === NULL) {
             reset($this->ids);
@@ -61,25 +61,25 @@ abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
 
     // Deprecated
-    function is_empty() { return $this->isEmpty() ;}
+    public function is_empty() { return $this->isEmpty() ;}
 
-    function isEmpty() {
+    public function isEmpty() {
         return empty($this->ids);
     }
 
-    function isDoc() {
+    public function isDoc() {
         return !isset($this->doc) || $this === $this->doc;
     }
 
-    function doc() {
+    public function doc() {
         return isset($this->doc) ? $this->doc : $this;
     }
 
-    function find($sel, $attr=NULL) {
+    public function find($sel, $attr=NULL) {
         return $this->doc()->find($sel, $attr, $this);
     }
 
-    function __toString() {
+    public function __toString() {
         // doc
         if($this->isDoc()) return $this->html;
 
@@ -97,7 +97,7 @@ abstract class hQuery_Node implements Iterator, Countable {
    /**
     * @return string .innerHTML
     */
-   function html($id=NULL) {
+   public function html($id=NULL) {
       if($this->isDoc()) return $this->html; // doc
 
       $id = $this->_my_ids($id);
@@ -115,7 +115,7 @@ abstract class hQuery_Node implements Iterator, Countable {
    /**
     * @return string .outerHtml
     */
-   function outerHtml($id=NULL) {
+   public function outerHtml($id=NULL) {
       $dm = $this->isDoc() && !isset($id);
       if($dm) return $this->html; // doc
 
@@ -137,37 +137,37 @@ abstract class hQuery_Node implements Iterator, Countable {
    /**
     * @return string .innerText
     */
-    function text($id=NULL) {
+    public function text($id=NULL) {
         return html_entity_decode(strip_tags($this->html($id)), ENT_QUOTES);/* ??? */
     }
 
-   /**
-    * @return string .nodeName
-    */
-   function nodeName($caseFolding = NULL, $id=NULL) {
-      if(!isset($caseFolding)) $caseFolding = hQuery_HTML_Parser::$case_folding;
-      $dm = $this->isDoc() && !isset($id);
-      if($dm) $ret = array_unique($this->tags); // doc
-      else {
-         $id = $this->_my_ids($id, true);
-         if($id === false) return self::$_fl_;
-         $ret = self::array_select($this->doc()->tags, $id);
-      }
-      if($caseFolding) {
-         foreach($ret as &$n) $n = strtolower($n);
-         if($dm) $ret = array_unique($ret);
-      }
-      return count($ret) <= 1 ? reset($ret) : $ret;
-   }
+    /**
+     * @return string .nodeName
+     */
+    public function nodeName($caseFolding = NULL, $id=NULL) {
+        if(!isset($caseFolding)) $caseFolding = hQuery_HTML_Parser::$case_folding;
+        $dm = $this->isDoc() && !isset($id);
+        if($dm) $ret = array_unique($this->tags); // doc
+        else {
+            $id = $this->_my_ids($id, true);
+            if($id === false) return self::$_fl_;
+            $ret = self::array_select($this->doc()->tags, $id);
+        }
+        if($caseFolding) {
+            foreach($ret as &$n) $n = strtolower($n);
+            if($dm) $ret = array_unique($ret);
+        }
+        return count($ret) <= 1 ? reset($ret) : $ret;
+    }
 
-//    function firstChild() {
+//    public function firstChild() {
 //       $doc = $this->doc();
 //       $q = reset($this->ids);
 //       $p = key($this->ids);
 //       return new hQuery_Element($doc, array($p=>$q));
 //    }
 //
-//    function lastChild() {
+//    public function lastChild() {
 //       $doc = $this->doc();
 //       $q = end($this->ids);
 //       $p = key($this->ids);
@@ -557,18 +557,18 @@ abstract class hQuery_Node implements Iterator, Countable {
     }
 
 // - Magic ------------------------------------------------
-    function __get($name) {
+    public function __get($name) {
         if(array_key_exists($name, $this->_prop)) return $this->_prop[$name];
         return $this->attr($name);
     }
-    function __set($name, $value) {
+    public function __set($name, $value) {
         if(isset($value)) return $this->_prop[$name] = $value;
         $this->__unset($name);
     }
-    function __isset($name) {
+    public function __isset($name) {
         return isset($this->_prop[$name]);
     }
-    function __unset($name) {
+    public function __unset($name) {
         unset($this->_prop[$name]);
     }
     // ------------------------------------------------------------------------
@@ -576,16 +576,16 @@ abstract class hQuery_Node implements Iterator, Countable {
     public function count() { return isset($this->ids) ? count($this->ids) : 0; }
     // ------------------------------------------------------------------------
     // Iterable:
-    function current() {
+    public function current() {
         $k = key($this->ids);
         if($k === NULL) return false;
         return array($k => $this->ids[$k]);
     }
-    function valid()   { return current($this->ids) !== false; }
-    function key()     { return key($this->ids); }
-    function next()    { return next($this->ids) !== false ? $this->current() : false; }
-    function prev()    { return prev($this->ids) !== false ? $this->current() : false; }
-    function rewind()  { reset($this->ids); return $this->current(); }
+    public function valid()   { return current($this->ids) !== false; }
+    public function key()     { return key($this->ids); }
+    public function next()    { return next($this->ids) !== false ? $this->current() : false; }
+    public function prev()    { return prev($this->ids) !== false ? $this->current() : false; }
+    public function rewind()  { reset($this->ids); return $this->current(); }
 
 // - Helpers ------------------------------------------------
 
@@ -697,7 +697,7 @@ abstract class hQuery_Node implements Iterator, Countable {
     }
 
     // ------------------------------------------------------------------------
-    static function html_findTagClose($str, $p) {
+    protected static function html_findTagClose($str, $p) {
         $l = strlen($str);
         while ( $i = $p < $l ? strpos($str, '>', $p) : $l ) {
             $e = $p; // save pos
@@ -787,8 +787,13 @@ abstract class hQuery_Node implements Iterator, Countable {
         $sq = htmlspecialchars($quote);
         if($sq == $quote) $sq = false;
         ksort($attr);
-        if(isset($attr['class']) && is_array($attr['class'])) { sort($attr['class']); $attr['class'] = implode(' ', $attr['class']); }
-        if(isset($attr['style']) && is_array($attr['style'])) $attr['style'] = self::CSSArr2Str($attr['style']);
+        if(isset($attr['class']) && is_array($attr['class'])) {
+            sort($attr['class']);
+            $attr['class'] = implode(' ', $attr['class']);
+        }
+        if(isset($attr['style']) && is_array($attr['style'])) {
+            $attr['style'] = self::CSSArr2Str($attr['style']);
+        }
         $ret = array();
         foreach($attr as $n => $v) {
             $ret[] = $n . '=' . $quote . ($sq ? str_replace($quote, $sq, $v) : $v) . $quote;
@@ -892,7 +897,7 @@ abstract class hQuery_Node implements Iterator, Countable {
  */
 class hQuery_Context extends hQuery_Node {
 
-    function __construct($doc=NULL, $el_arr=NULL) {
+    public function __construct($doc=NULL, $el_arr=NULL) {
         if($el_arr instanceof parent) {
            if(!$doc) $doc = $el_arr->doc();
            $el_arr = $el_arr->ids;
@@ -908,7 +913,7 @@ class hQuery_Context extends hQuery_Node {
      *
      *  @return hQuery_Context ctx
      */
-    function intersect($el, $eq=true) {
+    public function intersect($el, $eq=true) {
         if($el instanceof self) {
             if($el === $this) {
                 if($eq) return $this;
@@ -960,14 +965,13 @@ class hQuery_HTML_Parser extends hQuery_Node {
     protected $attr_idx      ; // attrId    => id | [ids]
     protected $class_idx     ; // class     => aid | [aids=>[ids]]
 
-    var $o = NULL;
+    protected $o = NULL;
 
     protected $indexed = false; // completely indexed
 
-
     // ------------------------------------------------------------------------
     // The magic of properties
-    function __get($name) {
+    public function __get($name) {
         if(array_key_exists($name, $this->_prop)) return $this->_prop[$name];
         switch($name) {
             case 'size':
@@ -993,7 +997,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
         }
     }
 
-    function __set($name, $value) {
+    public function __set($name, $value) {
         switch($name) {
             case 'hostURL': return false;
             case 'baseURI':
@@ -1011,7 +1015,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
     }
     // ------------------------------------------------------------------------
 
-    function location($href=NULL) {
+    public function location($href=NULL) {
         if(func_num_args() < 1) {
             return @$this->_prop['location']['href'];
         }
@@ -1025,7 +1029,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
     }
 
     /// get/set baseURI
-    function baseURI($href=NULL) {
+    public function baseURI($href=NULL) {
         if(func_num_args() < 1) {
             $href = @$this->_prop['baseURI'];
         }
@@ -1046,7 +1050,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
 
     }
 
-    function __construct($html, $idx=true) {
+    public function __construct($html, $idx=true) {
         if(!is_string($html)) $html = (string)$html;
         $c = self::detect_charset($html) or $c = NULL;
         if($c) {
@@ -1070,9 +1074,9 @@ class hQuery_HTML_Parser extends hQuery_Node {
         if($this->html && $idx) $this->_index_all();
     }
 
-    function __toString() { return $this->html; }
+    public function __toString() { return $this->html; }
 
-    static function get_url_base($url, $array=false) {
+    public static function get_url_base($url, $array=false) {
         if($ub = self::get_url_path($url)) {
             $up = $ub;
             $q = strpos($up, '/', strpos($up, '//')+2);
@@ -1081,7 +1085,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
         return $array && $ub ? array($ub, $up) : $ub;
     }
 
-    static function get_url_path($url) {
+    public static function get_url_path($url) {
         $p = strpos($url, '//');
         if($p === false || $p && !preg_match('|^[a-z]+\:$|', substr($url, 0, $p))) return false;
         $q = strrpos($url, '/');
@@ -1093,7 +1097,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
         return $url;
     }
 
-    function url2abs($url) {
+    public function url2abs($url) {
         if(isset($this->_prop['baseURL']) && !preg_match('|^([a-z]{1,20}:)?\/\/|', $url)) {
             if($url[0] == '/') { // abs path
                 $bu = $this->_prop['hostURL'];
@@ -1109,7 +1113,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
 
     /* <meta charset="ISO-8859-2" /> */
     /* <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" /> */
-    static function detect_charset($str) {
+    public static function detect_charset($str) {
         $l    = 1024;
         $str  = substr($str, 0, $l);
         $str_ = strtolower($str);
@@ -1140,7 +1144,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
     }
 
     /// This method is for debug only
-    function _info() {
+    public function _info() {
         $inf = array();
         $ar = array();
         foreach($this->attribs as $i => $a) $ar[$i] = self::html_attr2str($a);
@@ -1431,7 +1435,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
     }
 
    // ------------------------------------------------------------------------
-    function _get_ctx($ctx) {
+    protected function _get_ctx($ctx) {
         if ( !($ctx instanceof parent) ) {
             if(is_array($ctx) || is_int($ctx)) {
                 $ctx = new hQuery_Context($this, $ctx, true);
@@ -1443,7 +1447,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
         return $ctx && count($ctx) ? $ctx : self::$_fl_; // false for error - something is not ok
     }
    // ------------------------------------------------------------------------
-    function _find($name, $class=NULL, $attr=NULL, $ctx=NULL, $rec=true) {
+    protected function _find($name, $class=NULL, $attr=NULL, $ctx=NULL, $rec=true) {
       // if(!in_array($name, array('meta', 'head'))) debug(compact('name', 'class', 'attr','ctx', 'rec'));
 
       $aids = NULL;
@@ -1491,7 +1495,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
    /**
     * @return false - no class, 0 - hasn't class, true - has class, [ids.cl]
     */
-   function hasClass($id, $cl) {
+   protected function hasClass($id, $cl) {
       if(!is_array($cl)) $cl = preg_split('|\\s+|',trim($cl));
       if(is_array($id)) {
          $ret = self::$_ar_;
@@ -1512,8 +1516,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
       return self::$_tr_;
    }
 
-//    protected
-    function filter($ids, $name=NULL, $class=NULL, $attr=NULL, $ctx=NULL) {
+    protected function filter($ids, $name=NULL, $class=NULL, $attr=NULL, $ctx=NULL) {
       $aids = NULL;
       if($class) {
          if($attr)    $aids = $this->get_aids_byClassAttr($class, $attr, true);
@@ -1553,7 +1556,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
    /**
     * @return [aids]
     */
-   function get_aids_byAttr($attr, $as_keys=false, $actx=NULL) {
+   protected function get_aids_byAttr($attr, $as_keys=false, $actx=NULL) {
       $aids = self::$_ar_;
       if(isset($actx) && !$actx) return $aids;
       if(is_string($attr)) $attr = self::html_parseAttrStr($attr);
@@ -1577,7 +1580,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
    /**
     * @return $as_keys ? [aid => id | [ids]] : [aids]
     */
-   function get_aids_byClass($cl, $as_keys=false, $actx=NULL) {
+   protected function get_aids_byClass($cl, $as_keys=false, $actx=NULL) {
       $aids = self::$_ar_;
       if(isset($actx) && !$actx) return $aids;
       if(!is_array($cl)) $cl = preg_split('|\\s+|',trim($cl));
@@ -1597,7 +1600,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
       return $as_keys ? $aids : array_keys($aids);
    }
 
-   function get_aids_byClassAttr($cl, $attr, $as_keys=false, $actx=NULL) {
+   protected function get_aids_byClassAttr($cl, $attr, $as_keys=false, $actx=NULL) {
       $aids = $this->get_aids_byClass($cl, true, $actx);
       if(is_string($attr)) $attr = self::html_parseAttrStr($attr);
       if($attr) foreach($aids as $aid => $ix) {
@@ -1618,7 +1621,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
     * $has_keys == true  => $aid == [aid=>[ids]]
     * $has_keys == false => $aid == [aids]
     */
-   function get_ids_byAid($aid, $sort=true, $has_keys=false) {
+   protected function get_ids_byAid($aid, $sort=true, $has_keys=false) {
         $ret = self::$_ar_;
         if(!$has_keys) $aid = self::array_select($this->attr_idx, $aid);
         foreach($aid as $aid => $aix) {
@@ -1630,7 +1633,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
         return $ret;
    }
 
-   function get_ids_byAttr($attr, $sort=true) {
+   protected function get_ids_byAttr($attr, $sort=true) {
       $ret = self::$_ar_;
       if(is_string($attr)) $attr = self::html_parseAttrStr($attr);
       if(!$attr) return $ret;
@@ -1686,17 +1689,17 @@ class hQuery_HTML_Parser extends hQuery_Node {
       return $ret;
    }
 
-   function get_ids_byClass($cl, $sort=true) {
+   protected function get_ids_byClass($cl, $sort=true) {
       $aids = $this->get_aids_byClass($cl, true);
       return $this->get_ids_byAid($aids, $sort, true);
    }
 
-   function get_ids_byClassAttr($cl, $attr, $sort=true) {
+   protected function get_ids_byClassAttr($cl, $attr, $sort=true) {
       $aids = $this->get_aids_byClassAttr($cl, $attr, true);
       return $this->get_ids_byAid($aids, $sort, true);
    }
 
-   function get_attr_byAid($aid, $to_str=false) {
+   protected function get_attr_byAid($aid, $to_str=false) {
       if(is_array($aid)) {
          $ret = self::$_ar_;
          foreach($aid as $aid) $ret[$aid] = $this->get_attr_byAid($aid, $to_str);
@@ -1708,7 +1711,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
       return $ret;
    }
 
-   function get_attr_byId($id, $attr=NULL, $to_str=false) {
+   protected function get_attr_byId($id, $attr=NULL, $to_str=false) {
       $ret = self::$_ar_;
       if(is_array($id)) {
          foreach($id as $id => $e) $ret[$id] = $this->get_attr_byId($id, $attr, $to_str);
@@ -1752,8 +1755,8 @@ class hQuery extends hQuery_HTML_Parser {
     // Response headers when using self::fromURL()
     public $headers;
 
-    static public $cache_path;
-    static public $cache_expires = 3600;
+    public static $cache_path;
+    public static $cache_expires = 3600;
 
     // ------------------------------------------------------------------------
     /**
@@ -1764,7 +1767,7 @@ class hQuery extends hQuery_HTML_Parser {
      *
      *  @return hQuery $doc
      */
-    static function fromHTML($html, $url=NULL) {
+    public static function fromHTML($html, $url=NULL) {
         $index_time = microtime(true);
         $doc = new static($html, false); // Return an instance of actual class
         if($url) {
@@ -1785,7 +1788,7 @@ class hQuery extends hQuery_HTML_Parser {
      *
      *  @return hQuery $doc
      */
-    static function fromFile($filename, $use_include_path=false, $context=NULL) {
+    public static function fromFile($filename, $use_include_path=false, $context=NULL) {
         $read_time = microtime(true);
         $html = file_get_contents($filename, $use_include_path, $context);
         $read_time = microtime(true) - $read_time;
@@ -1806,7 +1809,7 @@ class hQuery extends hQuery_HTML_Parser {
      *
      *  @return hQuery $doc
      */
-    static function fromURL($url, $headers=NULL, $body=NULL, $options=NULL) {
+    public static function fromURL($url, $headers=NULL, $body=NULL, $options=NULL) {
         $opt = array(
             'timeout'   => 7,
             'redirects' => 7,
@@ -1899,7 +1902,7 @@ class hQuery extends hQuery_HTML_Parser {
      *
      *  @return hQuery_Element collection of matched elements
      */
-    function find($sel, $attr=NULL, $ctx=NULL) {
+    public function find($sel, $attr=NULL, $ctx=NULL) {
         $c = func_num_args();
         for($i=1;$i<$c;$i++) {
             $a = func_get_arg($i);
@@ -1987,7 +1990,7 @@ class hQuery extends hQuery_HTML_Parser {
      *
      *  @return array list of HTML contents of all matched elements
      */
-    function find_html($sel, $attr=NULL, $ctx=NULL) {
+    public function find_html($sel, $attr=NULL, $ctx=NULL) {
         $r = $this->find($sel, $attr=NULL, $ctx=NULL);
         $ret = self::$_ar_;
         if($r) foreach($r as $k => $v) $ret[$k] = $v->html();
@@ -2003,7 +2006,7 @@ class hQuery extends hQuery_HTML_Parser {
      *
      *  @return array list of Text contents of all matched elements
      */
-    function find_text($sel, $attr=NULL, $ctx=NULL) {
+    public function find_text($sel, $attr=NULL, $ctx=NULL) {
         $r = $this->find($sel, $attr=NULL, $ctx=NULL);
         $ret = self::$_ar_;
         if($r) foreach($r as $k => $v) $ret[$k] = $v->text();
@@ -2013,9 +2016,9 @@ class hQuery extends hQuery_HTML_Parser {
     /**
      * Index elements of the source HTML. (Called automatically)
      */
-    function index() { return $this->_index_all(); }
+    public function index() { return $this->_index_all(); }
 
-    function exclude($sel, $attr=NULL) {
+    public function exclude($sel, $attr=NULL) {
         $e = $this->find($sel, $attr, $this);
         if($e) {
             if(empty($this->exc)) $this->exc = $e;
@@ -2172,7 +2175,7 @@ class hQuery extends hQuery_HTML_Parser {
      *
      * @return bool TRUE if $path is a valid URL, FALSE otherwise
      */
-    static function is_url_path($path) {
+    public static function is_url_path($path) {
         return preg_match('/^[a-zA-Z]+\:\/\//', $path);
     }
 
@@ -2183,7 +2186,7 @@ class hQuery extends hQuery_HTML_Parser {
      *
      * @return bool TRUE if $path is an absolute path, FALSE otherwise
      */
-    static function is_abs_path($path) {
+    public static function is_abs_path($path) {
         $ds = array('\\'=>1,'/'=>2);
         if( isset($ds[substr($path, 0, 1)]) ||
             substr($path, 1, 1) == ':' && isset($ds[substr($path, 2, 1)])
@@ -2203,7 +2206,7 @@ class hQuery extends hQuery_HTML_Parser {
      * @return string absolute URL for $url
      *
      */
-    static function abs_url($url, $base) {
+    public static function abs_url($url, $base) {
         if(!self::is_url_path($url)) {
             $t = parse_url($base);
             if(substr($url, 0, 2) == '//') {
@@ -2246,7 +2249,7 @@ class hQuery extends hQuery_HTML_Parser {
      * @author Dumitru Uzun
      *
      */
-    static function http_wr($host, $head=NULL, $body=NULL, $options=NULL) {
+    public static function http_wr($host, $head=NULL, $body=NULL, $options=NULL) {
         self::$last_http_result =
         $ret = new stdClass;
         empty($options) and $options = array();
@@ -2490,7 +2493,7 @@ class hQuery_Element extends hQuery_Node {
     // Iterator
     protected $_ich = NULL; // Iterator Cache
     // ------------------------------------------------------------------------
-    function toArray($cch=true) {
+    public function toArray($cch=true) {
         if($cch && isset($this->_ich) && count($this->ids) === count($this->_ich)) return $this->_ich;
         $ret = array();
         if($cch) {
@@ -2510,7 +2513,7 @@ class hQuery_Element extends hQuery_Node {
     }
 
     // ------------------------------------------------------------------------
-    function __get($name) {
+    public function __get($name) {
         switch($name) {
             case 'html'     : return $this->html();
             case 'outerHtml': return $this->outerHtml();
@@ -2592,7 +2595,7 @@ class hQuery_Element extends hQuery_Node {
      * Get value of an :input element.
      *
      */
-    function val() {
+    public function val() {
         switch(strtoupper($this->nodeName(false))) {
             case 'TEXTAREA':
                 return $this->html();
@@ -2613,7 +2616,7 @@ class hQuery_Element extends hQuery_Node {
      *
      * @return hQuery_Element
      */
-    function current() {
+    public function current() {
         $k = key($this->ids);
         if($k === NULL) return false;
         if(count($this->ids) == 1) return $this;
@@ -2628,7 +2631,7 @@ class hQuery_Element extends hQuery_Node {
      *
      * @return hQuery_Element
      */
-    function get($idx) {
+    public function get($idx) {
         $i = array_slice($this->ids, $idx, 1, true);
         if(!$i) return NULL;
 
@@ -2652,7 +2655,7 @@ class hQuery_Element extends hQuery_Node {
      *
      * @return hQuery_Element
      */
-    function eq($idx) {
+    public function eq($idx) {
         $i = array_slice($this->ids, $idx, 1, true) or
         $i = array();
         // Create wraper instance for $i
@@ -2668,7 +2671,7 @@ class hQuery_Element extends hQuery_Node {
      *
      * @return hQuery_Element
      */
-    function slice($idx, $len=NULL) {
+    public function slice($idx, $len=NULL) {
         $c = $this->count();
         if($idx < $c) $p += $c;
         if($idx < $c) $ids = array(); else
@@ -2696,7 +2699,7 @@ class hQuery_Element extends hQuery_Node {
      *
      * @return hQuery_Element parent
      */
-    function parent() {
+    public function parent() {
         $p = $this->_parent();
         return $p ? new self($this->doc, $p) : NULL;
     }
@@ -2706,7 +2709,7 @@ class hQuery_Element extends hQuery_Node {
      *
      * @return hQuery_Element children
      */
-    function children() {
+    public function children() {
         $p = $this->_children();
         return $p ? new self($this->doc, $p) : NULL;
     }
