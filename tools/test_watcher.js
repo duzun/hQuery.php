@@ -94,7 +94,7 @@ check_phpunit_phar(function () {
       , {
         interval: _delay >>> 1
         , ignoreDotFiles: true
-        , ignoreDirectoryPattern: /(node_modules|scripts)/
+        , ignoreDirectoryPattern: /(node_modules|scripts|tools)/
         , filter: function (f, stat) { return stat.isDirectory() || path.extname(f) === '.php'; }
       }
       , function (monitor) {

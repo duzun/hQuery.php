@@ -4,14 +4,14 @@
  *  Copyright (C) 2014 Dumitru Uzun
  *
  *  @author Dumitru Uzun (DUzun.ME)
- *  @version 1.1.1
+ *  @version 1.1.3
  */
 // ------------------------------------------------------------------------
 
 /// Base class for all HTML Elements
 abstract class ADOM_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    static $version = '1.1.1';
+    static $version = '1.1.3';
     // ------------------------------------------------------------------------
     static $_ar_ = array()     ;
     static $_mi_ = PHP_INT_MAX ;
@@ -586,7 +586,7 @@ abstract class ADOM_Node implements Iterator, Countable {
     }
 
     // ------------------------------------------------------------------------
-    /*! Parse a selector string into an array structure.
+    /** Parse a selector string into an array structure.
      *
      * tn1#id1 .cl1.cl2:first tn2:5 , tn3.cl3 tn4#id2:eq(-1) > tn5:last-child > tn6:lt(3)
      *  -->
@@ -842,7 +842,7 @@ class IDOM_Context extends ADOM_Node {
         parent::__construct($doc, $el_arr, true);
     }
 
-    /*! ctx($el) * $this
+    /** ctx($el) * $this
      * @return ctx
      */
     function intersect($el, $eq=true) {
@@ -1405,7 +1405,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
       return $ni ? $ni : self::$_nl_;
    }
 
-   /*!
+   /**
     * @return false - no class, 0 - hasn't class, true - has class, [ids.cl]
     */
    function hasClass($id, $cl) {
@@ -1467,7 +1467,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
    }
    // ------------------------------------------------------------------------
 
-   /*!
+   /**
     * @return [aids]
     */
    function get_aids_byAttr($attr, $as_keys=false, $actx=NULL) {
@@ -1491,7 +1491,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
       return $as_keys ? $aids : array_keys($aids);
    }
 
-   /*!
+   /**
     * @return $as_keys ? [aid => id | [ids]] : [aids]
     */
    function get_aids_byClass($cl, $as_keys=false, $actx=NULL) {
@@ -1531,7 +1531,7 @@ class CHTML_Parser_Doc extends ADOM_Node {
       return $as_keys ? $aids : array_keys($aids);
    }
 
-   /*!
+   /**
     * $has_keys == true  => $aid == [aid=>[ids]]
     * $has_keys == false => $aid == [aids]
     */
@@ -1719,7 +1719,7 @@ class hQuery extends CHTML_Parser_Doc {
      *  @param string        $url     - the URL of the document
      *  @param array         $headers - OPTIONAL request headers
      *  @param array|string  $body    - OPTIONAL body of the request (for POST or PUT)
-     *  @param array         $options - OPTIONAL request options
+     *  @param array         $options - OPTIONAL request options (see self::http_wr() for more details)
      *
      *  @return hQuery $doc
      */
@@ -1895,9 +1895,15 @@ class hQuery extends CHTML_Parser_Doc {
         return NULL;
     }
 
-
-    function index() { return $this->_index_all(); }
-
+    /**
+     *  Combination of ->find() + ->html()
+     *
+     *  @param string       $sel  - A valid CSS selector.
+     *  @param array|string $attr - OPTIONAL attributes as string or key-value pairs.
+     *  @param ADOM_Node    $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
+     *
+     *  @return array list of HTML contents of all matched elements
+     */
     function find_html($sel, $attr=NULL, $ctx=NULL) {
         $r = $this->find($sel, $attr=NULL, $ctx=NULL);
         $ret = self::$_ar_;
@@ -1905,12 +1911,26 @@ class hQuery extends CHTML_Parser_Doc {
         return $ret;
     }
 
+    /**
+     *  Combination of ->find() + ->text()
+     *
+     *  @param string       $sel  - A valid CSS selector.
+     *  @param array|string $attr - OPTIONAL attributes as string or key-value pairs.
+     *  @param ADOM_Node    $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
+     *
+     *  @return array list of Text contents of all matched elements
+     */
     function find_text($sel, $attr=NULL, $ctx=NULL) {
         $r = $this->find($sel, $attr=NULL, $ctx=NULL);
         $ret = self::$_ar_;
         if($r) foreach($r as $k => $v) $ret[$k] = $v->text();
         return $ret;
     }
+
+    /**
+     * Index elements of the source HTML. (Called automatically)
+     */
+    function index() { return $this->_index_all(); }
 
     function exclude($sel, $attr=NULL) {
         $e = $this->find($sel, $attr, $this);
@@ -1926,7 +1946,15 @@ class hQuery extends CHTML_Parser_Doc {
 
     // - Helpers ------------------------------------------------
 
-    /// Read data from a cache file
+    /**
+     *  Read data from a cache file.
+     *
+     *  @param string $fn        - cache filename
+     *  @param int    $expire    - OPTIONAL contents returned only if it is newer then $expire seconds
+     *  @param bool   $meta_only - OPTIONAL if TRUE, read only meta-info (faster)
+     *
+     *  @return array [mixed <contents>, array <meta_info>]
+     */
     protected static function get_cache($fn, $expire=false, $meta_only=false) {
         $meta = $cnt = NULL;
         if( $fm = @filemtime($fn) and (!$expire || $fm + $expire > time()) ) {
@@ -1963,7 +1991,16 @@ class hQuery extends CHTML_Parser_Doc {
         return $cnt || $meta ? array($cnt, $meta) : false;
     }
 
-    /// Save data to a cache file
+    /**
+     *  Save data to a cache file.
+     *
+     *  @param string $fn   - cache filename
+     *  @param mixed  $cnt  - contents to be cached
+     *  @param array  $meta - OPTIONAL meta information related to contents.
+     *  @param bool   $gzip - OPTIONAL if TRUE and gzip supported, store contents gzipped
+     *
+     *  @return int|bool On success, number of written bytes, FALSE on fail.
+     */
     protected static function set_cache($fn, $cnt, $meta=NULL, $gzip=true) {
         if($cnt === false) return !file_exists($fn) || unlink($fn);
         $n = 0;
@@ -1987,9 +2024,9 @@ class hQuery extends CHTML_Parser_Doc {
     /**
      * Lock with retries
      *
-     * @param (resource)$fp         - Open file pointer
-     * @param (int)     $lock       - Lock type
-     * @param (int)     $timeout_ms - Timeout to wait for unlock in miliseconds
+     * @param resource $fp         - Open file pointer
+     * @param int      $lock       - Lock type
+     * @param int      $timeout_ms - OPTIONAL Timeout to wait for unlock in miliseconds
      *
      * @return true on success, false on fail
      *
@@ -2090,15 +2127,15 @@ class hQuery extends CHTML_Parser_Doc {
      * Executes a HTTP write-read session.
      *
      * @param string $host - IP/HOST address or URL
-     * @param (array) $head - list off HTTP headers to be sent along with the request to $host
-     * @param (mixed) $body - data to be sent as the contents of the request. If is array or object, a http query is built.
-     * @param (array) $options - list of option as key-value:
+     * @param array  $head - list off HTTP headers to be sent along with the request to $host
+     * @param mixed  $body - data to be sent as the contents of the request. If is array or object, a http query is built.
+     * @param array  $options - list of option as key-value:
      *                              timeout - connection timeout in seconds
      *                              host    - goes in headers, overrides $host (ex. $host == '127.0.0.1', $options['host'] == 'www.example.com')
      *                              scheme  - ssl, tls, udp, ...
      *                              close   - whether to close connection o not
      *
-     * @return (array)response: [contents, headers, http-status-code, http-status-message]
+     * @return array [contents, headers, http-status-code, http-status-message]
      *
      * @author Dumitru Uzun
      *
@@ -2351,7 +2388,10 @@ class HTML_Node extends ADOM_Node {
         $ret = array();
         if($cch) {
             foreach($this->ids as $b => $e) {
-                $ret[$b] = isset($this->_ich[$b]) ? $this->_ich[$b] : ( $this->_ich[$b] = new self($this->doc, array($b=>$e)) );
+                $ret[$b] = isset($this->_ich[$b])
+                    ? $this->_ich[$b]
+                    : ( $this->_ich[$b] = new self($this->doc, array($b=>$e)) )
+                ;
             }
         }
         else {
@@ -2397,6 +2437,8 @@ class HTML_Node extends ADOM_Node {
         }
     }
     // ------------------------------------------------------------------------
+    // Iterator methods:
+
     public function offsetSet($offset, $value) {
         if(is_null($offset)) {
             // $this->_data[] = $value; // ???
@@ -2439,14 +2481,18 @@ class HTML_Node extends ADOM_Node {
     }
     // ------------------------------------------------------------------------
 
+    /**
+     * Get value of an :input element.
+     *
+     */
     function val() {
         switch(strtoupper($this->nodeName(false))) {
             case 'TEXTAREA':
                 return $this->html();
             case 'INPUT':
                 switch(strtoupper($this->attr('type'))) {
-                case 'CHECKBOX': return $this->attr('checked') !== false;
-                default:         return $this->attr('value');
+                    case 'CHECKBOX': if ( $this->attr('checked') === false ) return false;
+                    default:         return $this->attr('value');
                 }
             return $this->html();
             case 'SELECT': // ???
@@ -2455,7 +2501,11 @@ class HTML_Node extends ADOM_Node {
         }
     }
 
-    // Override current for iterations
+    /**
+     * Override current() for iterations.
+     *
+     * @return HTML_Node
+     */
     function current() {
         $k = key($this->ids);
         if($k === NULL) return false;
@@ -2464,7 +2514,13 @@ class HTML_Node extends ADOM_Node {
         return $this->_ich[$k];
     }
 
-    // Get the node at $idx position in the set, using cache
+    /**
+     * Get the node at $idx position in the set, using cache
+     *
+     * @param int $idx - index of an element, starts with 0.
+     *
+     * @return HTML_Node
+     */
     function get($idx) {
         $i = array_slice($this->ids, $idx, 1, true);
         if(!$i) return NULL;
@@ -2482,7 +2538,13 @@ class HTML_Node extends ADOM_Node {
         return $o;
     }
 
-    // Get the node at $idx position in the set, no cache, each call creates new instance
+    /**
+     * Get the node at $idx position in the set, no cache, each call creates new instance.
+     *
+     * @param int $idx - index of an element, starts with 0.
+     *
+     * @return HTML_Node
+     */
     function eq($idx) {
         $i = array_slice($this->ids, $idx, 1, true) or
         $i = array();
@@ -2491,6 +2553,14 @@ class HTML_Node extends ADOM_Node {
         return $o;
     }
 
+    /**
+     * Get a slice of current node collection.
+     *
+     * @param int $idx - start index of an element, starts with 0.
+     * @param int $len - OPTIONAL number of element to slice. Defaults to all starting at $idx
+     *
+     * @return HTML_Node
+     */
     function slice($idx, $len=NULL) {
         $c = $this->count();
         if($idx < $c) $p += $c;
@@ -2501,7 +2571,8 @@ class HTML_Node extends ADOM_Node {
                 $ids = $this->ids;
             }
             $ids = array_slice($this->ids, $idx, $len, true);
-        } else {
+        }
+        else {
             if($idx == 0) {
                 return $this; // ???
                 $ids = $this->ids;
@@ -2513,11 +2584,21 @@ class HTML_Node extends ADOM_Node {
         return $o;
     }
 
+    /**
+     * Get parent nodes for this collection of nodes.
+     *
+     * @return HTML_Node parent
+     */
     function parent() {
         $p = $this->_parent();
         return $p ? new self($this->doc, $p) : NULL;
     }
 
+    /**
+     * Get child nodes for this collection of nodes.
+     *
+     * @return HTML_Node children
+     */
     function children() {
         $p = $this->_children();
         return $p ? new self($this->doc, $p) : NULL;
