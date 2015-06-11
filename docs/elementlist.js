@@ -1,3 +1,3 @@
 
 var ApiGen = ApiGen || {};
-ApiGen.elements = [["c","ADOM_Node"],["c","CHTML_Parser_Doc"],["c","hQuery"],["c","HTML_Node"],["c","IDOM_Context"]];
+ApiGen.elements = [["c","hQuery"],["c","hQuery_Element"],["c","hQuery_HTML_Parser"],["c","hQuery_Node"]];
