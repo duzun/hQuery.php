@@ -81,8 +81,9 @@ $size = $doc->size;
 
 #TODO
 
-  - Add Unit tests
+  - Unit tests everything
   - Document everything
+  - Cookie support
   - Add more selectors
   - Improve selectors to be able to select by attributes
 
