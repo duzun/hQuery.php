@@ -10,6 +10,8 @@
   "homepage": "https://duzun.me/playground/hquery",
   "keywords": [
     "HTML",
+    "XML",
+    "XHTML",
     "web",
     "scraper",
     "scraping",
@@ -26,8 +28,8 @@
   "scripts": {
     "verup": "node ./node_modules/verup",
     "apigen": "php ./tools/apigen.phar generate -d ./docs --template-theme bootstrap -s ./hquery.php",
-    "test": "php ./tests/phpunit.phar ./tests/",
-    "test-dev": "node tests/test_watcher.js"
+    "test": "php ./tools/phpunit.phar ./tests/",
+    "test-dev": "node ./tools/test_watcher.js"
   },
   "verup": {
     "files": [
