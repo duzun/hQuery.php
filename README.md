@@ -31,7 +31,7 @@ hQuery::$cache_path = "/path/to/cache";
 ### Open a remote HTML document
 ###### [hQuery::fromUrl](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL)( string `$url`, array `$headers` = NULL, array|string `$body` = NULL, array `$options` = NULL )
 ```php
-$doc = hQuery::fromUrl('http://example.com/someDoc.html', ['Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8']);
+$doc = hQuery::fromUrl('http://example.com/someDoc.html', ['Accept' => 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8']);
 
 var_dump($doc->headers); // See response headers
 var_dump(hQuery::$last_http_result); // See response details of last request

@@ -1,32 +1,39 @@
 <?php
 // ------------------------------------------------------------------------
 /**
- *  Copyright (C) 2014 Dumitru Uzun
+ *  Copyright (C) 2014-2015 Dumitru Uzun
  *
  *  @author Dumitru Uzun (DUzun.ME)
- *  @version 1.1.3
+ *  @license MIT
+ *  @version 1.2.0
  */
 // ------------------------------------------------------------------------
 
-/// Base class for all HTML Elements
-abstract class ADOM_Node implements Iterator, Countable {
+/**
+ *  Base class for HTML Elements and Documents.
+ *
+ *  used internally
+ */
+abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    static $version = '1.1.3';
+    const VERSION = '1.2.0';
+    // ------------------------------------------------------------------------
+    static $last_http_result; // Response details of last request
+
+    // ------------------------------------------------------------------------
+    static $selected_doc = NULL;
+    // ------------------------------------------------------------------------
+    protected $_prop; // Properties
+    protected $doc; // Parent doc
+    protected $ids; // contained elements' IDs
+
     // ------------------------------------------------------------------------
     static $_ar_ = array()     ;
     static $_mi_ = PHP_INT_MAX ;
     static $_nl_ = NULL        ;
     static $_fl_ = false       ;
     static $_tr_ = true        ;
-
-    static $selected_doc = NULL;
     // ------------------------------------------------------------------------
-    static $last_http_result;
-    // ------------------------------------------------------------------------
-    protected $_prop; // Properties
-    protected $doc; // Parent doc
-    protected $ids; // contained elements' IDs
-
     protected function __construct($doc, $ids, $is_ctx=false) {
         $this->doc = $doc;
         if(is_int($ids)) $ids = array($ids => $doc->ids[$ids]);
@@ -39,24 +46,8 @@ abstract class ADOM_Node implements Iterator, Countable {
 
     function __destruct() {
         if(self::$selected_doc === $this) self::$selected_doc = self::$_nl_;
-        $this->ids = self::$_nl_; // If any reference exists, destroy its contents! P.S. Might be buggy, but hey, I own this property. Sincerly yours, ADOM_Node class.
+        $this->ids = self::$_nl_; // If any reference exists, destroy its contents! P.S. Might be buggy, but hey, I own this property. Sincerly yours, hQuery_Node class.
         unset($this->doc, $this->ids);
-    }
-    // ------------------------------------------------------------------------
-    // The magic of properties
-    function __get($name) {
-        if(array_key_exists($name, $this->_prop)) return $this->_prop[$name];
-        return $this->attr($name);
-    }
-    function __set($name, $value) {
-        if(isset($value)) return $this->_prop[$name] = $value;
-        $this->__unset($name);
-    }
-    function __isset($name) {
-        return isset($this->_prop[$name]);
-    }
-    function __unset($name) {
-        unset($this->_prop[$name]);
     }
     // ------------------------------------------------------------------------
     function attr($attr=NULL, $to_str=false) {
@@ -68,41 +59,11 @@ abstract class ADOM_Node implements Iterator, Countable {
         return isset($k) ? $this->doc()->get_attr_byId($k, $attr, $to_str) : NULL;
     }
     // ------------------------------------------------------------------------
-    // Countable
-    public function count() { return isset($this->ids) ? count($this->ids) : 0; }
-    // ------------------------------------------------------------------------
-    // Iterable
-    function current() {
-        $k = key($this->ids);
-        if($k === NULL) return false;
-        return array($k => $this->ids[$k]);
-    }
-    function valid()   { return current($this->ids) !== false; }
-    function key()     { return key($this->ids); }
-    function next()    { return next($this->ids) !== false ? $this->current() : false; }
-    function prev()    { return prev($this->ids) !== false ? $this->current() : false; }
-    function rewind()  { reset($this->ids); return $this->current(); }
-    // ------------------------------------------------------------------------
 
-    /**
-     *  Get string offset of the first/current element
-     *  in the source HTML document.
-     */
-    public function pos($rst=true) {
-        $k = key($this->ids);
-        if($k === NULL) {
-            reset($this->ids);
-            $k = key($this->ids);
-            if($k !== NULL && $rst) {
-                end($this->ids);
-                next($this->ids);
-            }
-        }
-        return $k;
-    }
+    // Deprecated
+    function is_empty() { return $this->isEmpty() ;}
 
-
-    function is_empty() {
+    function isEmpty() {
         return empty($this->ids);
     }
 
@@ -132,16 +93,130 @@ abstract class ADOM_Node implements Iterator, Countable {
         return $ret;
     }
 
-    /// Make a context array of ids (if x in $ids && exists y in $ids such that x in y then del x from $ids)
+   // ------------------------------------------------------------------------
+   /**
+    * @return string .innerHTML
+    */
+   function html($id=NULL) {
+      if($this->isDoc()) return $this->html; // doc
+
+      $id = $this->_my_ids($id);
+      if($id === false) return self::$_fl_;
+      $doc = $this->doc;
+      $ret = self::$_nl_;
+      foreach($id as $p => $q) {
+         if(isset($this->exc, $this->exc[$p])) continue;
+         ++$p;
+         if($p<$q) $ret .= substr($doc->html, $p, $q-$p);
+      }
+      return $ret;
+   }
+
+   /**
+    * @return string .outerHtml
+    */
+   function outerHtml($id=NULL) {
+      $dm = $this->isDoc() && !isset($id);
+      if($dm) return $this->html; // doc
+
+      $id = $this->_my_ids($id);
+      if($id === false) return self::$_fl_;
+      $doc = $this->doc();
+      $ret = self::$_nl_;
+      $map = isset($this->tag_map) ? $this->tag_map : (isset($doc->tag_map) ? $doc->tag_map : NULL);
+      foreach($id as $p => $q) {
+         $a = $doc->get_attr_byId($p, NULL, true);
+         $n = $doc->tags[$p];
+         if($map && isset($map[$_n=strtolower($n)])) $n = $map[$_n];
+         $h = $p++ == $q ? false : ($p<$q ? substr($doc->html, $p, $q-$p) : '');
+         $ret .= '<'.$n.($a?' '.$a:'') . ($h === false ? ' />' : '>' . $h . '</'.$n.'>');
+      }
+      return $ret;
+   }
+
+   /**
+    * @return string .innerText
+    */
+    function text($id=NULL) {
+        return html_entity_decode(strip_tags($this->html($id)), ENT_QUOTES);/* ??? */
+    }
+
+   /**
+    * @return string .nodeName
+    */
+   function nodeName($caseFolding = NULL, $id=NULL) {
+      if(!isset($caseFolding)) $caseFolding = hQuery_HTML_Parser::$case_folding;
+      $dm = $this->isDoc() && !isset($id);
+      if($dm) $ret = array_unique($this->tags); // doc
+      else {
+         $id = $this->_my_ids($id, true);
+         if($id === false) return self::$_fl_;
+         $ret = self::array_select($this->doc()->tags, $id);
+      }
+      if($caseFolding) {
+         foreach($ret as &$n) $n = strtolower($n);
+         if($dm) $ret = array_unique($ret);
+      }
+      return count($ret) <= 1 ? reset($ret) : $ret;
+   }
+
+//    function firstChild() {
+//       $doc = $this->doc();
+//       $q = reset($this->ids);
+//       $p = key($this->ids);
+//       return new hQuery_Element($doc, array($p=>$q));
+//    }
+//
+//    function lastChild() {
+//       $doc = $this->doc();
+//       $q = end($this->ids);
+//       $p = key($this->ids);
+//       return new hQuery_Element($doc, array($p=>$q));
+//    }
+
+    // ------------------------------------------------------------------------
+    /**
+     *  Get string offset of the first/current element
+     *  in the source HTML document.
+     *
+     * @return int
+     */
+    public function pos($rst=true) {
+        $k = key($this->ids);
+        if($k === NULL) {
+            reset($this->ids);
+            $k = key($this->ids);
+            if($k !== NULL && $rst) {
+                end($this->ids);
+                next($this->ids);
+            }
+        }
+        return $k;
+    }
+    // ------------------------------------------------------------------------
+    /**
+     * Make a context array of ids (if x in $ids && exists y in $ids such that x in y then del x from $ids)
+     *
+     * @return array ids
+     */
     protected function _ctx_ids($ids=NULL) {
         $m = -1;
         if(!isset($ids)) $ids = $this->ids;
         if(is_int($ids)) $ids = isset($this->ids[$ids]) ? array($ids => $this->ids[$ids]) : self::$_fl_;
-        else foreach($ids as $b => $e) if($b <= $m || $b+1 >= $e) unset($ids[$b]); else $m = $e;
+        else {
+            foreach($ids as $b => $e) {
+                if($b <= $m || $b+1 >= $e) unset($ids[$b]);
+                else $m = $e;
+            }
+        }
         return $ids;
     }
 
-    /// Get all ids from inside of this element
+    /**
+     * Get all ids from inside of this element
+     *
+     * @return array ids
+     */
     protected function _sub_ids($eq=false) {
         $ret = array();
         $ce  = reset($this->ids);
@@ -161,7 +236,11 @@ abstract class ADOM_Node implements Iterator, Countable {
         return $ret;
     }
 
-    /// Get and Normalize ids of $el
+    /**
+     * Get and Normalize ids of $el
+     *
+     * @return array ids
+     */
     protected function _doc_ids($el, $force_array=true) {
         if($el instanceof self) $el = $el->ids;
         if($force_array) {
@@ -476,82 +555,48 @@ abstract class ADOM_Node implements Iterator, Countable {
       }
       return $ret;
     }
-   // ------------------------------------------------------------------------
 
-   /// innerHTML
-   function html($id=NULL) {
-      if($this->isDoc()) return $this->html; // doc
-
-      $id = $this->_my_ids($id);
-      if($id === false) return self::$_fl_;
-      $doc = $this->doc;
-      $ret = self::$_nl_;
-      foreach($id as $p => $q) {
-         if(isset($this->exc, $this->exc[$p])) continue;
-         ++$p;
-         if($p<$q) $ret .= substr($doc->html, $p, $q-$p);
-      }
-      return $ret;
-   }
-
-   function outerHtml($id=NULL) {
-      $dm = $this->isDoc() && !isset($id);
-      if($dm) return $this->html; // doc
-
-      $id = $this->_my_ids($id);
-      if($id === false) return self::$_fl_;
-      $doc = $this->doc();
-      $ret = self::$_nl_;
-      $map = isset($this->tag_map) ? $this->tag_map : (isset($doc->tag_map) ? $doc->tag_map : NULL);
-      foreach($id as $p => $q) {
-         $a = $doc->get_attr_byId($p, NULL, true);
-         $n = $doc->tags[$p];
-         if($map && isset($map[$_n=strtolower($n)])) $n = $map[$_n];
-         $h = $p++ == $q ? false : ($p<$q ? substr($doc->html, $p, $q-$p) : '');
-         $ret .= '<'.$n.($a?' '.$a:'') . ($h === false ? ' />' : '>' . $h . '</'.$n.'>');
-      }
-      return $ret;
-   }
-
-    /// innerText
-    function text($id=NULL) {
-        return html_entity_decode(strip_tags($this->html($id)), ENT_QUOTES);/* ??? */
+// - Magic ------------------------------------------------
+    function __get($name) {
+        if(array_key_exists($name, $this->_prop)) return $this->_prop[$name];
+        return $this->attr($name);
     }
-
-   function nodeName($caseFolding = NULL, $id=NULL) {
-      if(!isset($caseFolding)) $caseFolding = CHTML_Parser_Doc::$case_folding;
-      $dm = $this->isDoc() && !isset($id);
-      if($dm) $ret = array_unique($this->tags); // doc
-      else {
-         $id = $this->_my_ids($id, true);
-         if($id === false) return self::$_fl_;
-         $ret = self::array_select($this->doc()->tags, $id);
-      }
-      if($caseFolding) {
-         foreach($ret as &$n) $n = strtolower($n);
-         if($dm) $ret = array_unique($ret);
-      }
-      return count($ret) <= 1 ? reset($ret) : $ret;
-   }
-
-//    function firstChild() {
-//       $doc = $this->doc();
-//       $q = reset($this->ids);
-//       $p = key($this->ids);
-//       return new HTML_Node($doc, array($p=>$q));
-//    }
-//
-//    function lastChild() {
-//       $doc = $this->doc();
-//       $q = end($this->ids);
-//       $p = key($this->ids);
-//       return new HTML_Node($doc, array($p=>$q));
-//    }
+    function __set($name, $value) {
+        if(isset($value)) return $this->_prop[$name] = $value;
+        $this->__unset($name);
+    }
+    function __isset($name) {
+        return isset($this->_prop[$name]);
+    }
+    function __unset($name) {
+        unset($this->_prop[$name]);
+    }
+    // ------------------------------------------------------------------------
+    // Countable:
+    public function count() { return isset($this->ids) ? count($this->ids) : 0; }
+    // ------------------------------------------------------------------------
+    // Iterable:
+    function current() {
+        $k = key($this->ids);
+        if($k === NULL) return false;
+        return array($k => $this->ids[$k]);
+    }
+    function valid()   { return current($this->ids) !== false; }
+    function key()     { return key($this->ids); }
+    function next()    { return next($this->ids) !== false ? $this->current() : false; }
+    function prev()    { return prev($this->ids) !== false ? $this->current() : false; }
+    function rewind()  { reset($this->ids); return $this->current(); }
 
 // - Helpers ------------------------------------------------
 
-    /// Normalize a CSS selector pseudo-class string.
-    /// ( int, string or array(name => value) )
+    /**
+     * Normalize a CSS selector pseudo-class string.
+     * ( int, string or array(name => value) )
+     *
+     * @return int|array
+     *
+     * @internal
+     */
     static function html_normal_pseudoClass($p) {
         if(is_int($p)) return $p;
         $i = (int)$p;
@@ -578,7 +623,8 @@ abstract class ADOM_Node implements Iterator, Countable {
                 if(isset($map[$p[0]])) {
                     $p[0] = $map[$p[0]];
                     if(isset($p[1])) $p[1] = (int)$p[1];
-                } else {
+                }
+                else {
                 // ??? unknown ps
                 }
         }
@@ -586,7 +632,8 @@ abstract class ADOM_Node implements Iterator, Countable {
     }
 
     // ------------------------------------------------------------------------
-    /** Parse a selector string into an array structure.
+    /**
+     * Parse a selector string into an array structure.
      *
      * tn1#id1 .cl1.cl2:first tn2:5 , tn3.cl3 tn4#id2:eq(-1) > tn5:last-child > tn6:lt(3)
      *  -->
@@ -605,10 +652,15 @@ abstract class ADOM_Node implements Iterator, Countable {
      *          ]
      *      ]
      *   ]
+     *
+     * @return array
+     *
+     * @internal
      */
     static function html_selector2struc($sel) {
         $sc = '#.:';
-        $n = NULL; $a = array();
+        $n = NULL;
+        $a = array();
         $def = array('n'=>$n, 'i'=>$n, 'c'=>$a, 'p'=>$a);
         $sel = rtrim(trim(preg_replace('/\\s*(>|,)\\s*/', '$1', $sel), " \t\n\r,>"), $sc);
         $sel = explode(',', $sel);
@@ -745,26 +797,26 @@ abstract class ADOM_Node implements Iterator, Countable {
     }
     // ------------------------------------------------------------------------
     static function parseCSStr($str, $case_folding = true) {
-      $ret = array();
-      $a = explode(';', $str); // ??? what if ; in "" ?
-      foreach($a as $v) {
-         $v = explode(':', $v, 2);
-         $n = trim(reset($v));
-         if($case_folding) $n = strtolower($n);
-         $ret[$n] = count($v) == 2 ? trim(end($v)) : NULL;
-      }
-      unset($ret['']);
-      return $ret;
+        $ret = array();
+        $a = explode(';', $str); // ??? what if ; in "" ?
+        foreach($a as $v) {
+            $v = explode(':', $v, 2);
+            $n = trim(reset($v));
+            if($case_folding) $n = strtolower($n);
+            $ret[$n] = count($v) == 2 ? trim(end($v)) : NULL;
+        }
+        unset($ret['']);
+        return $ret;
     }
 
     static function CSSArr2Str($css) {
-       if(is_array($css)) {
-          ksort($css);
-          $ret = array();
-          foreach($css as $n => $v) $ret[] = $n.':'.$v;
-          return implode(';', $ret);
-       }
-       return $css;
+        if(is_array($css)) {
+            ksort($css);
+            $ret = array();
+            foreach($css as $n => $v) $ret[] = $n.':'.$v;
+            return implode(';', $ret);
+        }
+        return $css;
     }
     // ------------------------------------------------------------------------
     static function str_range($comp, $pos=0, $len=NULL) {
@@ -797,9 +849,10 @@ abstract class ADOM_Node implements Iterator, Countable {
     static function array_select($arr, $keys, $force_null=false) {
         $ret = array();
         is_array($keys) or is_object($keys) or $keys = array($keys);
-        foreach($keys as $k)
+        foreach($keys as $k) {
             if(isset($arr[$k])) $ret[$k] = $arr[$k];
             elseif($force_null) $ret[$k] = NULL;
+        }
         return $ret;
     }
     // ------------------------------------------------------------------------
@@ -832,30 +885,57 @@ abstract class ADOM_Node implements Iterator, Countable {
 }
 // ------------------------------------------------------------------------
 
-class IDOM_Context extends ADOM_Node {
+/**
+ *  A context is a list of node addresses with reference to their document.
+ *
+ *  @internal
+ */
+class hQuery_Context extends hQuery_Node {
+
     function __construct($doc=NULL, $el_arr=NULL) {
         if($el_arr instanceof parent) {
            if(!$doc) $doc = $el_arr->doc();
            $el_arr = $el_arr->ids;
         }
-        elseif(is_array($el_arr)) ksort($el_arr);
+        elseif(is_array($el_arr)) {
+            ksort($el_arr);
+        }
         parent::__construct($doc, $el_arr, true);
     }
 
-    /** ctx($el) * $this
-     * @return ctx
+    /**
+     *  ctx($el) * $this
+     *
+     *  @return hQuery_Context ctx
      */
     function intersect($el, $eq=true) {
-       if($el instanceof self) { if($el === $this) if($eq) return $this; else $el = array(); else $el = $el->ids; } else
-       $el = $this->_ctx_ids($this->_doc_ids($el, true));
-       foreach($el as $b => $e) if(!$this->has($b, $eq)) unset($el[$b]);
-       return new self($el, $this->doc);
+        if($el instanceof self) {
+            if($el === $this) {
+                if($eq) return $this;
+                else $el = array();
+            }
+            else {
+                $el = $el->ids;
+            }
+        }
+        else {
+            $el = $this->_ctx_ids($this->_doc_ids($el, true));
+        }
+        foreach($el as $b => $e) {
+            if(!$this->has($b, $eq)) unset($el[$b]);
+        }
+
+        return new self($el, $this->doc);
     }
 }
 
 // ------------------------------------------------------------------------
-/// HTML Parser Class
-class CHTML_Parser_Doc extends ADOM_Node {
+/**
+ *  HTML Parser Class
+ *
+ *  used internally
+ */
+class hQuery_HTML_Parser extends hQuery_Node {
     static $del_spaces          = false;
     static $case_folding        = true;
     static $autoclose_tags      = false; // 1 - auto-close non-empty tags, 2 - auto-close all tags
@@ -1352,12 +1432,15 @@ class CHTML_Parser_Doc extends ADOM_Node {
 
    // ------------------------------------------------------------------------
     function _get_ctx($ctx) {
-         if(!($ctx instanceof parent)) {
-            if(is_array($ctx) || is_int($ctx))
-               $ctx = new IDOM_Context($this, $ctx, true);
-            else $ctx = self::$_fl_;
-         }
-         return $ctx && count($ctx) ? $ctx : self::$_fl_; // false for error - something is not ok
+        if ( !($ctx instanceof parent) ) {
+            if(is_array($ctx) || is_int($ctx)) {
+                $ctx = new hQuery_Context($this, $ctx, true);
+            }
+            else {
+                $ctx = self::$_fl_;
+            }
+        }
+        return $ctx && count($ctx) ? $ctx : self::$_fl_; // false for error - something is not ok
     }
    // ------------------------------------------------------------------------
     function _find($name, $class=NULL, $attr=NULL, $ctx=NULL, $rec=true) {
@@ -1661,9 +1744,9 @@ class CHTML_Parser_Doc extends ADOM_Node {
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 /**
- *  The Main Class for HTML document
+ *  Main Class, represents an HTML document.
  */
-class hQuery extends CHTML_Parser_Doc {
+class hQuery extends hQuery_HTML_Parser {
 
     // ------------------------------------------------------------------------
     // Response headers when using self::fromURL()
@@ -1812,9 +1895,9 @@ class hQuery extends CHTML_Parser_Doc {
      *
      *  @param string       $sel  - A valid CSS selector.
      *  @param array|string $attr - OPTIONAL attributes as string or key-value pairs.
-     *  @param ADOM_Node    $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
+     *  @param hQuery_Node    $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
      *
-     *  @return HTML_Node collection of matched elements
+     *  @return hQuery_Element collection of matched elements
      */
     function find($sel, $attr=NULL, $ctx=NULL) {
         $c = func_num_args();
@@ -1824,7 +1907,7 @@ class hQuery extends CHTML_Parser_Doc {
             elseif(is_array($a))  $attr = array_merge($attr, $a);
             elseif(is_string($a)) $attr = array_merge($attr, self::html_parseAttrStr($a));
             elseif(is_object($a)) {
-                if($a instanceof ADOM_Node) $ctx = $a;
+                if($a instanceof hQuery_Node) $ctx = $a;
                 else throw new Exception('Wrong context in ' . __METHOD__);
             }
         }
@@ -1890,7 +1973,7 @@ class hQuery extends CHTML_Parser_Doc {
         }
         if($ra) {
             ksort($ra);
-            return new HTML_Node($this, $ra);
+            return new hQuery_Element($this, $ra);
         }
         return NULL;
     }
@@ -1900,7 +1983,7 @@ class hQuery extends CHTML_Parser_Doc {
      *
      *  @param string       $sel  - A valid CSS selector.
      *  @param array|string $attr - OPTIONAL attributes as string or key-value pairs.
-     *  @param ADOM_Node    $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
+     *  @param hQuery_Node    $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
      *
      *  @return array list of HTML contents of all matched elements
      */
@@ -1916,7 +1999,7 @@ class hQuery extends CHTML_Parser_Doc {
      *
      *  @param string       $sel  - A valid CSS selector.
      *  @param array|string $attr - OPTIONAL attributes as string or key-value pairs.
-     *  @param ADOM_Node    $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
+     *  @param hQuery_Node    $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
      *
      *  @return array list of Text contents of all matched elements
      */
@@ -2082,10 +2165,24 @@ class hQuery extends CHTML_Parser_Doc {
        return $ret;
     }
     // ------------------------------------------------------------------------
+    /**
+     * Check whether $path is a valid url.
+     *
+     * @param string $path - a path to check
+     *
+     * @return bool TRUE if $path is a valid URL, FALSE otherwise
+     */
     static function is_url_path($path) {
         return preg_match('/^[a-zA-Z]+\:\/\//', $path);
     }
 
+    /**
+     * Check whether $path is an absolute path.
+     *
+     * @param string $path - a path to check
+     *
+     * @return bool TRUE if $path is an absolute path, FALSE otherwise
+     */
     static function is_abs_path($path) {
         $ds = array('\\'=>1,'/'=>2);
         if( isset($ds[substr($path, 0, 1)]) ||
@@ -2097,6 +2194,15 @@ class hQuery extends CHTML_Parser_Doc {
         return false;
     }
 
+    /**
+     * Given a $url (relative or absolute) and a $base url, returns absolute url for $url.
+     *
+     * @param string $url  - relative or absolute URL
+     * @param string $base - Base URL for $url
+     *
+     * @return string absolute URL for $url
+     *
+     */
     static function abs_url($url, $base) {
         if(!self::is_url_path($url)) {
             $t = parse_url($base);
@@ -2132,7 +2238,7 @@ class hQuery extends CHTML_Parser_Doc {
      * @param array  $options - list of option as key-value:
      *                              timeout - connection timeout in seconds
      *                              host    - goes in headers, overrides $host (ex. $host == '127.0.0.1', $options['host'] == 'www.example.com')
-     *                              scheme  - ssl, tls, udp, ...
+     *                              scheme  - http, ssl, tls, udp, ...
      *                              close   - whether to close connection o not
      *
      * @return array [contents, headers, http-status-code, http-status-message]
@@ -2163,8 +2269,8 @@ class hQuery extends CHTML_Parser_Doc {
         // isset($path) or $path = '/';
 
         if(!isset($port)) {
-            if(isset($options['port'])) $port = $options['port']; else
-            switch($options['scheme']) {
+            if(isset($options['port'])) $port = $options['port'];
+            else switch($options['scheme']) {
                 case 'tls'  :
                 case 'ssl'  :
                 case 'https': $port = 443; break;
@@ -2193,7 +2299,7 @@ class hQuery extends CHTML_Parser_Doc {
             }
         }
 
-        $boundary = "\r\n\r\n";
+        static $boundary = "\r\n\r\n";
         $blen = strlen($boundary);
         if($body) {
            if(is_array($body) || is_object($body)) {
@@ -2376,9 +2482,10 @@ class hQuery extends CHTML_Parser_Doc {
 
 // ------------------------------------------------------------------------
 /**
- *  Represents an HTML Node
+ *  Represents an HTML Element ( eg div, input etc )
+ *  or a collection of elements ( eq jQuery([div, span, ...]) )
  */
-class HTML_Node extends ADOM_Node {
+class hQuery_Element extends hQuery_Node {
     // ------------------------------------------------------------------------
     // Iterator
     protected $_ich = NULL; // Iterator Cache
@@ -2504,7 +2611,7 @@ class HTML_Node extends ADOM_Node {
     /**
      * Override current() for iterations.
      *
-     * @return HTML_Node
+     * @return hQuery_Element
      */
     function current() {
         $k = key($this->ids);
@@ -2519,7 +2626,7 @@ class HTML_Node extends ADOM_Node {
      *
      * @param int $idx - index of an element, starts with 0.
      *
-     * @return HTML_Node
+     * @return hQuery_Element
      */
     function get($idx) {
         $i = array_slice($this->ids, $idx, 1, true);
@@ -2543,7 +2650,7 @@ class HTML_Node extends ADOM_Node {
      *
      * @param int $idx - index of an element, starts with 0.
      *
-     * @return HTML_Node
+     * @return hQuery_Element
      */
     function eq($idx) {
         $i = array_slice($this->ids, $idx, 1, true) or
@@ -2559,7 +2666,7 @@ class HTML_Node extends ADOM_Node {
      * @param int $idx - start index of an element, starts with 0.
      * @param int $len - OPTIONAL number of element to slice. Defaults to all starting at $idx
      *
-     * @return HTML_Node
+     * @return hQuery_Element
      */
     function slice($idx, $len=NULL) {
         $c = $this->count();
@@ -2587,7 +2694,7 @@ class HTML_Node extends ADOM_Node {
     /**
      * Get parent nodes for this collection of nodes.
      *
-     * @return HTML_Node parent
+     * @return hQuery_Element parent
      */
     function parent() {
         $p = $this->_parent();
@@ -2597,7 +2704,7 @@ class HTML_Node extends ADOM_Node {
     /**
      * Get child nodes for this collection of nodes.
      *
-     * @return HTML_Node children
+     * @return hQuery_Element children
      */
     function children() {
         $p = $this->_children();
@@ -2606,7 +2713,6 @@ class HTML_Node extends ADOM_Node {
 
 };
 
-// ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
 
 ?>

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Class ADOM_Node</title>
+	<title>Class hQuery_Node</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
 	<link rel="stylesheet" href="resources/style.css?49f43d3208c5d7e33fa16d36107a345bf11cc00d">
@@ -49,11 +49,10 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
-				<li class="active"><a href="class-ADOM_Node.html">ADOM_Node</a></li>
-				<li><a href="class-CHTML_Parser_Doc.html">CHTML_Parser_Doc</a></li>
 				<li><a href="class-hQuery.html">hQuery</a></li>
-				<li><a href="class-HTML_Node.html">HTML_Node</a></li>
-				<li><a href="class-IDOM_Context.html">IDOM_Context</a></li>
+				<li><a href="class-hQuery_Element.html">hQuery_Element</a></li>
+				<li><a href="class-hQuery_HTML_Parser.html">hQuery_HTML_Parser</a></li>
+				<li class="active"><a href="class-hQuery_Node.html">hQuery_Node</a></li>
 			</ul>
 
 
@@ -69,13 +68,18 @@
 <div id="right">
 	<div id="rightInner">
 <div id="content" class="class">
-	<h1>Class ADOM_Node</h1>
+	<h1>Class hQuery_Node</h1>
 
 
+	<div class="description">
+	<p>Base class for HTML Elements and Documents.</p>
+
+<p>used internally</p>
+	</div>
 
 	<dl class="tree well">
 		<dd style="padding-left:0px">
-<b><span>ADOM_Node</span></b>			
+<b><span>hQuery_Node</span></b>			
 			 implements 
 <span>Iterator</span>, 
 			
@@ -89,9 +93,8 @@
 	<div>
 		<h3>Direct known subclasses</h3>
 		<p class="elementList">
-			<code><a href="class-CHTML_Parser_Doc.html">CHTML_Parser_Doc</a></code>, 
-			<code><a href="class-HTML_Node.html">HTML_Node</a></code>, 
-			<code><a href="class-IDOM_Context.html">IDOM_Context</a></code>
+			<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>, 
+			<code><a href="class-hQuery_HTML_Parser.html">hQuery_HTML_Parser</a></code>
 		</p>
 	</div>
 
@@ -112,9 +115,11 @@
 		
 		
 
+				<b>License:</b>
+				<a href="MIT">MIT</a><br>
 				<b>Author:</b>
 				Dumitru Uzun (DUzun.ME)<br>
-			<b>Located at</b> <a href="source-class-ADOM_Node.html#12-832" title="Go to source code"></a>
+			<b>Located at</b> <a href="source-class-hQuery_Node.html#12-885" title="Go to source code"></a>
 		<br>
 	</div>
 
@@ -134,7 +139,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#___construct">#</a>
-			<code><a href="source-class-ADOM_Node.html#30-38" title="Go to source code">__construct</a>( <span> <var>$doc</var></span>, <span> <var>$ids</var></span>, <span> <var>$is_ctx</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#37-45" title="Go to source code">__construct</a>( <span> <var>$doc</var></span>, <span> <var>$ids</var></span>, <span> <var>$is_ctx</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				
@@ -163,123 +168,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#___destruct">#</a>
-			<code><a href="source-class-ADOM_Node.html#40-44" title="Go to source code">__destruct</a>( )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="__get" id="___get">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#___get">#</a>
-			<code><a href="source-class-ADOM_Node.html#47-50" title="Go to source code">__get</a>( <span> <var>$name</var></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="__set" id="___set">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#___set">#</a>
-			<code><a href="source-class-ADOM_Node.html#51-54" title="Go to source code">__set</a>( <span> <var>$name</var></span>, <span> <var>$value</var></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="__isset" id="___isset">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#___isset">#</a>
-			<code><a href="source-class-ADOM_Node.html#55-57" title="Go to source code">__isset</a>( <span> <var>$name</var></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="__unset" id="___unset">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#___unset">#</a>
-			<code><a href="source-class-ADOM_Node.html#58-60" title="Go to source code">__unset</a>( <span> <var>$name</var></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#47-51" title="Go to source code">__destruct</a>( )</code>
 
 			<div class="description short">
 				
@@ -308,7 +197,794 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_attr">#</a>
-			<code><a href="source-class-ADOM_Node.html#62-69" title="Go to source code">attr</a>( <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$to_str</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#53-60" title="Go to source code">attr</a>( <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$to_str</var> = <span class="php-keyword1">false</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="is_empty" id="_is_empty">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_is_empty">#</a>
+			<code><a href="source-class-hQuery_Node.html#64" title="Go to source code">is_empty</a>( )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="isEmpty" id="_isEmpty">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_isEmpty">#</a>
+			<code><a href="source-class-hQuery_Node.html#66-68" title="Go to source code">isEmpty</a>( )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="isDoc" id="_isDoc">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_isDoc">#</a>
+			<code><a href="source-class-hQuery_Node.html#70-72" title="Go to source code">isDoc</a>( )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="doc" id="_doc">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_doc">#</a>
+			<code><a href="source-class-hQuery_Node.html#74-76" title="Go to source code">doc</a>( )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="find" id="_find">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_find">#</a>
+			<code><a href="source-class-hQuery_Node.html#78-80" title="Go to source code">find</a>( <span> <var>$sel</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="__toString" id="___toString">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#___toString">#</a>
+			<code><a href="source-class-hQuery_Node.html#82-94" title="Go to source code">__toString</a>( )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="html" id="_html">
+
+			<td class="attributes"><code>
+				 public 
+				string
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_html">#</a>
+			<code><a href="source-class-hQuery_Node.html#97-113" title="Go to source code">html</a>( <span> <var>$id</var> = <span class="php-keyword1">NULL</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+					<h4>Returns</h4>
+					<div class="list">
+						string<br>.innerHTML
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="outerHtml" id="_outerHtml">
+
+			<td class="attributes"><code>
+				 public 
+				string
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_outerHtml">#</a>
+			<code><a href="source-class-hQuery_Node.html#115-135" title="Go to source code">outerHtml</a>( <span> <var>$id</var> = <span class="php-keyword1">NULL</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+					<h4>Returns</h4>
+					<div class="list">
+						string<br>.outerHtml
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="text" id="_text">
+
+			<td class="attributes"><code>
+				 public 
+				string
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_text">#</a>
+			<code><a href="source-class-hQuery_Node.html#137-142" title="Go to source code">text</a>( <span> <var>$id</var> = <span class="php-keyword1">NULL</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+					<h4>Returns</h4>
+					<div class="list">
+						string<br>.innerText
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="nodeName" id="_nodeName">
+
+			<td class="attributes"><code>
+				 public 
+				string
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_nodeName">#</a>
+			<code><a href="source-class-hQuery_Node.html#144-161" title="Go to source code">nodeName</a>( <span> <var>$caseFolding</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$id</var> = <span class="php-keyword1">NULL</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+					<h4>Returns</h4>
+					<div class="list">
+						string<br>.nodeName
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="pos" id="_pos">
+
+			<td class="attributes"><code>
+				 public 
+				integer
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#_pos">#</a>
+			<code><a href="source-class-hQuery_Node.html#178-195" title="Go to source code">pos</a>( <span> <var>$rst</var> = <span class="php-keyword1">true</span></span> )</code>
+
+			<div class="description short">
+				<p>Get string offset of the first/current element
+ in the source HTML document.</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Get string offset of the first/current element in the source HTML document.</p>
+
+
+
+					<h4>Returns</h4>
+					<div class="list">
+						integer
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_ctx_ids" id="__ctx_ids">
+
+			<td class="attributes"><code>
+				 protected 
+				array
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__ctx_ids">#</a>
+			<code><a href="source-class-hQuery_Node.html#197-213" title="Go to source code">_ctx_ids</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span> )</code>
+
+			<div class="description short">
+				<p>Make a context array of ids (if x in $ids &amp;&amp; exists y in $ids such that x in y then del x from $ids)</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Make a context array of ids (if x in $ids &amp;&amp; exists y in $ids such that x in y then del x from $ids)</p>
+
+
+
+					<h4>Returns</h4>
+					<div class="list">
+						array<br>ids
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_sub_ids" id="__sub_ids">
+
+			<td class="attributes"><code>
+				 protected 
+				array
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__sub_ids">#</a>
+			<code><a href="source-class-hQuery_Node.html#215-237" title="Go to source code">_sub_ids</a>( <span> <var>$eq</var> = <span class="php-keyword1">false</span></span> )</code>
+
+			<div class="description short">
+				<p>Get all ids from inside of this element</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Get all ids from inside of this element</p>
+
+
+
+					<h4>Returns</h4>
+					<div class="list">
+						array<br>ids
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_doc_ids" id="__doc_ids">
+
+			<td class="attributes"><code>
+				 protected 
+				array
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__doc_ids">#</a>
+			<code><a href="source-class-hQuery_Node.html#239-251" title="Go to source code">_doc_ids</a>( <span> <var>$el</var></span>, <span> <var>$force_array</var> = <span class="php-keyword1">true</span></span> )</code>
+
+			<div class="description short">
+				<p>Get and Normalize ids of $el</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>Get and Normalize ids of $el</p>
+
+
+
+					<h4>Returns</h4>
+					<div class="list">
+						array<br>ids
+					</div>
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_my_ids" id="__my_ids">
+
+			<td class="attributes"><code>
+				 protected 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__my_ids">#</a>
+			<code><a href="source-class-hQuery_Node.html#253-263" title="Go to source code">_my_ids</a>( <span> <var>$id</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$keys</var> = <span class="php-keyword1">false</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_parent" id="__parent">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__parent">#</a>
+			<code><a href="source-class-hQuery_Node.html#265-297" title="Go to source code">_parent</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$n</var> = <span class="php-num">0</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_children" id="__children">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__children">#</a>
+			<code><a href="source-class-hQuery_Node.html#299-339" title="Go to source code">_children</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$n</var> = <span class="php-keyword1">NULL</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_next" id="__next">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__next">#</a>
+			<code><a href="source-class-hQuery_Node.html#341-407" title="Go to source code">_next</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$n</var> = <span class="php-num">0</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_prev" id="__prev">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__prev">#</a>
+			<code><a href="source-class-hQuery_Node.html#409-500" title="Go to source code">_prev</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$n</var> = <span class="php-num">0</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_all" id="__all">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__all">#</a>
+			<code><a href="source-class-hQuery_Node.html#502-508" title="Go to source code">_all</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_has" id="__has">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__has">#</a>
+			<code><a href="source-class-hQuery_Node.html#511-526" title="Go to source code">_has</a>( <span> <var>$el</var></span>, <span> <var>$eq</var> = <span class="php-keyword1">false</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="_filter" id="__filter">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#__filter">#</a>
+			<code><a href="source-class-hQuery_Node.html#529-557" title="Go to source code">_filter</a>( <span> <var>$el</var></span>, <span> <var>$eq</var> = <span class="php-keyword1">false</span></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="__get" id="___get">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#___get">#</a>
+			<code><a href="source-class-hQuery_Node.html#560-563" title="Go to source code">__get</a>( <span> <var>$name</var></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="__set" id="___set">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#___set">#</a>
+			<code><a href="source-class-hQuery_Node.html#564-567" title="Go to source code">__set</a>( <span> <var>$name</var></span>, <span> <var>$value</var></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="__isset" id="___isset">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#___isset">#</a>
+			<code><a href="source-class-hQuery_Node.html#568-570" title="Go to source code">__isset</a>( <span> <var>$name</var></span> )</code>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+
+
+
+
+
+
+			</div>
+			</div></td>
+		</tr>
+		<tr data-order="__unset" id="___unset">
+
+			<td class="attributes"><code>
+				 public 
+				
+				
+				</code>
+			</td>
+
+			<td class="name"><div>
+			<a class="anchor" href="#___unset">#</a>
+			<code><a href="source-class-hQuery_Node.html#571-573" title="Go to source code">__unset</a>( <span> <var>$name</var></span> )</code>
 
 			<div class="description short">
 				
@@ -337,7 +1013,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_count">#</a>
-			<code><a href="source-class-ADOM_Node.html#72" title="Go to source code">count</a>( )</code>
+			<code><a href="source-class-hQuery_Node.html#576" title="Go to source code">count</a>( )</code>
 
 			<div class="description short">
 				
@@ -368,7 +1044,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_current">#</a>
-			<code><a href="source-class-ADOM_Node.html#75-79" title="Go to source code">current</a>( )</code>
+			<code><a href="source-class-hQuery_Node.html#579-583" title="Go to source code">current</a>( )</code>
 
 			<div class="description short">
 				
@@ -399,7 +1075,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_valid">#</a>
-			<code><a href="source-class-ADOM_Node.html#80" title="Go to source code">valid</a>( )</code>
+			<code><a href="source-class-hQuery_Node.html#584" title="Go to source code">valid</a>( )</code>
 
 			<div class="description short">
 				
@@ -430,7 +1106,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_key">#</a>
-			<code><a href="source-class-ADOM_Node.html#81" title="Go to source code">key</a>( )</code>
+			<code><a href="source-class-hQuery_Node.html#585" title="Go to source code">key</a>( )</code>
 
 			<div class="description short">
 				
@@ -461,7 +1137,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_next">#</a>
-			<code><a href="source-class-ADOM_Node.html#82" title="Go to source code">next</a>( )</code>
+			<code><a href="source-class-hQuery_Node.html#586" title="Go to source code">next</a>( )</code>
 
 			<div class="description short">
 				
@@ -492,7 +1168,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_prev">#</a>
-			<code><a href="source-class-ADOM_Node.html#83" title="Go to source code">prev</a>( )</code>
+			<code><a href="source-class-hQuery_Node.html#587" title="Go to source code">prev</a>( )</code>
 
 			<div class="description short">
 				
@@ -521,7 +1197,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_rewind">#</a>
-			<code><a href="source-class-ADOM_Node.html#84" title="Go to source code">rewind</a>( )</code>
+			<code><a href="source-class-hQuery_Node.html#588" title="Go to source code">rewind</a>( )</code>
 
 			<div class="description short">
 				
@@ -541,676 +1217,6 @@
 			</div>
 			</div></td>
 		</tr>
-		<tr data-order="pos" id="_pos">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_pos">#</a>
-			<code><a href="source-class-ADOM_Node.html#87-102" title="Go to source code">pos</a>( <span> <var>$rst</var> = <span class="php-keyword1">true</span></span> )</code>
-
-			<div class="description short">
-				<p>Get string offset of the first/current element
- in the source HTML document.</p>
-			</div>
-
-			<div class="description detailed hidden">
-				<p>Get string offset of the first/current element in the source HTML document.</p>
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="is_empty" id="_is_empty">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_is_empty">#</a>
-			<code><a href="source-class-ADOM_Node.html#105-107" title="Go to source code">is_empty</a>( )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="isDoc" id="_isDoc">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_isDoc">#</a>
-			<code><a href="source-class-ADOM_Node.html#109-111" title="Go to source code">isDoc</a>( )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="doc" id="_doc">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_doc">#</a>
-			<code><a href="source-class-ADOM_Node.html#113-115" title="Go to source code">doc</a>( )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="find" id="_find">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_find">#</a>
-			<code><a href="source-class-ADOM_Node.html#117-119" title="Go to source code">find</a>( <span> <var>$sel</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="__toString" id="___toString">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#___toString">#</a>
-			<code><a href="source-class-ADOM_Node.html#121-133" title="Go to source code">__toString</a>( )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_ctx_ids" id="__ctx_ids">
-
-			<td class="attributes"><code>
-				 protected 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__ctx_ids">#</a>
-			<code><a href="source-class-ADOM_Node.html#136-142" title="Go to source code">_ctx_ids</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_sub_ids" id="__sub_ids">
-
-			<td class="attributes"><code>
-				 protected 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__sub_ids">#</a>
-			<code><a href="source-class-ADOM_Node.html#145-162" title="Go to source code">_sub_ids</a>( <span> <var>$eq</var> = <span class="php-keyword1">false</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_doc_ids" id="__doc_ids">
-
-			<td class="attributes"><code>
-				 protected 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__doc_ids">#</a>
-			<code><a href="source-class-ADOM_Node.html#165-172" title="Go to source code">_doc_ids</a>( <span> <var>$el</var></span>, <span> <var>$force_array</var> = <span class="php-keyword1">true</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_my_ids" id="__my_ids">
-
-			<td class="attributes"><code>
-				 protected 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__my_ids">#</a>
-			<code><a href="source-class-ADOM_Node.html#174-184" title="Go to source code">_my_ids</a>( <span> <var>$id</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$keys</var> = <span class="php-keyword1">false</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_parent" id="__parent">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__parent">#</a>
-			<code><a href="source-class-ADOM_Node.html#186-218" title="Go to source code">_parent</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$n</var> = <span class="php-num">0</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_children" id="__children">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__children">#</a>
-			<code><a href="source-class-ADOM_Node.html#220-260" title="Go to source code">_children</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$n</var> = <span class="php-keyword1">NULL</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_next" id="__next">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__next">#</a>
-			<code><a href="source-class-ADOM_Node.html#262-328" title="Go to source code">_next</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$n</var> = <span class="php-num">0</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_prev" id="__prev">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__prev">#</a>
-			<code><a href="source-class-ADOM_Node.html#330-421" title="Go to source code">_prev</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$n</var> = <span class="php-num">0</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_all" id="__all">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__all">#</a>
-			<code><a href="source-class-ADOM_Node.html#423-429" title="Go to source code">_all</a>( <span> <var>$ids</var> = <span class="php-keyword1">NULL</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_has" id="__has">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__has">#</a>
-			<code><a href="source-class-ADOM_Node.html#432-447" title="Go to source code">_has</a>( <span> <var>$el</var></span>, <span> <var>$eq</var> = <span class="php-keyword1">false</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="_filter" id="__filter">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#__filter">#</a>
-			<code><a href="source-class-ADOM_Node.html#450-478" title="Go to source code">_filter</a>( <span> <var>$el</var></span>, <span> <var>$eq</var> = <span class="php-keyword1">false</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="html" id="_html">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_html">#</a>
-			<code><a href="source-class-ADOM_Node.html#482-495" title="Go to source code">html</a>( <span> <var>$id</var> = <span class="php-keyword1">NULL</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="outerHtml" id="_outerHtml">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_outerHtml">#</a>
-			<code><a href="source-class-ADOM_Node.html#497-514" title="Go to source code">outerHtml</a>( <span> <var>$id</var> = <span class="php-keyword1">NULL</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="text" id="_text">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_text">#</a>
-			<code><a href="source-class-ADOM_Node.html#517-519" title="Go to source code">text</a>( <span> <var>$id</var> = <span class="php-keyword1">NULL</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="nodeName" id="_nodeName">
-
-			<td class="attributes"><code>
-				 public 
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_nodeName">#</a>
-			<code><a href="source-class-ADOM_Node.html#521-535" title="Go to source code">nodeName</a>( <span> <var>$caseFolding</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$id</var> = <span class="php-keyword1">NULL</span></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="html_normal_pseudoClass" id="_html_normal_pseudoClass">
-
-			<td class="attributes"><code>
-				 public static
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_html_normal_pseudoClass">#</a>
-			<code><a href="source-class-ADOM_Node.html#555-586" title="Go to source code">html_normal_pseudoClass</a>( <span> <var>$p</var></span> )</code>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
-		<tr data-order="html_selector2struc" id="_html_selector2struc">
-
-			<td class="attributes"><code>
-				 public static
-				
-				
-				</code>
-			</td>
-
-			<td class="name"><div>
-			<a class="anchor" href="#_html_selector2struc">#</a>
-			<code><a href="source-class-ADOM_Node.html#589-645" title="Go to source code">html_selector2struc</a>( <span> <var>$sel</var></span> )</code>
-
-			<div class="description short">
-				<p>Parse a selector string into an array structure.</p>
-			</div>
-
-			<div class="description detailed hidden">
-				<p>Parse a selector string into an array structure.</p>
-
-<p>tn1#id1 .cl1.cl2:first tn2:5 , tn3.cl3 tn4#id2:eq(-1) > tn5:last-child > tn6:lt(3) --> [ [ [{ n: "tn1", i: "id1", c: [],            p: []  }], [{ n: NULL,  i: NULL,  c: ["cl1","cl2"], p: [0] }], [{ n: "tn2", i: NULL,  c: [],            p: [5] }] ] , [ [{ n: "tn3", i: NULL, c: ["cl3"], p: [] }], [ { n: "tn4", i: "id2", c: [], p: [-1]   }, { n: "tn5", i: NULL , c: [], p: [-1]   }, { n: "tn6", i: NULL , c: [], p: ["&lt;3"] } ] ] ]</p>
-
-
-
-
-
-
-
-			</div>
-			</div></td>
-		</tr>
 		<tr data-order="html_findTagClose" id="_html_findTagClose">
 
 			<td class="attributes"><code>
@@ -1222,7 +1228,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_html_findTagClose">#</a>
-			<code><a href="source-class-ADOM_Node.html#648-678" title="Go to source code">html_findTagClose</a>( <span> <var>$str</var></span>, <span> <var>$p</var></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#700-730" title="Go to source code">html_findTagClose</a>( <span> <var>$str</var></span>, <span> <var>$p</var></span> )</code>
 
 			<div class="description short">
 				
@@ -1251,7 +1257,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_html_parseAttrStr">#</a>
-			<code><a href="source-class-ADOM_Node.html#680-732" title="Go to source code">html_parseAttrStr</a>( <span> <var>$str</var></span>, <span> <var>$case_folding</var> = <span class="php-keyword1">true</span></span>, <span> <var>$extended</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#732-784" title="Go to source code">html_parseAttrStr</a>( <span> <var>$str</var></span>, <span> <var>$case_folding</var> = <span class="php-keyword1">true</span></span>, <span> <var>$extended</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				
@@ -1280,7 +1286,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_html_attr2str">#</a>
-			<code><a href="source-class-ADOM_Node.html#734-745" title="Go to source code">html_attr2str</a>( <span> <var>$attr</var></span>, <span> <var>$quote</var> = <span class="php-quote">'&quot;'</span></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#786-797" title="Go to source code">html_attr2str</a>( <span> <var>$attr</var></span>, <span> <var>$quote</var> = <span class="php-quote">'&quot;'</span></span> )</code>
 
 			<div class="description short">
 				
@@ -1309,7 +1315,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_parseCSStr">#</a>
-			<code><a href="source-class-ADOM_Node.html#747-758" title="Go to source code">parseCSStr</a>( <span> <var>$str</var></span>, <span> <var>$case_folding</var> = <span class="php-keyword1">true</span></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#799-810" title="Go to source code">parseCSStr</a>( <span> <var>$str</var></span>, <span> <var>$case_folding</var> = <span class="php-keyword1">true</span></span> )</code>
 
 			<div class="description short">
 				
@@ -1338,7 +1344,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_CSSArr2Str">#</a>
-			<code><a href="source-class-ADOM_Node.html#760-768" title="Go to source code">CSSArr2Str</a>( <span> <var>$css</var></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#812-820" title="Go to source code">CSSArr2Str</a>( <span> <var>$css</var></span> )</code>
 
 			<div class="description short">
 				
@@ -1367,7 +1373,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_str_range">#</a>
-			<code><a href="source-class-ADOM_Node.html#770-795" title="Go to source code">str_range</a>( <span> <var>$comp</var></span>, <span> <var>$pos</var> = <span class="php-num">0</span></span>, <span> <var>$len</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#822-847" title="Go to source code">str_range</a>( <span> <var>$comp</var></span>, <span> <var>$pos</var> = <span class="php-num">0</span></span>, <span> <var>$len</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -1396,7 +1402,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_array_select">#</a>
-			<code><a href="source-class-ADOM_Node.html#797-804" title="Go to source code">array_select</a>( <span> <var>$arr</var></span>, <span> <var>$keys</var></span>, <span> <var>$force_null</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#849-857" title="Go to source code">array_select</a>( <span> <var>$arr</var></span>, <span> <var>$keys</var></span>, <span> <var>$force_null</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				
@@ -1425,7 +1431,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_convert_encoding">#</a>
-			<code><a href="source-class-ADOM_Node.html#806-830" title="Go to source code">convert_encoding</a>( <span> <var>$a</var></span>, <span> <var>$to</var></span>, <span> <var>$from</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery_Node.html#859-883" title="Go to source code">convert_encoding</a>( <span> <var>$a</var></span>, <span> <var>$to</var></span>, <span> <var>$from</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -1453,187 +1459,42 @@
 
 
 
+		<div class="panel panel-default">
+            <div class="panel-heading"><h2>Constants summary</h2></div>
+			<table class="summary table table-bordered table-striped constants" id="constants">
+			<tr data-order="VERSION" id="VERSION">
+
+				<td class="attributes"><code>string</code></td>
+				<td class="name">
+					<code>
+						<a href="source-class-hQuery_Node.html#19" title="Go to source code"><b>VERSION</b></a>
+					</code>
+
+					<div class="description short">
+						
+					</div>
+
+					<div class="description detailed hidden">
+						
+
+					</div>
+				</td>
+				<td class="value">
+					<div>
+						<a href="#VERSION" class="anchor">#</a>
+						<code><span class="php-quote">'1.2.0'</span></code>
+					</div>
+				</td>
+			</tr>
+			</table>
+		</div>
+
 
 
 
 		<div class="panel panel-default">
             <div class="panel-heading"><h2>Properties summary</h2></div>
 			<table class="summary table table-bordered table-striped properties" id="properties">
-		<tr data-order="version" id="$version">
-			<td class="attributes"><code>
-				public static 
-				string
-			</code></td>
-
-			<td class="name">
-					<a href="source-class-ADOM_Node.html#14" title="Go to source code"><var>$version</var></a>
-
-				<div class="description short">
-					
-				</div>
-
-				<div class="description detailed hidden">
-					
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$version" class="anchor">#</a>
-					<code><span class="php-quote">'1.1.3'</span></code>
-				</div>
-			</td>
-		</tr>
-		<tr data-order="_ar_" id="$_ar_">
-			<td class="attributes"><code>
-				public static 
-				array
-			</code></td>
-
-			<td class="name">
-					<a href="source-class-ADOM_Node.html#16" title="Go to source code"><var>$_ar_</var></a>
-
-				<div class="description short">
-					
-				</div>
-
-				<div class="description detailed hidden">
-					
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$_ar_" class="anchor">#</a>
-					<code><span class="php-keyword1">array</span>()     </code>
-				</div>
-			</td>
-		</tr>
-		<tr data-order="_mi_" id="$_mi_">
-			<td class="attributes"><code>
-				public static 
-				integer
-			</code></td>
-
-			<td class="name">
-					<a href="source-class-ADOM_Node.html#17" title="Go to source code"><var>$_mi_</var></a>
-
-				<div class="description short">
-					
-				</div>
-
-				<div class="description detailed hidden">
-					
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$_mi_" class="anchor">#</a>
-					<code>PHP_INT_MAX </code>
-				</div>
-			</td>
-		</tr>
-		<tr data-order="_nl_" id="$_nl_">
-			<td class="attributes"><code>
-				public static 
-				
-			</code></td>
-
-			<td class="name">
-					<a href="source-class-ADOM_Node.html#18" title="Go to source code"><var>$_nl_</var></a>
-
-				<div class="description short">
-					
-				</div>
-
-				<div class="description detailed hidden">
-					
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$_nl_" class="anchor">#</a>
-					<code><span class="php-keyword1">NULL</span>        </code>
-				</div>
-			</td>
-		</tr>
-		<tr data-order="_fl_" id="$_fl_">
-			<td class="attributes"><code>
-				public static 
-				boolean
-			</code></td>
-
-			<td class="name">
-					<a href="source-class-ADOM_Node.html#19" title="Go to source code"><var>$_fl_</var></a>
-
-				<div class="description short">
-					
-				</div>
-
-				<div class="description detailed hidden">
-					
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$_fl_" class="anchor">#</a>
-					<code><span class="php-keyword1">false</span>       </code>
-				</div>
-			</td>
-		</tr>
-		<tr data-order="_tr_" id="$_tr_">
-			<td class="attributes"><code>
-				public static 
-				boolean
-			</code></td>
-
-			<td class="name">
-					<a href="source-class-ADOM_Node.html#20" title="Go to source code"><var>$_tr_</var></a>
-
-				<div class="description short">
-					
-				</div>
-
-				<div class="description detailed hidden">
-					
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$_tr_" class="anchor">#</a>
-					<code><span class="php-keyword1">true</span>        </code>
-				</div>
-			</td>
-		</tr>
-		<tr data-order="selected_doc" id="$selected_doc">
-			<td class="attributes"><code>
-				public static 
-				
-			</code></td>
-
-			<td class="name">
-					<a href="source-class-ADOM_Node.html#22" title="Go to source code"><var>$selected_doc</var></a>
-
-				<div class="description short">
-					
-				</div>
-
-				<div class="description detailed hidden">
-					
-
-				</div>
-			</td>
-			<td class="value">
-				<div>
-					<a href="#$selected_doc" class="anchor">#</a>
-					<code><span class="php-keyword1">NULL</span></code>
-				</div>
-			</td>
-		</tr>
 		<tr data-order="last_http_result" id="$last_http_result">
 			<td class="attributes"><code>
 				public static 
@@ -1641,7 +1502,7 @@
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-ADOM_Node.html#24" title="Go to source code"><var>$last_http_result</var></a>
+					<a href="source-class-hQuery_Node.html#21" title="Go to source code"><var>$last_http_result</var></a>
 
 				<div class="description short">
 					
@@ -1659,6 +1520,31 @@
 				</div>
 			</td>
 		</tr>
+		<tr data-order="selected_doc" id="$selected_doc">
+			<td class="attributes"><code>
+				public static 
+				
+			</code></td>
+
+			<td class="name">
+					<a href="source-class-hQuery_Node.html#24" title="Go to source code"><var>$selected_doc</var></a>
+
+				<div class="description short">
+					
+				</div>
+
+				<div class="description detailed hidden">
+					
+
+				</div>
+			</td>
+			<td class="value">
+				<div>
+					<a href="#$selected_doc" class="anchor">#</a>
+					<code><span class="php-keyword1">NULL</span></code>
+				</div>
+			</td>
+		</tr>
 		<tr data-order="_prop" id="$_prop">
 			<td class="attributes"><code>
 				protected  
@@ -1666,7 +1552,7 @@
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-ADOM_Node.html#26" title="Go to source code"><var>$_prop</var></a>
+					<a href="source-class-hQuery_Node.html#26" title="Go to source code"><var>$_prop</var></a>
 
 				<div class="description short">
 					
@@ -1691,7 +1577,7 @@
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-ADOM_Node.html#27" title="Go to source code"><var>$doc</var></a>
+					<a href="source-class-hQuery_Node.html#27" title="Go to source code"><var>$doc</var></a>
 
 				<div class="description short">
 					
@@ -1716,7 +1602,7 @@
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-ADOM_Node.html#28" title="Go to source code"><var>$ids</var></a>
+					<a href="source-class-hQuery_Node.html#28" title="Go to source code"><var>$ids</var></a>
 
 				<div class="description short">
 					
@@ -1731,6 +1617,131 @@
 				<div>
 					<a href="#$ids" class="anchor">#</a>
 					<code></code>
+				</div>
+			</td>
+		</tr>
+		<tr data-order="_ar_" id="$_ar_">
+			<td class="attributes"><code>
+				public static 
+				array
+			</code></td>
+
+			<td class="name">
+					<a href="source-class-hQuery_Node.html#31" title="Go to source code"><var>$_ar_</var></a>
+
+				<div class="description short">
+					
+				</div>
+
+				<div class="description detailed hidden">
+					
+
+				</div>
+			</td>
+			<td class="value">
+				<div>
+					<a href="#$_ar_" class="anchor">#</a>
+					<code><span class="php-keyword1">array</span>()     </code>
+				</div>
+			</td>
+		</tr>
+		<tr data-order="_mi_" id="$_mi_">
+			<td class="attributes"><code>
+				public static 
+				integer
+			</code></td>
+
+			<td class="name">
+					<a href="source-class-hQuery_Node.html#32" title="Go to source code"><var>$_mi_</var></a>
+
+				<div class="description short">
+					
+				</div>
+
+				<div class="description detailed hidden">
+					
+
+				</div>
+			</td>
+			<td class="value">
+				<div>
+					<a href="#$_mi_" class="anchor">#</a>
+					<code>PHP_INT_MAX </code>
+				</div>
+			</td>
+		</tr>
+		<tr data-order="_nl_" id="$_nl_">
+			<td class="attributes"><code>
+				public static 
+				
+			</code></td>
+
+			<td class="name">
+					<a href="source-class-hQuery_Node.html#33" title="Go to source code"><var>$_nl_</var></a>
+
+				<div class="description short">
+					
+				</div>
+
+				<div class="description detailed hidden">
+					
+
+				</div>
+			</td>
+			<td class="value">
+				<div>
+					<a href="#$_nl_" class="anchor">#</a>
+					<code><span class="php-keyword1">NULL</span>        </code>
+				</div>
+			</td>
+		</tr>
+		<tr data-order="_fl_" id="$_fl_">
+			<td class="attributes"><code>
+				public static 
+				boolean
+			</code></td>
+
+			<td class="name">
+					<a href="source-class-hQuery_Node.html#34" title="Go to source code"><var>$_fl_</var></a>
+
+				<div class="description short">
+					
+				</div>
+
+				<div class="description detailed hidden">
+					
+
+				</div>
+			</td>
+			<td class="value">
+				<div>
+					<a href="#$_fl_" class="anchor">#</a>
+					<code><span class="php-keyword1">false</span>       </code>
+				</div>
+			</td>
+		</tr>
+		<tr data-order="_tr_" id="$_tr_">
+			<td class="attributes"><code>
+				public static 
+				boolean
+			</code></td>
+
+			<td class="name">
+					<a href="source-class-hQuery_Node.html#35" title="Go to source code"><var>$_tr_</var></a>
+
+				<div class="description short">
+					
+				</div>
+
+				<div class="description detailed hidden">
+					
+
+				</div>
+			</td>
+			<td class="value">
+				<div>
+					<a href="#$_tr_" class="anchor">#</a>
+					<code><span class="php-keyword1">true</span>        </code>
 				</div>
 			</td>
 		</tr>

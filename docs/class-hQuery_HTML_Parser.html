@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Class CHTML_Parser_Doc</title>
+	<title>Class hQuery_HTML_Parser</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
 	<link rel="stylesheet" href="resources/style.css?49f43d3208c5d7e33fa16d36107a345bf11cc00d">
@@ -49,11 +49,10 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
-				<li><a href="class-ADOM_Node.html">ADOM_Node</a></li>
-				<li class="active"><a href="class-CHTML_Parser_Doc.html">CHTML_Parser_Doc</a></li>
 				<li><a href="class-hQuery.html">hQuery</a></li>
-				<li><a href="class-HTML_Node.html">HTML_Node</a></li>
-				<li><a href="class-IDOM_Context.html">IDOM_Context</a></li>
+				<li><a href="class-hQuery_Element.html">hQuery_Element</a></li>
+				<li class="active"><a href="class-hQuery_HTML_Parser.html">hQuery_HTML_Parser</a></li>
+				<li><a href="class-hQuery_Node.html">hQuery_Node</a></li>
 			</ul>
 
 
@@ -69,13 +68,18 @@
 <div id="right">
 	<div id="rightInner">
 <div id="content" class="class">
-	<h1>Class CHTML_Parser_Doc</h1>
+	<h1>Class hQuery_HTML_Parser</h1>
 
 
+	<div class="description">
+	<p>HTML Parser Class</p>
+
+<p>used internally</p>
+	</div>
 
 	<dl class="tree well">
 		<dd style="padding-left:0px">
-			<a href="class-ADOM_Node.html"><span>ADOM_Node</span></a>
+			<a href="class-hQuery_Node.html"><span>hQuery_Node</span></a>
 			
 			 implements 
 <span>Iterator</span>, 
@@ -86,7 +90,7 @@
 		</dd>
 		<dd style="padding-left:30px">
 			<img src="resources/inherit.png" alt="Extended by">
-<b><span>CHTML_Parser_Doc</span></b>			
+<b><span>hQuery_HTML_Parser</span></b>			
 			
 			
 		</dd>
@@ -111,9 +115,11 @@
 		
 		
 
+				<b>License:</b>
+				<a href="MIT">MIT</a><br>
 				<b>Author:</b>
 				Dumitru Uzun (DUzun.ME)<br>
-			<b>Located at</b> <a href="source-class-CHTML_Parser_Doc.html#858-1659" title="Go to source code"></a>
+			<b>Located at</b> <a href="source-class-hQuery_HTML_Parser.html#933-1742" title="Go to source code"></a>
 		<br>
 	</div>
 
@@ -133,7 +139,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#___get">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#890-914" title="Go to source code">__get</a>( <span> <var>$name</var></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#970-994" title="Go to source code">__get</a>( <span> <var>$name</var></span> )</code>
 
 			<div class="description short">
 				
@@ -148,7 +154,7 @@
 
 
 					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-ADOM_Node.html#___get">ADOM_Node::__get</a></code></div>
+					<div class="list"><code><a href="class-hQuery_Node.html#___get">hQuery_Node::__get</a></code></div>
 
 			</div>
 			</div></td>
@@ -164,7 +170,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#___set">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#916-931" title="Go to source code">__set</a>( <span> <var>$name</var></span>, <span> <var>$value</var></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#996-1011" title="Go to source code">__set</a>( <span> <var>$name</var></span>, <span> <var>$value</var></span> )</code>
 
 			<div class="description short">
 				
@@ -179,7 +185,7 @@
 
 
 					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-ADOM_Node.html#___set">ADOM_Node::__set</a></code></div>
+					<div class="list"><code><a href="class-hQuery_Node.html#___set">hQuery_Node::__set</a></code></div>
 
 			</div>
 			</div></td>
@@ -195,7 +201,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_location">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#934-945" title="Go to source code">location</a>( <span> <var>$href</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1014-1025" title="Go to source code">location</a>( <span> <var>$href</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -224,7 +230,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_baseURI">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#948-967" title="Go to source code">baseURI</a>( <span> <var>$href</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1028-1047" title="Go to source code">baseURI</a>( <span> <var>$href</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -253,7 +259,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#___construct">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#969-991" title="Go to source code">__construct</a>( <span> <var>$html</var></span>, <span> <var>$idx</var> = <span class="php-keyword1">true</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1049-1071" title="Go to source code">__construct</a>( <span> <var>$html</var></span>, <span> <var>$idx</var> = <span class="php-keyword1">true</span></span> )</code>
 
 			<div class="description short">
 				
@@ -268,7 +274,7 @@
 
 
 					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-ADOM_Node.html#___construct">ADOM_Node::__construct</a></code></div>
+					<div class="list"><code><a href="class-hQuery_Node.html#___construct">hQuery_Node::__construct</a></code></div>
 
 			</div>
 			</div></td>
@@ -284,7 +290,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#___toString">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#993" title="Go to source code">__toString</a>( )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1073" title="Go to source code">__toString</a>( )</code>
 
 			<div class="description short">
 				
@@ -299,7 +305,7 @@
 
 
 					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-ADOM_Node.html#___toString">ADOM_Node::__toString</a></code></div>
+					<div class="list"><code><a href="class-hQuery_Node.html#___toString">hQuery_Node::__toString</a></code></div>
 
 			</div>
 			</div></td>
@@ -315,7 +321,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_url_base">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#995-1002" title="Go to source code">get_url_base</a>( <span> <var>$url</var></span>, <span> <var>$array</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1075-1082" title="Go to source code">get_url_base</a>( <span> <var>$url</var></span>, <span> <var>$array</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				
@@ -344,7 +350,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_url_path">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1004-1014" title="Go to source code">get_url_path</a>( <span> <var>$url</var></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1084-1094" title="Go to source code">get_url_path</a>( <span> <var>$url</var></span> )</code>
 
 			<div class="description short">
 				
@@ -373,7 +379,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_url2abs">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1016-1028" title="Go to source code">url2abs</a>( <span> <var>$url</var></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1096-1108" title="Go to source code">url2abs</a>( <span> <var>$url</var></span> )</code>
 
 			<div class="description short">
 				
@@ -402,7 +408,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_detect_charset">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1032-1056" title="Go to source code">detect_charset</a>( <span> <var>$str</var></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1112-1136" title="Go to source code">detect_charset</a>( <span> <var>$str</var></span> )</code>
 
 			<div class="description short">
 				
@@ -431,7 +437,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_strlen">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1058-1060" title="Go to source code">strlen</a>( )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1138-1140" title="Go to source code">strlen</a>( )</code>
 
 			<div class="description short">
 				
@@ -460,7 +466,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#__info">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1063-1097" title="Go to source code">_info</a>( )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1143-1177" title="Go to source code">_info</a>( )</code>
 
 			<div class="description short">
 				
@@ -489,7 +495,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#__index_comments_html">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1100-1115" title="Go to source code">_index_comments_html</a>( <span> <var>$o</var></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1180-1195" title="Go to source code">_index_comments_html</a>( <span> <var>$o</var></span> )</code>
 
 			<div class="description short">
 				
@@ -518,7 +524,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#__index_all">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1225-1351" title="Go to source code">_index_all</a>( )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1305-1431" title="Go to source code">_index_all</a>( )</code>
 
 			<div class="description short">
 				
@@ -547,7 +553,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#__get_ctx">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1354-1361" title="Go to source code">_get_ctx</a>( <span> <var>$ctx</var></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1434-1444" title="Go to source code">_get_ctx</a>( <span> <var>$ctx</var></span> )</code>
 
 			<div class="description short">
 				
@@ -576,7 +582,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#__find">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1363-1406" title="Go to source code">_find</a>( <span> <var>$name</var></span>, <span> <var>$class</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$ctx</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$rec</var> = <span class="php-keyword1">true</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1446-1489" title="Go to source code">_find</a>( <span> <var>$name</var></span>, <span> <var>$class</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$ctx</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$rec</var> = <span class="php-keyword1">true</span></span> )</code>
 
 			<div class="description short">
 				
@@ -605,7 +611,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_hasClass">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1408-1430" title="Go to source code">hasClass</a>( <span> <var>$id</var></span>, <span> <var>$cl</var></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1491-1513" title="Go to source code">hasClass</a>( <span> <var>$id</var></span>, <span> <var>$cl</var></span> )</code>
 
 			<div class="description short">
 				
@@ -640,7 +646,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_filter">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1433-1467" title="Go to source code">filter</a>( <span> <var>$ids</var></span>, <span> <var>$name</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$class</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$ctx</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1516-1550" title="Go to source code">filter</a>( <span> <var>$ids</var></span>, <span> <var>$name</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$class</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$ctx</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -669,7 +675,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_aids_byAttr">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1470-1492" title="Go to source code">get_aids_byAttr</a>( <span> <var>$attr</var></span>, <span> <var>$as_keys</var> = <span class="php-keyword1">false</span></span>, <span> <var>$actx</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1553-1575" title="Go to source code">get_aids_byAttr</a>( <span> <var>$attr</var></span>, <span> <var>$as_keys</var> = <span class="php-keyword1">false</span></span>, <span> <var>$actx</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -702,7 +708,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_aids_byClass">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1494-1515" title="Go to source code">get_aids_byClass</a>( <span> <var>$cl</var></span>, <span> <var>$as_keys</var> = <span class="php-keyword1">false</span></span>, <span> <var>$actx</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1577-1598" title="Go to source code">get_aids_byClass</a>( <span> <var>$cl</var></span>, <span> <var>$as_keys</var> = <span class="php-keyword1">false</span></span>, <span> <var>$actx</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -735,7 +741,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_aids_byClassAttr">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1517-1532" title="Go to source code">get_aids_byClassAttr</a>( <span> <var>$cl</var></span>, <span> <var>$attr</var></span>, <span> <var>$as_keys</var> = <span class="php-keyword1">false</span></span>, <span> <var>$actx</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1600-1615" title="Go to source code">get_aids_byClassAttr</a>( <span> <var>$cl</var></span>, <span> <var>$attr</var></span>, <span> <var>$as_keys</var> = <span class="php-keyword1">false</span></span>, <span> <var>$actx</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				
@@ -764,7 +770,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_ids_byAid">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1534-1548" title="Go to source code">get_ids_byAid</a>( <span> <var>$aid</var></span>, <span> <var>$sort</var> = <span class="php-keyword1">true</span></span>, <span> <var>$has_keys</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1617-1631" title="Go to source code">get_ids_byAid</a>( <span> <var>$aid</var></span>, <span> <var>$sort</var> = <span class="php-keyword1">true</span></span>, <span> <var>$has_keys</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				<p>$has_keys == true  => $aid == [aid=>[ids]]
@@ -795,7 +801,7 @@ $has_keys == false => $aid == [aids]</p>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_ids_byAttr">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1550-1604" title="Go to source code">get_ids_byAttr</a>( <span> <var>$attr</var></span>, <span> <var>$sort</var> = <span class="php-keyword1">true</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1633-1687" title="Go to source code">get_ids_byAttr</a>( <span> <var>$attr</var></span>, <span> <var>$sort</var> = <span class="php-keyword1">true</span></span> )</code>
 
 			<div class="description short">
 				
@@ -824,7 +830,7 @@ $has_keys == false => $aid == [aids]</p>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_ids_byClass">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1606-1609" title="Go to source code">get_ids_byClass</a>( <span> <var>$cl</var></span>, <span> <var>$sort</var> = <span class="php-keyword1">true</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1689-1692" title="Go to source code">get_ids_byClass</a>( <span> <var>$cl</var></span>, <span> <var>$sort</var> = <span class="php-keyword1">true</span></span> )</code>
 
 			<div class="description short">
 				
@@ -853,7 +859,7 @@ $has_keys == false => $aid == [aids]</p>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_ids_byClassAttr">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1611-1614" title="Go to source code">get_ids_byClassAttr</a>( <span> <var>$cl</var></span>, <span> <var>$attr</var></span>, <span> <var>$sort</var> = <span class="php-keyword1">true</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1694-1697" title="Go to source code">get_ids_byClassAttr</a>( <span> <var>$cl</var></span>, <span> <var>$attr</var></span>, <span> <var>$sort</var> = <span class="php-keyword1">true</span></span> )</code>
 
 			<div class="description short">
 				
@@ -882,7 +888,7 @@ $has_keys == false => $aid == [aids]</p>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_attr_byAid">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1616-1626" title="Go to source code">get_attr_byAid</a>( <span> <var>$aid</var></span>, <span> <var>$to_str</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1699-1709" title="Go to source code">get_attr_byAid</a>( <span> <var>$aid</var></span>, <span> <var>$to_str</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				
@@ -911,7 +917,7 @@ $has_keys == false => $aid == [aids]</p>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get_attr_byId">#</a>
-			<code><a href="source-class-CHTML_Parser_Doc.html#1628-1658" title="Go to source code">get_attr_byId</a>( <span> <var>$id</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$to_str</var> = <span class="php-keyword1">false</span></span> )</code>
+			<code><a href="source-class-hQuery_HTML_Parser.html#1711-1741" title="Go to source code">get_attr_byId</a>( <span> <var>$id</var></span>, <span> <var>$attr</var> = <span class="php-keyword1">NULL</span></span>, <span> <var>$to_str</var> = <span class="php-keyword1">false</span></span> )</code>
 
 			<div class="description short">
 				
@@ -933,49 +939,48 @@ $has_keys == false => $aid == [aids]</p>
 		</div>
 
 		<div class="panel panel-default">
-	        <div class="panel-heading"><h3>Methods inherited from <a href="class-ADOM_Node.html#methods">ADOM_Node</a></h3></div>
+	        <div class="panel-heading"><h3>Methods inherited from <a href="class-hQuery_Node.html#methods">hQuery_Node</a></h3></div>
 			<p class="elementList">
-				<code><a href="class-ADOM_Node.html#_CSSArr2Str">CSSArr2Str()</a></code>, 
-				<code><a href="class-ADOM_Node.html#___destruct">__destruct()</a></code>, 
-				<code><a href="class-ADOM_Node.html#___isset">__isset()</a></code>, 
-				<code><a href="class-ADOM_Node.html#___unset">__unset()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__all">_all()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__children">_children()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__ctx_ids">_ctx_ids()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__doc_ids">_doc_ids()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__filter">_filter()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__has">_has()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__my_ids">_my_ids()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__next">_next()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__parent">_parent()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__prev">_prev()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__sub_ids">_sub_ids()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_array_select">array_select()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_attr">attr()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_convert_encoding">convert_encoding()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_count">count()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_current">current()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_doc">doc()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_find">find()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html">html()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html_attr2str">html_attr2str()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html_findTagClose">html_findTagClose()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html_normal_pseudoClass">html_normal_pseudoClass()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html_parseAttrStr">html_parseAttrStr()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html_selector2struc">html_selector2struc()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_isDoc">isDoc()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_is_empty">is_empty()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_key">key()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_next">next()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_nodeName">nodeName()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_outerHtml">outerHtml()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_parseCSStr">parseCSStr()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_pos">pos()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_prev">prev()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_rewind">rewind()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_str_range">str_range()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_text">text()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_valid">valid()</a></code>
+				<code><a href="class-hQuery_Node.html#_CSSArr2Str">CSSArr2Str()</a></code>, 
+				<code><a href="class-hQuery_Node.html#___destruct">__destruct()</a></code>, 
+				<code><a href="class-hQuery_Node.html#___isset">__isset()</a></code>, 
+				<code><a href="class-hQuery_Node.html#___unset">__unset()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__all">_all()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__children">_children()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__ctx_ids">_ctx_ids()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__doc_ids">_doc_ids()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__filter">_filter()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__has">_has()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__my_ids">_my_ids()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__next">_next()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__parent">_parent()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__prev">_prev()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__sub_ids">_sub_ids()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_array_select">array_select()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_attr">attr()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_convert_encoding">convert_encoding()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_count">count()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_current">current()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_doc">doc()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_find">find()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_html">html()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_html_attr2str">html_attr2str()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_html_findTagClose">html_findTagClose()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_html_parseAttrStr">html_parseAttrStr()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_isDoc">isDoc()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_isEmpty">isEmpty()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_is_empty">is_empty()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_key">key()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_next">next()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_nodeName">nodeName()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_outerHtml">outerHtml()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_parseCSStr">parseCSStr()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_pos">pos()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_prev">prev()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_rewind">rewind()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_str_range">str_range()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_text">text()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_valid">valid()</a></code>
 			</p>
 		</div>
 
@@ -985,6 +990,16 @@ $has_keys == false => $aid == [aids]</p>
 
 
 
+		<div class="panel panel-default">
+            <div class="panel-heading"><h2>Constants summary</h2></div>
+		</div>
+
+		<div class="panel panel-default">
+            <div class="panel-heading"><h3>Constants inherited from <a href="class-hQuery_Node.html#constants">hQuery_Node</a></h3></div>
+			<p class="elementList">
+				<code><a href="class-hQuery_Node.html#VERSION"><b>VERSION</b></a></code>
+			</p>
+		</div>
 
 
 
@@ -998,7 +1013,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#859" title="Go to source code"><var>$del_spaces</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#939" title="Go to source code"><var>$del_spaces</var></a>
 
 				<div class="description short">
 					
@@ -1023,7 +1038,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#860" title="Go to source code"><var>$case_folding</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#940" title="Go to source code"><var>$case_folding</var></a>
 
 				<div class="description short">
 					
@@ -1048,7 +1063,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#861" title="Go to source code"><var>$autoclose_tags</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#941" title="Go to source code"><var>$autoclose_tags</var></a>
 
 				<div class="description short">
 					
@@ -1073,7 +1088,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#863" title="Go to source code"><var>$_emptyTags</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#943" title="Go to source code"><var>$_emptyTags</var></a>
 
 				<div class="description short">
 					
@@ -1098,7 +1113,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#864" title="Go to source code"><var>$_specialTags</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#944" title="Go to source code"><var>$_specialTags</var></a>
 
 				<div class="description short">
 					
@@ -1123,7 +1138,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#865" title="Go to source code"><var>$_unparsedTags</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#945" title="Go to source code"><var>$_unparsedTags</var></a>
 
 				<div class="description short">
 					
@@ -1148,7 +1163,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#866" title="Go to source code"><var>$_index_attribs</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#946" title="Go to source code"><var>$_index_attribs</var></a>
 
 				<div class="description short">
 					
@@ -1173,7 +1188,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#867" title="Go to source code"><var>$_url_attribs</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#947" title="Go to source code"><var>$_url_attribs</var></a>
 
 				<div class="description short">
 					
@@ -1198,7 +1213,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#868" title="Go to source code"><var>$_tagID_first_letter</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#948" title="Go to source code"><var>$_tagID_first_letter</var></a>
 
 				<div class="description short">
 					
@@ -1223,7 +1238,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#869" title="Go to source code"><var>$_tagID_letters</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#949" title="Go to source code"><var>$_tagID_letters</var></a>
 
 				<div class="description short">
 					
@@ -1248,7 +1263,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#870" title="Go to source code"><var>$_icharset</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#950" title="Go to source code"><var>$_icharset</var></a>
 
 				<div class="description short">
 					
@@ -1273,7 +1288,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#872" title="Go to source code"><var>$html</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#952" title="Go to source code"><var>$html</var></a>
 
 				<div class="description short">
 					
@@ -1298,7 +1313,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#875" title="Go to source code"><var>$tags</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#955" title="Go to source code"><var>$tags</var></a>
 
 				<div class="description short">
 					
@@ -1323,7 +1338,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#876" title="Go to source code"><var>$attrs</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#956" title="Go to source code"><var>$attrs</var></a>
 
 				<div class="description short">
 					
@@ -1348,7 +1363,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#877" title="Go to source code"><var>$attribs</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#957" title="Go to source code"><var>$attribs</var></a>
 
 				<div class="description short">
 					
@@ -1373,7 +1388,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#878" title="Go to source code"><var>$idx_attr</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#958" title="Go to source code"><var>$idx_attr</var></a>
 
 				<div class="description short">
 					
@@ -1398,7 +1413,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#879" title="Go to source code"><var>$tag_idx</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#959" title="Go to source code"><var>$tag_idx</var></a>
 
 				<div class="description short">
 					
@@ -1423,7 +1438,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#880" title="Go to source code"><var>$attr_idx</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#960" title="Go to source code"><var>$attr_idx</var></a>
 
 				<div class="description short">
 					
@@ -1448,7 +1463,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#881" title="Go to source code"><var>$class_idx</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#961" title="Go to source code"><var>$class_idx</var></a>
 
 				<div class="description short">
 					
@@ -1473,7 +1488,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#883" title="Go to source code"><var>$o</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#963" title="Go to source code"><var>$o</var></a>
 
 				<div class="description short">
 					
@@ -1498,7 +1513,7 @@ $has_keys == false => $aid == [aids]</p>
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-CHTML_Parser_Doc.html#885" title="Go to source code"><var>$indexed</var></a>
+					<a href="source-class-hQuery_HTML_Parser.html#965" title="Go to source code"><var>$indexed</var></a>
 
 				<div class="description short">
 					
@@ -1520,19 +1535,18 @@ $has_keys == false => $aid == [aids]</p>
 		</div>
 
 		<div class="panel panel-default">
-            <div class="panel-heading"><h3>Properties inherited from <a href="class-ADOM_Node.html#properties">ADOM_Node</a></h3></div>
+            <div class="panel-heading"><h3>Properties inherited from <a href="class-hQuery_Node.html#properties">hQuery_Node</a></h3></div>
 			<p class="elementList">
-				<code><a href="class-ADOM_Node.html#$_ar_"><var>$_ar_</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$_fl_"><var>$_fl_</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$_mi_"><var>$_mi_</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$_nl_"><var>$_nl_</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$_prop"><var>$_prop</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$_tr_"><var>$_tr_</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$doc"><var>$doc</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$ids"><var>$ids</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$last_http_result"><var>$last_http_result</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$selected_doc"><var>$selected_doc</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$version"><var>$version</var></a></code>
+				<code><a href="class-hQuery_Node.html#$_ar_"><var>$_ar_</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$_fl_"><var>$_fl_</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$_mi_"><var>$_mi_</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$_nl_"><var>$_nl_</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$_prop"><var>$_prop</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$_tr_"><var>$_tr_</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$doc"><var>$doc</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$ids"><var>$ids</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$last_http_result"><var>$last_http_result</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$selected_doc"><var>$selected_doc</var></a></code>
 			</p>
 		</div>
 

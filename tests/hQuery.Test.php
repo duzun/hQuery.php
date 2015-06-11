@@ -96,7 +96,7 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
         $a = self::$inst->find('.test-class #test-div.test-div > a');
 
         $this->assertNotEmpty($a);
-        $this->assertTrue($a instanceof HTML_Node);
+        $this->assertTrue($a instanceof hQuery_Element);
         $this->assertEquals('a', $a->nodeName);
         $this->assertEquals('This is a link', $a->text);
         $this->assertEquals('https://DUzun.Me/path', $a->attr('href'));

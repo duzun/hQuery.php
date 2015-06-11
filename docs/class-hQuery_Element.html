@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Class HTML_Node</title>
+	<title>Class hQuery_Element</title>
 
 	<link rel="stylesheet" href="resources/bootstrap.min.css?973e37a8502921d56bc02bb55321f45b072b6f71">
 	<link rel="stylesheet" href="resources/style.css?49f43d3208c5d7e33fa16d36107a345bf11cc00d">
@@ -49,11 +49,10 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
-				<li><a href="class-ADOM_Node.html">ADOM_Node</a></li>
-				<li><a href="class-CHTML_Parser_Doc.html">CHTML_Parser_Doc</a></li>
 				<li><a href="class-hQuery.html">hQuery</a></li>
-				<li class="active"><a href="class-HTML_Node.html">HTML_Node</a></li>
-				<li><a href="class-IDOM_Context.html">IDOM_Context</a></li>
+				<li class="active"><a href="class-hQuery_Element.html">hQuery_Element</a></li>
+				<li><a href="class-hQuery_HTML_Parser.html">hQuery_HTML_Parser</a></li>
+				<li><a href="class-hQuery_Node.html">hQuery_Node</a></li>
 			</ul>
 
 
@@ -69,16 +68,16 @@
 <div id="right">
 	<div id="rightInner">
 <div id="content" class="class">
-	<h1>Class HTML_Node</h1>
+	<h1>Class hQuery_Element</h1>
 
 
 	<div class="description">
-	<p>Represents an HTML Node</p>
+	<p>Represents an HTML Element ( eg div, input etc ) or a collection of elements ( eq jQuery([div, span, ...]) )</p>
 	</div>
 
 	<dl class="tree well">
 		<dd style="padding-left:0px">
-			<a href="class-ADOM_Node.html"><span>ADOM_Node</span></a>
+			<a href="class-hQuery_Node.html"><span>hQuery_Node</span></a>
 			
 			 implements 
 <span>Iterator</span>, 
@@ -89,7 +88,7 @@
 		</dd>
 		<dd style="padding-left:30px">
 			<img src="resources/inherit.png" alt="Extended by">
-<b><span>HTML_Node</span></b>			
+<b><span>hQuery_Element</span></b>			
 			
 			
 		</dd>
@@ -108,9 +107,11 @@
 		
 		
 
+				<b>License:</b>
+				<a href="MIT">MIT</a><br>
 				<b>Author:</b>
 				Dumitru Uzun (DUzun.ME)<br>
-			<b>Located at</b> <a href="source-class-HTML_Node.html#2378-2607" title="Go to source code"></a>
+			<b>Located at</b> <a href="source-class-hQuery_Element.html#2484-2714" title="Go to source code"></a>
 		<br>
 	</div>
 
@@ -130,7 +131,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_toArray">#</a>
-			<code><a href="source-class-HTML_Node.html#2386-2403" title="Go to source code">toArray</a>( <span> <var>$cch</var> = <span class="php-keyword1">true</span></span> )</code>
+			<code><a href="source-class-hQuery_Element.html#2493-2510" title="Go to source code">toArray</a>( <span> <var>$cch</var> = <span class="php-keyword1">true</span></span> )</code>
 
 			<div class="description short">
 				
@@ -159,7 +160,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#___get">#</a>
-			<code><a href="source-class-HTML_Node.html#2406-2438" title="Go to source code">__get</a>( <span> <var>$name</var></span> )</code>
+			<code><a href="source-class-hQuery_Element.html#2513-2545" title="Go to source code">__get</a>( <span> <var>$name</var></span> )</code>
 
 			<div class="description short">
 				
@@ -174,7 +175,7 @@
 
 
 					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-ADOM_Node.html#___get">ADOM_Node::__get</a></code></div>
+					<div class="list"><code><a href="class-hQuery_Node.html#___get">hQuery_Node::__get</a></code></div>
 
 			</div>
 			</div></td>
@@ -190,7 +191,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_offsetSet">#</a>
-			<code><a href="source-class-HTML_Node.html#2442-2453" title="Go to source code">offsetSet</a>( <span> <var>$offset</var></span>, <span> <var>$value</var></span> )</code>
+			<code><a href="source-class-hQuery_Element.html#2549-2560" title="Go to source code">offsetSet</a>( <span> <var>$offset</var></span>, <span> <var>$value</var></span> )</code>
 
 			<div class="description short">
 				
@@ -219,7 +220,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_offsetGet">#</a>
-			<code><a href="source-class-HTML_Node.html#2455-2461" title="Go to source code">offsetGet</a>( <span> <var>$offset</var></span> )</code>
+			<code><a href="source-class-hQuery_Element.html#2562-2568" title="Go to source code">offsetGet</a>( <span> <var>$offset</var></span> )</code>
 
 			<div class="description short">
 				
@@ -248,7 +249,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_offsetExists">#</a>
-			<code><a href="source-class-HTML_Node.html#2463-2468" title="Go to source code">offsetExists</a>( <span> <var>$offset</var></span> )</code>
+			<code><a href="source-class-hQuery_Element.html#2570-2575" title="Go to source code">offsetExists</a>( <span> <var>$offset</var></span> )</code>
 
 			<div class="description short">
 				
@@ -277,7 +278,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_offsetUnset">#</a>
-			<code><a href="source-class-HTML_Node.html#2470-2481" title="Go to source code">offsetUnset</a>( <span> <var>$offset</var></span> )</code>
+			<code><a href="source-class-hQuery_Element.html#2577-2588" title="Go to source code">offsetUnset</a>( <span> <var>$offset</var></span> )</code>
 
 			<div class="description short">
 				
@@ -306,7 +307,7 @@
 
 			<td class="name"><div>
 			<a class="anchor" href="#_val">#</a>
-			<code><a href="source-class-HTML_Node.html#2484-2502" title="Go to source code">val</a>( )</code>
+			<code><a href="source-class-hQuery_Element.html#2591-2609" title="Go to source code">val</a>( )</code>
 
 			<div class="description short">
 				<p>Get value of an :input element.</p>
@@ -328,14 +329,14 @@
 
 			<td class="attributes"><code>
 				 public 
-				<code><a href="class-HTML_Node.html">HTML_Node</a></code>
+				<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>
 				
 				</code>
 			</td>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_current">#</a>
-			<code><a href="source-class-HTML_Node.html#2504-2515" title="Go to source code">current</a>( )</code>
+			<code><a href="source-class-hQuery_Element.html#2611-2622" title="Go to source code">current</a>( )</code>
 
 			<div class="description short">
 				<p>Override current() for iterations.</p>
@@ -348,13 +349,13 @@
 
 					<h4>Returns</h4>
 					<div class="list">
-						<code><a href="class-HTML_Node.html">HTML_Node</a></code>
+						<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>
 					</div>
 
 
 
 					<h4>Overrides</h4>
-					<div class="list"><code><a href="class-ADOM_Node.html#_current">ADOM_Node::current</a></code></div>
+					<div class="list"><code><a href="class-hQuery_Node.html#_current">hQuery_Node::current</a></code></div>
 
 			</div>
 			</div></td>
@@ -363,14 +364,14 @@
 
 			<td class="attributes"><code>
 				 public 
-				<code><a href="class-HTML_Node.html">HTML_Node</a></code>
+				<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>
 				
 				</code>
 			</td>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_get">#</a>
-			<code><a href="source-class-HTML_Node.html#2517-2539" title="Go to source code">get</a>( <span>integer <var>$idx</var></span> )</code>
+			<code><a href="source-class-hQuery_Element.html#2624-2646" title="Go to source code">get</a>( <span>integer <var>$idx</var></span> )</code>
 
 			<div class="description short">
 				<p>Get the node at $idx position in the set, using cache</p>
@@ -390,7 +391,7 @@
 
 					<h4>Returns</h4>
 					<div class="list">
-						<code><a href="class-HTML_Node.html">HTML_Node</a></code>
+						<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>
 					</div>
 
 
@@ -403,14 +404,14 @@
 
 			<td class="attributes"><code>
 				 public 
-				<code><a href="class-HTML_Node.html">HTML_Node</a></code>
+				<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>
 				
 				</code>
 			</td>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_eq">#</a>
-			<code><a href="source-class-HTML_Node.html#2541-2554" title="Go to source code">eq</a>( <span>integer <var>$idx</var></span> )</code>
+			<code><a href="source-class-hQuery_Element.html#2648-2661" title="Go to source code">eq</a>( <span>integer <var>$idx</var></span> )</code>
 
 			<div class="description short">
 				<p>Get the node at $idx position in the set, no cache, each call creates new instance.</p>
@@ -430,7 +431,7 @@
 
 					<h4>Returns</h4>
 					<div class="list">
-						<code><a href="class-HTML_Node.html">HTML_Node</a></code>
+						<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>
 					</div>
 
 
@@ -443,14 +444,14 @@
 
 			<td class="attributes"><code>
 				 public 
-				<code><a href="class-HTML_Node.html">HTML_Node</a></code>
+				<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>
 				
 				</code>
 			</td>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_slice">#</a>
-			<code><a href="source-class-HTML_Node.html#2556-2585" title="Go to source code">slice</a>( <span>integer <var>$idx</var></span>, <span>integer <var>$len</var> = <span class="php-keyword1">NULL</span></span> )</code>
+			<code><a href="source-class-hQuery_Element.html#2663-2692" title="Go to source code">slice</a>( <span>integer <var>$idx</var></span>, <span>integer <var>$len</var> = <span class="php-keyword1">NULL</span></span> )</code>
 
 			<div class="description short">
 				<p>Get a slice of current node collection.</p>
@@ -474,7 +475,7 @@
 
 					<h4>Returns</h4>
 					<div class="list">
-						<code><a href="class-HTML_Node.html">HTML_Node</a></code>
+						<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>
 					</div>
 
 
@@ -487,14 +488,14 @@
 
 			<td class="attributes"><code>
 				 public 
-				<code><a href="class-HTML_Node.html">HTML_Node</a></code>
+				<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>
 				
 				</code>
 			</td>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_parent">#</a>
-			<code><a href="source-class-HTML_Node.html#2587-2595" title="Go to source code">parent</a>( )</code>
+			<code><a href="source-class-hQuery_Element.html#2694-2702" title="Go to source code">parent</a>( )</code>
 
 			<div class="description short">
 				<p>Get parent nodes for this collection of nodes.</p>
@@ -507,7 +508,7 @@
 
 					<h4>Returns</h4>
 					<div class="list">
-						<code><a href="class-HTML_Node.html">HTML_Node</a></code><br>parent
+						<code><a href="class-hQuery_Element.html">hQuery_Element</a></code><br>parent
 					</div>
 
 
@@ -520,14 +521,14 @@
 
 			<td class="attributes"><code>
 				 public 
-				<code><a href="class-HTML_Node.html">HTML_Node</a></code>
+				<code><a href="class-hQuery_Element.html">hQuery_Element</a></code>
 				
 				</code>
 			</td>
 
 			<td class="name"><div>
 			<a class="anchor" href="#_children">#</a>
-			<code><a href="source-class-HTML_Node.html#2597-2605" title="Go to source code">children</a>( )</code>
+			<code><a href="source-class-hQuery_Element.html#2704-2712" title="Go to source code">children</a>( )</code>
 
 			<div class="description short">
 				<p>Get child nodes for this collection of nodes.</p>
@@ -540,7 +541,7 @@
 
 					<h4>Returns</h4>
 					<div class="list">
-						<code><a href="class-HTML_Node.html">HTML_Node</a></code><br>children
+						<code><a href="class-hQuery_Element.html">hQuery_Element</a></code><br>children
 					</div>
 
 
@@ -553,51 +554,50 @@
 		</div>
 
 		<div class="panel panel-default">
-	        <div class="panel-heading"><h3>Methods inherited from <a href="class-ADOM_Node.html#methods">ADOM_Node</a></h3></div>
+	        <div class="panel-heading"><h3>Methods inherited from <a href="class-hQuery_Node.html#methods">hQuery_Node</a></h3></div>
 			<p class="elementList">
-				<code><a href="class-ADOM_Node.html#_CSSArr2Str">CSSArr2Str()</a></code>, 
-				<code><a href="class-ADOM_Node.html#___construct">__construct()</a></code>, 
-				<code><a href="class-ADOM_Node.html#___destruct">__destruct()</a></code>, 
-				<code><a href="class-ADOM_Node.html#___isset">__isset()</a></code>, 
-				<code><a href="class-ADOM_Node.html#___set">__set()</a></code>, 
-				<code><a href="class-ADOM_Node.html#___toString">__toString()</a></code>, 
-				<code><a href="class-ADOM_Node.html#___unset">__unset()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__all">_all()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__children">_children()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__ctx_ids">_ctx_ids()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__doc_ids">_doc_ids()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__filter">_filter()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__has">_has()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__my_ids">_my_ids()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__next">_next()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__parent">_parent()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__prev">_prev()</a></code>, 
-				<code><a href="class-ADOM_Node.html#__sub_ids">_sub_ids()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_array_select">array_select()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_attr">attr()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_convert_encoding">convert_encoding()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_count">count()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_doc">doc()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_find">find()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html">html()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html_attr2str">html_attr2str()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html_findTagClose">html_findTagClose()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html_normal_pseudoClass">html_normal_pseudoClass()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html_parseAttrStr">html_parseAttrStr()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_html_selector2struc">html_selector2struc()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_isDoc">isDoc()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_is_empty">is_empty()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_key">key()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_next">next()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_nodeName">nodeName()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_outerHtml">outerHtml()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_parseCSStr">parseCSStr()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_pos">pos()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_prev">prev()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_rewind">rewind()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_str_range">str_range()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_text">text()</a></code>, 
-				<code><a href="class-ADOM_Node.html#_valid">valid()</a></code>
+				<code><a href="class-hQuery_Node.html#_CSSArr2Str">CSSArr2Str()</a></code>, 
+				<code><a href="class-hQuery_Node.html#___construct">__construct()</a></code>, 
+				<code><a href="class-hQuery_Node.html#___destruct">__destruct()</a></code>, 
+				<code><a href="class-hQuery_Node.html#___isset">__isset()</a></code>, 
+				<code><a href="class-hQuery_Node.html#___set">__set()</a></code>, 
+				<code><a href="class-hQuery_Node.html#___toString">__toString()</a></code>, 
+				<code><a href="class-hQuery_Node.html#___unset">__unset()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__all">_all()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__children">_children()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__ctx_ids">_ctx_ids()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__doc_ids">_doc_ids()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__filter">_filter()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__has">_has()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__my_ids">_my_ids()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__next">_next()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__parent">_parent()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__prev">_prev()</a></code>, 
+				<code><a href="class-hQuery_Node.html#__sub_ids">_sub_ids()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_array_select">array_select()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_attr">attr()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_convert_encoding">convert_encoding()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_count">count()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_doc">doc()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_find">find()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_html">html()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_html_attr2str">html_attr2str()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_html_findTagClose">html_findTagClose()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_html_parseAttrStr">html_parseAttrStr()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_isDoc">isDoc()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_isEmpty">isEmpty()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_is_empty">is_empty()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_key">key()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_next">next()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_nodeName">nodeName()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_outerHtml">outerHtml()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_parseCSStr">parseCSStr()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_pos">pos()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_prev">prev()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_rewind">rewind()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_str_range">str_range()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_text">text()</a></code>, 
+				<code><a href="class-hQuery_Node.html#_valid">valid()</a></code>
 			</p>
 		</div>
 
@@ -607,6 +607,16 @@
 
 
 
+		<div class="panel panel-default">
+            <div class="panel-heading"><h2>Constants summary</h2></div>
+		</div>
+
+		<div class="panel panel-default">
+            <div class="panel-heading"><h3>Constants inherited from <a href="class-hQuery_Node.html#constants">hQuery_Node</a></h3></div>
+			<p class="elementList">
+				<code><a href="class-hQuery_Node.html#VERSION"><b>VERSION</b></a></code>
+			</p>
+		</div>
 
 
 
@@ -620,7 +630,7 @@
 			</code></td>
 
 			<td class="name">
-					<a href="source-class-HTML_Node.html#2384" title="Go to source code"><var>$_ich</var></a>
+					<a href="source-class-hQuery_Element.html#2491" title="Go to source code"><var>$_ich</var></a>
 
 				<div class="description short">
 					
@@ -642,19 +652,18 @@
 		</div>
 
 		<div class="panel panel-default">
-            <div class="panel-heading"><h3>Properties inherited from <a href="class-ADOM_Node.html#properties">ADOM_Node</a></h3></div>
+            <div class="panel-heading"><h3>Properties inherited from <a href="class-hQuery_Node.html#properties">hQuery_Node</a></h3></div>
 			<p class="elementList">
-				<code><a href="class-ADOM_Node.html#$_ar_"><var>$_ar_</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$_fl_"><var>$_fl_</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$_mi_"><var>$_mi_</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$_nl_"><var>$_nl_</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$_prop"><var>$_prop</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$_tr_"><var>$_tr_</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$doc"><var>$doc</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$ids"><var>$ids</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$last_http_result"><var>$last_http_result</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$selected_doc"><var>$selected_doc</var></a></code>, 
-				<code><a href="class-ADOM_Node.html#$version"><var>$version</var></a></code>
+				<code><a href="class-hQuery_Node.html#$_ar_"><var>$_ar_</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$_fl_"><var>$_fl_</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$_mi_"><var>$_mi_</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$_nl_"><var>$_nl_</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$_prop"><var>$_prop</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$_tr_"><var>$_tr_</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$doc"><var>$doc</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$ids"><var>$ids</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$last_http_result"><var>$last_http_result</var></a></code>, 
+				<code><a href="class-hQuery_Node.html#$selected_doc"><var>$selected_doc</var></a></code>
 			</p>
 		</div>
 
