@@ -15,6 +15,7 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
   - Automatically handles redirects (301, 302, 303)
   - Caches response for multiple processing tasks
   - PHP 5+
+  - No dependencies
 
 # Usage
 
