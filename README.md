@@ -54,7 +54,7 @@ $doc->base_url = 'http://desired-host.net/path';
 ```
 
 ### Processing the results
-###### [hQuery::find](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_find)( string `$sel`, array|string `$attr` = NULL, ADOM_Node `$ctx` = NULL )
+###### [hQuery::find](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_find)( string `$sel`, array|string `$attr` = NULL, hQuery_Node `$ctx` = NULL )
 ```php
 // Find all banners (images inside anchors)
 $banners = $doc->find('a > img:parent');
