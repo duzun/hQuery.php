@@ -2,7 +2,7 @@
   "name": "duzun/hquery",
   "type": "library",
   "description": "An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": {
     "name": "Dumitru Uzun",
     "email": "contact@duzun.me",
