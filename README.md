@@ -3,6 +3,7 @@ hQuery.php   [![Build Status](https://travis-ci.org/duzun/hQuery.php.svg?branch=
 
 An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye.
 
+[API Documentation](https://duzun.github.io/hQuery.php/docs/class-hQuery.html)
 
 # Features
 
@@ -18,8 +19,6 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
   - No dependencies
 
 # Usage
-
-[API Documentation](https://duzun.github.io/hQuery.php/docs/class-hQuery.html)
 
 ### Basic setup:
 ```php
