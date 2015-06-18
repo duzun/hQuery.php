@@ -59,6 +59,8 @@
   },
   "scripts": {
     "verup": "node ./node_modules/verup",
+    "preversion": "php ./tools/phpunit.phar ./tests/",
+    "version": "node ./node_modules/verup 0",
     "apigen": "php ./tools/apigen.phar generate -d ./docs --template-theme bootstrap -s ./hquery.php",
     "test": "php ./tools/phpunit.phar ./tests/",
     "test-dev": "node ./tools/test_watcher.js"
