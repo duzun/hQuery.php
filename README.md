@@ -18,11 +18,20 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
   - PHP 5+
   - No dependencies
 
+# Install
+
+Just `include_once 'hquery.php';` in your project and start using `hQuery`.
+
+Alternatively `composer require duzun/hquery`
+
+or using `npm install hquery.php`, `require_once 'node_modules/hquery.php/hquery.php';`.
+
+
 # Usage
 
 ### Basic setup:
 ```php
-include '/path/to/libs/hquery.php';
+include_once '/path/to/libs/hquery.php';
 
 // Set the cache path - must be a writable folder
 hQuery::$cache_path = "/path/to/cache";
