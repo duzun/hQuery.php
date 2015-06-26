@@ -28,6 +28,8 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
 
     // Before any test
     static public function setUpBeforeClass() {
+        hQuery::$_mockup_class = 'TestHQueryTests';
+
         self::$inst = TestHQueryTests::fromHTML(
             '<doctype html>'.
             '<html>'.
@@ -45,6 +47,7 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
             '</html>'
             , self::$baseUrl
         );
+        self::log(get_class(self::$inst));
     }
 
     // After all tests

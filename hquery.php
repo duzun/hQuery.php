@@ -3,9 +3,11 @@
 /**
  *  Copyright (C) 2014-2015 Dumitru Uzun
  *
+ *  API Documentation at https://duzun.github.io/hQuery.php
+ *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.2.2
+ *  @version 1.2.3
  */
 // ------------------------------------------------------------------------
 
@@ -16,7 +18,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.2.2';
+    const VERSION = '1.2.3';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -1761,6 +1763,8 @@ class hQuery extends hQuery_HTML_Parser {
     public static $cache_expires = 3600;
 
     // ------------------------------------------------------------------------
+    public static $_mockup_class; // Used internally for teting
+    // ------------------------------------------------------------------------
     /**
      *  Parse and HTML string.
      *
@@ -1771,7 +1775,12 @@ class hQuery extends hQuery_HTML_Parser {
      */
     public static function fromHTML($html, $url=NULL) {
         $index_time = microtime(true);
-        $doc = new static($html, false); // Return an instance of actual class
+        if ( isset(self::$_mockup_class) ) {
+            $doc = new self::$_mockup_class($html, false);
+        }
+        else {
+            $doc = new self($html, false);
+        }
         if($url) {
             $doc->location($url);
         }
