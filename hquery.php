@@ -28,6 +28,8 @@ abstract class hQuery_Node implements Iterator, Countable {
     protected $ids; // contained elements' IDs
 
     // ------------------------------------------------------------------------
+    public $tag_map; // map tag names (eg ['b' => 'string'])
+    // ------------------------------------------------------------------------
     static $_ar_ = array()     ;
     static $_mi_ = PHP_INT_MAX ;
     static $_nl_ = NULL        ;
