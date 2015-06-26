@@ -10,8 +10,7 @@ php:
 
 matrix:
     allow_failures:
-        - php: 
-            - hhvm
-            - 5.2
+        - php: hhvm
+        - php: 5.2
 
 script: phpunit tests/
