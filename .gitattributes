@@ -24,3 +24,5 @@
 *.gz binary
 *.phar binary
 
+*.ser binary
+

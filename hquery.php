@@ -2082,7 +2082,7 @@ class hQuery extends hQuery_HTML_Parser {
         }
         switch($type) {
             case 'ser': {
-                $data = unserialize($str);
+                $data = @unserialize($str);
                 if ( $data === false ) {
                     if ( strpos($str, "\n") !== false ) {
                         if ( $retry = strpos($str, "\r") === false ) {
