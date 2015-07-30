@@ -6,7 +6,9 @@
  *  @TODO: Test all methods
  */
 // -----------------------------------------------------
-require_once dirname(dirname(__FILE__)) . '/hquery.php';
+define('PHPUNIT_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
+// -----------------------------------------------------
+require_once dirname(PHPUNIT_DIR) . '/hquery.php';
 // -----------------------------------------------------
 // Surogate class for testing, to access protected attributes of hQuery
 class TestHQueryTests extends hQuery {
@@ -121,6 +123,39 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
         // @TODO
     }
 
+    // -----------------------------------------------------
+    // -----------------------------------------------------
+    public function test_unjsonize() {
+        $ser  = file_get_contents(PHPUNIT_DIR . '/data/jsonize.ser');
+        $json = file_get_contents(PHPUNIT_DIR . '/data/jsonize.json');
+
+        $ser_ = str_replace("\n", "\r\n", $ser);
+
+        $os = TestHQueryTests::unjsonize($ser);
+        $os_ = TestHQueryTests::unjsonize($ser_);
+        $oj = TestHQueryTests::unjsonize($json);
+
+        $this->assertNotEmpty($os);
+        $this->assertNotEmpty($os_);
+        $this->assertNotEmpty($oj);
+        $this->assertEquals($os, $oj);
+
+        return array($os, $ser, $json);
+    }
+
+    /**
+     * @depends test_unjsonize
+     */
+    public function test_jsonize($vars) {
+        list($o, $ser, $json) = $vars;
+        $b = TestHQueryTests::jsonize($o);
+
+        $this->assertTrue(is_string($b));
+        $this->assertNotEmpty($b);
+
+        $this->assertTrue($b == $json || $b == $ser);
+    }
+    
     // -----------------------------------------------------
     // -----------------------------------------------------
     /**

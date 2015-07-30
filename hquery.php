@@ -7,7 +7,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.2.3
+ *  @version 1.2.4
  */
 // ------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.2.3';
+    const VERSION = '1.2.4';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -1841,7 +1841,7 @@ class hQuery extends hQuery_HTML_Parser {
             $t = realpath($dir) and $dir = $t or mkdir($dir, 0766, true);
             $dir .= DS;
             $cch_id = hash('sha1', $url, true);
-            $t = hash('md5', serialize($opt), true);
+            $t = hash('md5', self::jsonize($opt), true);
             $cch_id = bin2hex(substr($cch_id, 0, -strlen($t)) . (substr($cch_id, -strlen($t)) ^ $t));
             $cch_fn = $dir . $cch_id;
             $ext = strtolower(strrchr($url, '.'));
@@ -2043,6 +2043,110 @@ class hQuery extends hQuery_HTML_Parser {
 
     // - Helpers ------------------------------------------------
 
+    // ---------------------------------------------------------------
+    /**
+     *  Serialize $data as JSON, fallback to serialize.
+     *
+     *  @param mixed   $data - the data to be serialized
+     *  @param &string $type - returns the serialization method used ('json' | 'ser')
+     *
+     *  @return string the serialized data
+     */
+    public static function jsonize($data, &$type=NULL, $ops = 0) {
+        if(defined('JSON_UNESCAPED_UNICODE')) {
+            $ops |= JSON_UNESCAPED_UNICODE;
+        }
+        $str = json_encode($data, $ops);
+        if(json_last_error() != JSON_ERROR_NONE) {
+            $str = serialize($data);
+            $type = 'ser';
+        }
+        else {
+            $type = 'json';
+        }
+        return $str;
+    }
+
+    /**
+     *  Unserialize $data from either JSON or serialize.
+     *
+     *  @param string  $str  - the data to be unserialized
+     *  @param &string $type - if not set, returns the serialization method detected ('json' | 'ser');
+     *                          if set, forces unjsonize() to use this method for unserialization.
+     *
+     *  @return mixed the unserialized data
+     */
+    public static function unjsonize($str, &$type=NULL) {
+        if(!isset($type)) {
+            $type = self::serjstype($str);
+        }
+        switch($type) {
+            case 'ser': {
+                $data = unserialize($str);
+                if ( $data === false ) {
+                    if ( strpos($str, "\n") !== false ) {
+                        if ( $retry = strpos($str, "\r") === false ) {
+                            $str = str_replace("\n", "\r\n", $str);
+                        }
+                        elseif ( $retry = strpos($str, "\r\n") !== false ) {
+                            $str = str_replace("\r\n", "\n", $str);
+                        }
+                        $retry and $data = unserialize($str);
+                    }
+                }
+            } break;
+
+            case 'json': {
+                $data = json_decode($str, true);
+                // If can't decode JSON, try to remove trailing commans in arrays and objects:
+                if(json_last_error() != JSON_ERROR_NONE) {
+                    $t = preg_replace('/,\s*([\]\}])/m', '$1', $str) and
+                    $data = json_decode($t, true);
+                }
+                if(json_last_error() != JSON_ERROR_NONE) {
+                    if ( function_exists('json_last_error_msg') ) { // PHP 5 >= 5.5.0
+                        error_log('json_decode: ' . json_last_error_msg());
+                    }
+                    else {
+                        error_log("json_decode error with code #".json_last_error());
+                    }
+                }
+            } break;
+
+            default: { // at least try!
+                $data = json_decode($str, true);
+                if(json_last_error() != JSON_ERROR_NONE) {
+                    $data = unserialize($str);
+                }
+            }
+        }
+        return $data;
+    }
+
+    /**
+     *  Tries to detect format of $str (json or ser).
+     *
+     *  @param  string $str - JSON encoded or PHP serialized data.
+     *
+     *  @return string 'json' | 'ser', or FALSE on failure to detect format.
+     */
+    protected static function serjstype($str) {
+        $c = substr($str, 0, 1);
+        if($str === 'N;' || strpos('sibadO', $c) !== false && substr($str, 1, 1) === ':') {
+            $type = 'ser';
+        }
+        else {
+            $l = substr($str, -1);
+            if($c == '{' && $l == '}' || $c == '[' && $l == ']') {
+                $type = 'json';
+            }
+            else {
+                $type = false; // Unknown
+            }
+        }
+        return $type;
+    }
+
     /**
      *  Read data from a cache file.
      *
@@ -2067,14 +2171,14 @@ class hQuery extends hQuery_HTML_Parser {
                 $l = strlen($n) + 2;
                 if($n) {
                     $meta = substr($cnt, $l, $n);
-                    if($meta !== '') $meta = unserialize($meta);
+                    if($meta !== '') $meta = self::unjsonize($meta);
                 }
                 if($meta_only) $cnt = '';
                 else {
                     $l += $n;
                     if($cnt[$l] == "\n") {
                         $cnt = substr($cnt, ++$l);
-                        if($cnt !== '') $cnt = unserialize($cnt);
+                        if($cnt !== '') $cnt = self::unjsonize($cnt);
                     }
                     else {
                         $cnt = substr($cnt, $l);
@@ -2102,11 +2206,11 @@ class hQuery extends hQuery_HTML_Parser {
         if($cnt === false) return !file_exists($fn) || unlink($fn);
         $n = 0;
         if(isset($meta)) {
-           $meta = serialize($meta);
+           $meta = self::jsonize($meta);
            $n += strlen($meta);
         }
         $meta = '#'.$n . "\n" . $meta;
-        if(!is_string($cnt) || $cnt[0] == "\n") { $cnt = "\n" . serialize($cnt); ++$n; }
+        if(!is_string($cnt) || $cnt[0] == "\n") { $cnt = "\n" . self::jsonize($cnt); ++$n; }
         if($n) $cnt = $meta . $cnt;
         unset($meta);
         @mkdir(dirname($fn), 0777, true);
@@ -2132,7 +2236,7 @@ class hQuery extends hQuery_HTML_Parser {
      */
     static function do_flock($fp, $lock, $timeout_ms=384) {
         $l = flock($fp, $lock);
-        if(!$l && ($lock & LOCK_UN) != LOCK_UN && ($lock & LOCK_NB) != LOCK_NB ) {
+        if( !$l && ($lock & LOCK_UN) != LOCK_UN ) {
             $st = microtime(true);
             $m = min( 1e3, $timeout_ms*1e3);
             $n = min(64e3, $timeout_ms*1e3);
@@ -2148,35 +2252,38 @@ class hQuery extends hQuery_HTML_Parser {
     }
 
     static function flock_put_contents($fn, $cnt, $block=false) {
-       // return file_put_contents($fn, $cnt, $block & FILE_APPEND);
-       $ret = false;
-       if( $f = fopen($fn, 'c+') ) {
-           $app = $block & FILE_APPEND and $block ^= $app;
-           if( $block ? self::do_flock($f, LOCK_EX) : flock($f, LOCK_EX | LOCK_NB) ) {
-              if(is_array($cnt) || is_object($cnt)) $cnt = serialize($cnt);
-              if($app) fseek($f, 0, SEEK_END);
-              if(false !== ($ret = fwrite($f, $cnt))) ftruncate($f, ftell($f));
-              flock($f, LOCK_UN);
-           }
-           fclose($f);
-       }
-       return $ret;
+        // return file_put_contents($fn, $cnt, $block & FILE_APPEND);
+        $ret = false;
+        if( $f = fopen($fn, 'c+') ) {
+            $app = $block & FILE_APPEND and $block ^= $app;
+            if( $block ? self::do_flock($f, LOCK_EX) : flock($f, LOCK_EX | LOCK_NB) ) {
+                if(is_array($cnt) || is_object($cnt)) $cnt = self::jsonize($cnt);
+                if($app) fseek($f, 0, SEEK_END);
+                if(false !== ($ret = fwrite($f, $cnt))) {
+                    fflush($f);
+                    ftruncate($f, ftell($f));
+                }
+                flock($f, LOCK_UN);
+            }
+            fclose($f);
+        }
+        return $ret;
     }
 
     static function flock_get_contents($fn, $block=false) {
-       // return file_get_contents($fn);
-       $ret = false;
-       if( $f = fopen($fn, 'r') ) {
-           if( flock($f, LOCK_SH | ($block ? 0 : LOCK_NB)) ) {
-              $s = 1 << 14 ;
-              do $ret .= $r = fread($f, $s); while($r !== false && !feof($f));
-              if($ret == NULL && $r === false) $ret = $r;
-              // filesize result is cached
-              flock($f, LOCK_UN);
-           }
-           fclose($f);
-       }
-       return $ret;
+        // return file_get_contents($fn);
+        $ret = false;
+        if( $f = fopen($fn, 'r') ) {
+            if( flock($f, LOCK_SH | ($block ? 0 : LOCK_NB)) ) {
+                $s = 1 << 14 ;
+                do $ret .= $r = fread($f, $s); while($r !== false && !feof($f));
+                if($ret == NULL && $r === false) $ret = $r;
+                // filesize result is cached
+                flock($f, LOCK_UN);
+            }
+            fclose($f);
+        }
+        return $ret;
     }
     // ------------------------------------------------------------------------
     /**
