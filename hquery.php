@@ -2052,12 +2052,12 @@ class hQuery extends hQuery_HTML_Parser {
      *
      *  @return string the serialized data
      */
-    public static function jsonize($data, &$type=NULL, $ops = 0) {
+    public static function jsonize($data, &$type = NULL, $ops = 0) {
         if(defined('JSON_UNESCAPED_UNICODE')) {
             $ops |= JSON_UNESCAPED_UNICODE;
         }
-        $str = json_encode($data, $ops);
-        if(json_last_error() != JSON_ERROR_NONE) {
+        $str = $ops ? json_encode($data, $ops) : json_encode($data);
+        if( $str === false /*&& json_last_error() != JSON_ERROR_NONE*/ ) {
             $str = serialize($data);
             $type = 'ser';
         }
@@ -2080,6 +2080,18 @@ class hQuery extends hQuery_HTML_Parser {
         if(!isset($type)) {
             $type = self::serjstype($str);
         }
+        static $_json_support;
+        if ( !isset($_json_support) ) {
+            $_json_support = 0;
+            // PHP 5 >= 5.3.0
+            if ( function_exists('json_last_error') ) {
+                ++$_json_support;
+                // PHP 5 >= 5.5.0
+                if ( function_exists('json_last_error_msg') ) {
+                    ++$_json_support;
+                }
+            }
+        }
         switch($type) {
             case 'ser': {
                 $data = @unserialize($str);
@@ -2098,24 +2110,40 @@ class hQuery extends hQuery_HTML_Parser {
 
             case 'json': {
                 $data = json_decode($str, true);
-                // If can't decode JSON, try to remove trailing commans in arrays and objects:
-                if(json_last_error() != JSON_ERROR_NONE) {
-                    $t = preg_replace('/,\s*([\]\}])/m', '$1', $str) and
-                    $data = json_decode($t, true);
-                }
-                if(json_last_error() != JSON_ERROR_NONE) {
-                    if ( function_exists('json_last_error_msg') ) { // PHP 5 >= 5.5.0
-                        error_log('json_decode: ' . json_last_error_msg());
+                // Check for errors only if $data is NULL
+                if ( is_null($data) ) {
+                    // If can't decode JSON, try to remove trailing commans in arrays and objects:
+                    if( $_json_support == 0 ? $str !== 'null' : json_last_error() != JSON_ERROR_NONE ) {
+                        $t = preg_replace('/,\s*([\]\}])/m', '$1', $str) and
+                        $data = json_decode($t, true);
                     }
-                    else {
-                        error_log("json_decode error with code #".json_last_error());
+                    if( is_null($data) ) {
+                        // PHP 5 >= 5.3.0
+                        if ( $_json_support ) {
+                            if ( json_last_error() != JSON_ERROR_NONE ) {
+                                // PHP 5 >= 5.5.0
+                                if ( $_json_support > 1 ) {
+                                    error_log('json_decode: ' . json_last_error_msg());
+                                }
+                                elseif( $_json_support > 0 ) {
+                                    error_log("json_decode error with code #".json_last_error());
+                                }
+                            }
+                        }
+                        // PHP 5 < 5.3.0
+                        else {
+                            // Only 'null' should result in NULL
+                            if ( $str !== 'null' ) {
+                                error_log("json_decode error");
+                            }
+                        }
                     }
                 }
             } break;
 
             default: { // at least try!
                 $data = json_decode($str, true);
-                if(json_last_error() != JSON_ERROR_NONE) {
+                if( is_null($data) && ($_json_support == 0 ? $str !== 'null' : json_last_error() != JSON_ERROR_NONE) ) {
                     $data = unserialize($str);
                 }
             }

@@ -140,6 +140,12 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
         $this->assertNotEmpty($oj);
         $this->assertEquals($os, $oj);
 
+        $t = TestHQueryTests::unjsonize('{"a":1,"b":2,}');
+        $this->assertNotEmpty($t, 'should handle trailing commas in objects');
+        $t = TestHQueryTests::unjsonize('[1,2,]');
+        $this->assertNotEmpty($t, 'should handle trailing commas in arrays');
+
+
         return array($os, $ser, $json);
     }
 
@@ -155,7 +161,7 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue($b == $json || $b == $ser);
     }
-    
+
     // -----------------------------------------------------
     // -----------------------------------------------------
     /**
