@@ -6,9 +6,7 @@
  *  @TODO: Test all methods
  */
 // -----------------------------------------------------
-define('PHPUNIT_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
-// -----------------------------------------------------
-require_once dirname(PHPUNIT_DIR) . '/hquery.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
 // -----------------------------------------------------
 // Surogate class for testing, to access protected attributes of hQuery
 class TestHQueryTests extends hQuery {
@@ -20,52 +18,47 @@ class TestHQueryTests extends hQuery {
 }
 // -----------------------------------------------------
 
-class TestHQuery extends PHPUnit_Framework_TestCase {
+class TestHQuery extends PHPUnit_BaseClass {
     // -----------------------------------------------------
-    static public $inst;
-    static public $className = 'hQuery';
-    static public $baseUrl   = 'https://DUzun.Me/';
-    static public $log       = true;
-    static public $testName;
+    public static $inst;
+    public static $className = 'hQuery';
+    public static $baseUrl   = 'https://DUzun.Me/';
+    public static $log       = true;
 
     // Before any test
-    static public function setUpBeforeClass() {
+    public static function setUpBeforeClass() {
         hQuery::$_mockup_class = 'TestHQueryTests';
 
         self::$inst = TestHQueryTests::fromHTML(
             '<doctype html>'.
             '<html>'.
             '<head>'.
+                '<meta charset="ISO-8859-2" />'.
+                // '<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" />'
                 '<title>Sample HTML Doc</title>'.
             '</head>'.
             '<body class="test-class">'.
                 '<div id="test-div" class="test-class test-div">'.
+                    'This is some text'.
                     '<a href="/path">'.
                         'This is a link'.
                     '</a>'.
+                    ' between tags'.
+                    '<span id="aSpan">Span text</span>'.
                 '</div>'.
                 'Contents...'.
             '</body>'.
             '</html>'
-            , self::$baseUrl
+            , self::$baseUrl . 'index.html'
         );
         self::log(get_class(self::$inst));
     }
 
     // After all tests
-    static public function tearDownAfterClass() {
+    public static function tearDownAfterClass() {
         self::$inst = NULL;
     }
 
-
-    // Before every test
-    public function setUp() {
-        self::$testName = $this->getName();
-    }
-
-    // After every test
-    public function tearDown() {
-    }
 
     // -----------------------------------------------------
     // -----------------------------------------------------
@@ -100,7 +93,7 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
     }
 
     // -----------------------------------------------------
-    public function testFind() {
+    public function test_find() {
         // 1)
         $a = self::$inst->find('.test-class #test-div.test-div > a');
 
@@ -119,7 +112,52 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
     }
 
     // -----------------------------------------------------
-    public function testHttp_wr() {
+    public function test_prop_charset() {
+        $charset = self::$inst->charset;
+        $this->assertEquals('ISO-8859-2', strtoupper($charset));
+    }
+    // -----------------------------------------------------
+    public function test_prop_size() {
+        $size = self::$inst->size;
+        $this->assertGreaterThan(200, $size);
+    }
+    // -----------------------------------------------------
+    public function test_prop_baseURL() {
+        $baseURL = self::$inst->baseURL;
+        $this->assertEquals(self::$baseUrl, $baseURL);
+    }
+    // -----------------------------------------------------
+    public function test_prop_baseURI() {
+        $baseURI = self::$inst->baseURI;
+        $this->assertEquals(self::$baseUrl . 'index.html', $baseURI);
+    }
+    // -----------------------------------------------------
+    // Alias of baseURI
+    public function test_prop_href() {
+        $href = self::$inst->href;
+        $this->assertEquals(self::$baseUrl . 'index.html', $href);
+    }
+
+    // -----------------------------------------------------
+    public function test_text() {
+        $div = self::$inst->find('#test-div');
+        $text = $div->text();
+        $this->assertEquals('This is some textThis is a link between tagsSpan text', $text);
+    }
+
+    // -----------------------------------------------------
+    // public function test_extract_text_contents() {
+        // $div = self::$inst->find('#test-div');
+        // $div->exclude('*');
+        // $html = $div->html();
+        // $text = $div->text();
+        // $pos = $div->pos();
+        // $_pos = strpos(self::$inst->html(), $div->html());
+        // self::log(compact(/*'pos', '_pos', */'html', 'text'), self::$inst->html());
+    // }
+
+    // -----------------------------------------------------
+    public function test_http_wr() {
         // @TODO
     }
 
@@ -162,37 +200,6 @@ class TestHQuery extends PHPUnit_Framework_TestCase {
         $this->assertTrue($b == $json || $b == $ser);
     }
 
-    // -----------------------------------------------------
-    // -----------------------------------------------------
-    /**
-     * Asserts that a method exists.
-     *
-     * @param  string $methodName
-     * @param  string|object  $className
-     * @throws PHPUnit_Framework_AssertionFailedError
-     */
-    public static function assertMehodExists($methodName, $className, $message = '') {
-        self::assertThat(method_exists($className, $methodName), self::isTrue(), $message);
-    }
-    // -----------------------------------------------------
-    static function log() {
-        if ( empty(self::$log) ) return;
-        static $idx = 0;
-        static $lastTest;
-        if ( $lastTest != self::$testName ) {
-            echo PHP_EOL, '-> ', self::$testName, ' ()';
-            $lastTest = self::$testName;
-        }
-        $args = func_get_args();
-        foreach($args as $k => $v) is_string($v) or is_int($v) or is_float($v) or $args[$k] = var_export($v, true);
-        echo PHP_EOL
-            , ""
-            , str_pad(++$idx, 3, ' ', STR_PAD_LEFT)
-            , ")\t"
-            , implode(' ', $args)
-        ;
-    }
-    // -----------------------------------------------------
     // -----------------------------------------------------
 
 }

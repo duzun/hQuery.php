@@ -7,7 +7,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.2.4
+ *  @version 1.2.5
  */
 // ------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.2.4';
+    const VERSION = '1.2.5';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -28,6 +28,7 @@ abstract class hQuery_Node implements Iterator, Countable {
     protected $_prop; // Properties
     protected $doc; // Parent doc
     protected $ids; // contained elements' IDs
+    protected $exc; // excluded elements' IDs
 
     // ------------------------------------------------------------------------
     public $tag_map; // map tag names (eg ['b' => 'string'])
@@ -81,6 +82,20 @@ abstract class hQuery_Node implements Iterator, Countable {
 
     public function find($sel, $attr=NULL) {
         return $this->doc()->find($sel, $attr, $this);
+    }
+
+    public function exclude($sel, $attr=NULL) {
+        $e = $this->find($sel, $attr, $this);
+        if($e) {
+            if(empty($this->exc)) {
+                $this->exc = $e->ids;
+            }
+            else {
+                foreach($e->ids as $b => $e) $this->exc[$b] = $e;
+                ksort($this->exc);
+            }
+        }
+        return $e;
     }
 
     public function __toString() {
@@ -164,33 +179,39 @@ abstract class hQuery_Node implements Iterator, Countable {
         return count($ret) <= 1 ? reset($ret) : $ret;
     }
 
-//    public function firstChild() {
-//       $doc = $this->doc();
-//       $q = reset($this->ids);
-//       $p = key($this->ids);
-//       return new hQuery_Element($doc, array($p=>$q));
-//    }
-//
-//    public function lastChild() {
-//       $doc = $this->doc();
-//       $q = end($this->ids);
-//       $p = key($this->ids);
-//       return new hQuery_Element($doc, array($p=>$q));
-//    }
+    // public function firstChild() {
+        // $doc = $this->doc();
+        // $q = reset($this->ids);
+        // $p = key($this->ids);
+        // return new hQuery_Element($doc, array($p=>$q));
+    // }
+
+    // public function lastChild() {
+        // $doc = $this->doc();
+        // $q = end($this->ids);
+        // $p = key($this->ids);
+        // return new hQuery_Element($doc, array($p=>$q));
+    // }
 
     // ------------------------------------------------------------------------
     /**
      *  Get string offset of the first/current element
      *  in the source HTML document.
      *
+     *   <div class="test"> Contents <span>of</span> #test </div>
+     *                    |
+     *                    pos()
+     *
+     * @param bool $restore - if true, restore internal pointer to previous position
+     *
      * @return int
      */
-    public function pos($rst=true) {
+    public function pos($restore=true) {
         $k = key($this->ids);
         if($k === NULL) {
             reset($this->ids);
             $k = key($this->ids);
-            if($k !== NULL && $rst) {
+            if($k !== NULL && $restore) {
                 end($this->ids);
                 next($this->ids);
             }
@@ -206,7 +227,7 @@ abstract class hQuery_Node implements Iterator, Countable {
     protected function _ctx_ids($ids=NULL) {
         $m = -1;
         if(!isset($ids)) $ids = $this->ids;
-        if(is_int($ids)) $ids = isset($this->ids[$ids]) ? array($ids => $this->ids[$ids]) : self::$_fl_;
+        elseif(is_int($ids)) $ids = isset($this->ids[$ids]) ? array($ids => $this->ids[$ids]) : self::$_fl_;
         else {
             foreach($ids as $b => $e) {
                 if($b <= $m || $b+1 >= $e) unset($ids[$b]);
@@ -312,7 +333,8 @@ abstract class hQuery_Node implements Iterator, Countable {
         foreach($ids as $b => $e) {
             if($b+4 >= $e) continue; // empty tag; min 3 chars are required for a tag - eg. <b>
 
-            if($b <= $le) {          // child of prev element
+            // child of prev element
+            if($b <= $le) {
                 while($b < $ib) if($ie = prev($dids)) $ib = key($dids); else { reset($dids); break; }
             }
             else {
@@ -945,18 +967,19 @@ class hQuery_Context extends hQuery_Node {
  *  used internally
  */
 class hQuery_HTML_Parser extends hQuery_Node {
-    static $del_spaces          = false;
-    static $case_folding        = true;
-    static $autoclose_tags      = false; // 1 - auto-close non-empty tags, 2 - auto-close all tags
+    public static $del_spaces          = false;
+    public static $case_folding        = true;
+    public static $autoclose_tags      = false; // 1 - auto-close non-empty tags, 2 - auto-close all tags
 
-    static $_emptyTags          = array('base','meta','link','hr','br','basefont','param','img','area','input','isindex','col');
-    static $_specialTags        = array('--'=>'--', '[CDATA['=>']]');
-    static $_unparsedTags       = array('style', 'script');
-    static $_index_attribs      = array('href', 'src');
-    static $_url_attribs        = array('href'=>'href', 'src'=>'src');
-    static $_tagID_first_letter = 'a-zA-Z_';
-    static $_tagID_letters      = 'a-zA-Z_0-9:\-';
-    static $_icharset           = 'UTF-8'; // Internal charset
+    public static $_emptyTags          = array('base','meta','link','hr','br','basefont','param','img','area','input','isindex','col');
+    public static $_specialTags        = array('--'=>'--', '[CDATA['=>']]');
+    public static $_unparsedTags       = array('style', 'script');
+    public static $_index_attribs      = array('href', 'src');
+    public static $_url_attribs        = array('href'=>'href', 'src'=>'src');
+
+    protected static $_tagID_first_letter = 'a-zA-Z_';
+    protected static $_tagID_letters      = 'a-zA-Z_0-9:\-';
+    protected static $_icharset           = 'UTF-8'; // Internal charset
 
     protected $html = ''; // html string
 
@@ -987,7 +1010,6 @@ class hQuery_HTML_Parser extends hQuery_Node {
             case 'base_url':
                 return @$this->_prop['baseURL'];
 
-            case 'location':
             case 'href':
                 return $this->location();
 
@@ -1095,7 +1117,8 @@ class hQuery_HTML_Parser extends hQuery_Node {
         $q = strrpos($url, '/');
         if($p+1 < $q) {
             $url = substr($url, 0, $q+1);
-        } else {
+        }
+        else {
             $url .= '/';
         }
         return $url;
@@ -1147,13 +1170,20 @@ class hQuery_HTML_Parser extends hQuery_Node {
         return isset($this->html) ? strlen($this->html) : 0;
     }
 
-    /// This method is for debug only
+    public function substr($start, $length=NULL) {
+        return isset($this->html)
+            ? substr($this->html, $start, isset($length) ? $length : strlen($this->html))
+            : self::$_fl_;
+        ;
+    }
+
+    /// This method is for debugging only
     public function _info() {
         $inf = array();
         $ar = array();
         foreach($this->attribs as $i => $a) $ar[$i] = self::html_attr2str($a);
-        $inf['attribs']   = $ar   ;
-        $inf['attrs']     = $attrs     ;
+        $inf['attribs']   = $ar              ;
+        $inf['attrs']     = $attrs           ;
         $inf['idx_attr']  = $this->idx_attr  ;
         $inf['tag_idx']   = $this->tag_idx   ;
         $inf['attr_idx']  = $this->attr_idx  ;
@@ -1195,8 +1225,8 @@ class hQuery_HTML_Parser extends hQuery_Node {
             $p = $i;
             $i += 4;
             $i = strpos($o->h, '-->', $i);
-            if($i === false) break;
-            $i += 3;
+            if($i === false) $i = $o->l;
+            else $i += 3;
             $o->tg[$p] = $i;
         }
         return $o;
@@ -1207,25 +1237,27 @@ class hQuery_HTML_Parser extends hQuery_Node {
         $s = $nix = $ix = self::$_ar_;
         $ids = $this->ids;
         foreach($this->tags as $id => $n) {
-            if(!isset($ix[$n])) $ix[$n] = array();
+            // if(!isset($ix[$n])) $ix[$n] = array();
             $ix[$n][$id] = $ids[$id];
         }
         foreach($ix as $n => $v) {
             foreach($v as $id => $e) $this->tags[$id] = $n;
             if(isset($nix[$n])) continue;
             $_n = strtolower($n);
-            if(!isset($nix[$_n])) $nix[$_n] = $v;
-            else {
+            if(isset($nix[$_n])) {
                 foreach($v as $id => $e) $nix[$_n][$id] = $e;
                 $s[] = $_n;
+            }
+            else {
+                $nix[$_n] = $v;
             }
         }
         foreach($s as $_n) asort($nix[$_n]);
         return $this->tag_idx = $nix;
     }
 
-   /// make attribute ids (aids) and index all attributes by aid at ids
-   private function _index_attribs($attrs) {
+    /// make attribute ids (aids) and index all attributes by aid at ids
+    private function _index_attribs($attrs) {
       $this->attr_idx = $this->attrs = $aix = $six = $iix = $iax = self::$_ar_;
       $i = 0;
       $ian = self::$_index_attribs;
@@ -1284,49 +1316,50 @@ class hQuery_HTML_Parser extends hQuery_Node {
       $this->attribs = $aix;
 
       return $this->attr_idx;
-   }
+    }
 
-   /// index all classes by class-name at aids
-   private function _index_classes() {
-      $ix = array();
-      $aix = $this->attr_idx;
-      foreach($this->attribs as $aid => &$a) {
-         if(!empty($a['class'])) {
-           $cl = $a['class'];
-           if(!is_array($cl)) {
+    /// index all classes by class-name at aids
+    private function _index_classes() {
+        $ix = array();
+        $aix = $this->attr_idx;
+        foreach($this->attribs as $aid => &$a) if(!empty($a['class'])) {
+            $cl = $a['class'];
+            if(!is_array($cl)) {
                 $cl = preg_split('|\\s+|',trim($cl));
-           }
-           foreach($cl as $cl) {
-              if(isset($ix[$cl])) {
-                if(!is_array($ix[$cl])) $ix[$cl] = array($ix[$cl]=>$this->attr_idx[$ix[$cl]]);
-                $ix[$cl][$aid] = $this->attr_idx[$aid];
-              }
-              else {
-                $ix[$cl] = $aid;
-              }
-           }
-         }
-      }
-      return $this->class_idx = $ix;
-   }
+            }
+            foreach($cl as $cl) {
+                if(isset($ix[$cl])) {
+                    if(!is_array($ix[$cl])) $ix[$cl] = array($ix[$cl]=>$this->attr_idx[$ix[$cl]]);
+                    $ix[$cl][$aid] = $this->attr_idx[$aid];
+                }
+                else {
+                    $ix[$cl] = $aid;
+                }
+            }
+        }
+        return $this->class_idx = $ix;
+    }
 
     protected function _index_all() {
         if($this->indexed) return $this->tag_idx;
+        $this->indexed = true;
 
-        $this->o = $o = (object)array();
+        // Parser state object
+        $this->o = $o = new stdClass;
         $o->h   = $this->html;
         $o->l   = strlen($o->h);
         $o->i   = 0;
         $o->tg  = self::$_ar_;
-        $fl     = self::str_range(self::$_tagID_first_letter); // first letter chars
-        $tl     = self::str_range(self::$_tagID_letters);      // tag name chars
-        $i      = $o->i;
-        $st     = array('!'=>1, '?'=>2); // special tags
-        $ut     = array_flip(self::$_unparsedTags);
-        $utn    = NULL;
-        $ct     = '/';
-        $stack  = $a = self::$_ar_;
         $this->_index_comments_html($o);
+
+        $firstLetterChars = self::str_range(self::$_tagID_first_letter); // first letter chars
+        $tagLettersChars  = self::str_range(self::$_tagID_letters);      // tag name chars
+        $specialTags      = array('!'=>1, '?'=>2); // special tags
+        $unparsedTags     = array_flip(self::$_unparsedTags);
+
+        $utn    = NULL; // current unparsed tag name
+        $i      = $o->i;
+        $stack  = $a = self::$_ar_;
 
         while($i < $o->l) {
             $i = strpos($o->h, '<', $i);
@@ -1336,20 +1369,20 @@ class hQuery_HTML_Parser extends hQuery_Node {
             $c = $o->h[$i];
 
             // if close tags
-            if($w = $c === $ct) {
+            if($isCloseTag = $c === '/') {
                 ++$i;
                 $c = $o->h[$i];
             }
 
             // usual tags
-            if(strpos($fl, $c) !== false) {
+            if( false !== strpos($firstLetterChars, $c) ) {
                 ++$i; // posibly second letter of tagName
-                $j = strspn($o->h, $tl, $i);
+                $j = strspn($o->h, $tagLettersChars, $i);
                 $n = substr($o->h, $i-1, $j+1);
                 $i += $j;
                 if($utn) {
                     $n = strtolower($n);
-                    if($utn !== $n || !$w) {
+                    if($utn !== $n || !$isCloseTag) {
                         continue;
                     }
                     $utn = NULL;
@@ -1358,8 +1391,8 @@ class hQuery_HTML_Parser extends hQuery_Node {
                 if($i === false) break;
                 $e = $i++;
                 // open tag
-                if(!$w) {
-                    $this->ids[$e] = $e;  // the end of the teg contents (>)
+                if(!$isCloseTag) {
+                    $this->ids[$e] = $e;  // the end of the tag contents (>)
                     $this->tags[$e] = $n;
                     $b += $j+1;
                     $b += strspn($o->h, " \n\r\t", $b);
@@ -1371,9 +1404,9 @@ class hQuery_HTML_Parser extends hQuery_Node {
                             else $a[$at][] = $e;
                         };
                     }
-                    if($o->h[$e-1] != $ct) {
+                    if($o->h[$e-1] != '/') {
                         $n = strtolower($n);
-                        if(isset($ut[$n])) {
+                        if(isset($unparsedTags[$n])) {
                             $utn = $n;
                         }
                         $stack[$n][$b] = $e; // put in stack
@@ -1387,14 +1420,14 @@ class hQuery_HTML_Parser extends hQuery_Node {
                     else {
                         $q = end($s);
                         $p = key($s);
-                        unset($s[$p]);
-                        $this->ids[$q] = $b-1;                  // the end of the teg contents (<)
+                        unset($s[$p], $s);
+                        $this->ids[$q] = $b-1;                  // the end of the tag contents (<)
                     }
                 }
             }
-            elseif(!$w) {
+            elseif(!$isCloseTag) {
                 // special tags
-                if(isset($st[$c])) {
+                if(isset($specialTags[$c])) {
                     $b--;
                     if(isset($o->tg[$b])) {
                         $i = $o->tg[$b];
@@ -1424,8 +1457,9 @@ class hQuery_HTML_Parser extends hQuery_Node {
 
         // debug($stack); // unclosed tags
 
-        $this->o = self::$_nl_;
-        $this->indexed = true;
+        $this->o = self::$_nl_; // Free mem
+
+        // Read <base href="..." /> tag
         if(!empty($this->tag_idx['base'])) {
             foreach($this->tag_idx['base'] as $b => $e) {
                 if($a = $this->get_attr_byId($b, 'href', false)) {
@@ -2028,18 +2062,6 @@ class hQuery extends hQuery_HTML_Parser {
      * Index elements of the source HTML. (Called automatically)
      */
     public function index() { return $this->_index_all(); }
-
-    public function exclude($sel, $attr=NULL) {
-        $e = $this->find($sel, $attr, $this);
-        if($e) {
-            if(empty($this->exc)) $this->exc = $e;
-            else {
-                foreach($e->ids as $b => $e) $this->exc[$b] = $e;
-                ksort($this->exc);
-            }
-        }
-        return $e;
-    }
 
     // - Helpers ------------------------------------------------
 
@@ -2661,10 +2683,13 @@ class hQuery_Element extends hQuery_Node {
     // ------------------------------------------------------------------------
     public function __get($name) {
         switch($name) {
+            case 'innerHTML':
             case 'html'     : return $this->html();
             case 'outerHtml': return $this->outerHtml();
+            case 'textContent':
             case 'text'     : return $this->text();
             case 'attr'     : return $this->attr();
+            case 'value'    :
             case 'val'      : return $this->val();
             case 'nodeName' : return $this->nodeName(false);
             case 'parent'   : return $this->parent();

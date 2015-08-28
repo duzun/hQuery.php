@@ -12,6 +12,7 @@ var _dir     = path.join(__dirname, '..');
 var _test_dir = path.join(_dir, 'tests');
 var _phpunit_url = 'https://phar.phpunit.de/phpunit.phar';
 var _phpunit_path = path.join(__dirname, 'phpunit.phar');
+var _test_file = _test_dir;
 
 
 function run_test() {
@@ -32,7 +33,7 @@ function run_test() {
         args.push('-c');
         args.push(phpunit_xml);
     }
-    args.push(_test_dir);
+    args.push(_test_file);
 
     _running = spawn( 'php', args, { cwd: _dir, env: process.env } );
 
@@ -63,6 +64,40 @@ function run_test() {
     });
 }
 
+function get_test_file_path(fn) {
+    if ( fn ) {
+        if ( path.extname(fn) != '.php' ) {
+            fn += '.Test.php';
+        }
+        var _fn = path.join(_test_dir, fn);
+        if ( fs.existsSync(_fn) ) {
+            return _test_file = _fn;
+        }
+        else {
+            var files = fs.readdirSync(_test_dir);
+            var found = false;
+            if ( files ) {
+                files.forEach(function (_fn) {
+                    if ( path.extname(_fn) ) return; // not a dir, possibly :-)
+                    _fn = path.join(_test_dir, _fn, fn);
+                    if ( fs.existsSync(_fn) ) {
+                        found = true;
+                        _test_file = _fn;
+                        return false;
+                    }
+                });
+            }
+            if ( found ) return _test_file;
+        }
+        return false;
+    }
+    else {
+        // Run all tests
+        return _test_file = _test_dir;
+    }
+}
+
+
 function run_test_async() {
     if ( _to ) {
       clearTimeout(_to);
@@ -86,6 +121,15 @@ function check_phpunit_phar(cb) {
 }
 
 check_phpunit_phar(function () {
+    var testcase = process.argv[2];
+    _test_file = get_test_file_path(testcase);
+    if ( false === _test_file ) {
+        console.error("Can't find TestCase `" + testcase + "`");
+        process.exit(1);
+    }
+    if ( _test_dir != _test_file ) {
+        console.log("Using '%s'", _test_file.slice(_test_dir.length+1));
+    }
 
     run_test_async();
 
@@ -100,13 +144,13 @@ check_phpunit_phar(function () {
       , function (monitor) {
         // monitor.files['/home/mikeal/.zshrc'] // Stat object for my zshrc.
         monitor.on("created", function (f, stat) {
-          run_test_async()
+            run_test_async();
         })
         monitor.on("changed", function (f, curr, prev) {
-          run_test_async()
+          run_test_async();
         })
         monitor.on("removed", function (f, stat) {
-          run_test_async()
+          run_test_async();
         })
         // monitor.stop(); // Stop watching
       }
