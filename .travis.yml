@@ -18,3 +18,5 @@ matrix:
         - php: 5.0
 
 script: phpunit tests/
+
+sudo: false
