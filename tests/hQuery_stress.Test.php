@@ -40,7 +40,7 @@ class TestHQueryStress extends PHPUnit_BaseClass {
         $tags = $doc->index();
         $mem = self::memer($mmr);
         $exe = self::timer($tmr);
-        $this->assertLessThan(3000000, self::timer($tmr, false), 'should index 3Mb in less then 3 sec');
+        $this->assertLessThan(6000000, self::timer($tmr, false), 'should index 3Mb in less then 3 sec');
         $count = self::fmtNumber(array_reduce($tags, function ($cary, $item) { return $cary + count($item); }, 0));
         self::log( "Indexed   {$count} tags\tin\t{$exe}\t{$mem} RAM" );
 
@@ -117,7 +117,7 @@ class TestHQueryStress extends PHPUnit_BaseClass {
 
     public static function timer($timer=NULL, $fmt=true) {
         $mt = microtime(true);
-        return isset($timer) ? $fmt ? self::fmtMicroTime($mt - $timer) : $mt - $timer : $mt;
+        return isset($timer) ? $fmt ? self::fmtMicroTime($mt - $timer) : ($mt - $timer) * 1e6 : $mt;
     }
 
     public static function memer($memer=NULL, $fmt=true) {
