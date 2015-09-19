@@ -6,16 +6,16 @@ php:
   - 5.4
   - 5.3
   - 5.2
-  - 5.1
-  - 5.0
+  - 7.0
+  - 7.1
   - hhvm
 
 matrix:
     allow_failures:
         - php: hhvm
         - php: 5.2
-        - php: 5.1
-        - php: 5.0
+        - php: 7.0
+        - php: 7.1
 
 script: phpunit tests/
 
