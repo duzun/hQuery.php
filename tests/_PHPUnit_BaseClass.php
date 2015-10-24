@@ -8,6 +8,15 @@
 define('PHPUNIT_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 define('ROOT_DIR', strtr(dirname(PHPUNIT_DIR), '\\', '/').'/');
 // -----------------------------------------------------
+if ( version_compare(PHP_VERSION, '5.3.0') >= 0 ) {
+    spl_autoload_register(function ($class) {
+        if ( strncmp($class, 'duzun\\', 6) == 0 ) {
+            $fn = realpath(ROOT_DIR .'psr-4' . strtr(substr($class, 5), '\\', DIRECTORY_SEPARATOR) . '.php');
+            return include_once $fn;
+        }
+        return false;
+    });
+}
 require_once ROOT_DIR . 'hquery.php';
 // -----------------------------------------------------
 // -----------------------------------------------------

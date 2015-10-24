@@ -8,6 +8,8 @@
 // -----------------------------------------------------
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
 // -----------------------------------------------------
+// use duzun\hQuery; // PHP >= 5.3.0
+
 // Surogate class for testing, to access protected attributes of hQuery
 class TestHQueryTests extends hQuery {
     public $class_idx;
@@ -99,6 +101,7 @@ class TestHQuery extends PHPUnit_BaseClass {
 
         $this->assertNotEmpty($a);
         $this->assertTrue($a instanceof hQuery_Element);
+        // $this->assertTrue($a instanceof hQuery\Element); // psr-4
         $this->assertEquals('a', $a->nodeName);
         $this->assertEquals('This is a link', $a->text);
         $this->assertEquals('https://DUzun.Me/path', $a->attr('href'));

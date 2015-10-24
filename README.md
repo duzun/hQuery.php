@@ -31,7 +31,11 @@ or using `npm install hquery.php`, `require_once 'node_modules/hquery.php/hquery
 
 ### Basic setup:
 ```php
+// Either use commposer, either include this file:
 include_once '/path/to/libs/hquery.php';
+
+// Optionally, user namespaces (PHP >= 5.3.0 only)
+use duzun\hQuery;
 
 // Set the cache path - must be a writable folder
 hQuery::$cache_path = "/path/to/cache";
@@ -40,6 +44,8 @@ hQuery::$cache_path = "/path/to/cache";
 ### Open a remote HTML document
 ###### [hQuery::fromUrl](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL)( string `$url`, array `$headers` = NULL, array|string `$body` = NULL, array `$options` = NULL )
 ```php
+use duzun\hQuery; // Optional (PHP 5.3+)
+
 $doc = hQuery::fromUrl('http://example.com/someDoc.html', ['Accept' => 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8']);
 
 var_dump($doc->headers); // See response headers

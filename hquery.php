@@ -1,13 +1,27 @@
 <?php
 // ------------------------------------------------------------------------
 /**
- *  Copyright (C) 2014-2015 Dumitru Uzun
+ *  An extremely fast web scraper that parses megabytes of HTML in a blink of an eye.
+ *  PHP5+, no dependencies.
+ *
+ *  PHP 5+ classes:
+ *     hQuery
+ *     hQuery_Element
+ *     hQuery_Node
+ *
+ *  PHP 5.3+ classes:
+ *     duzun\hQuery
+ *     duzun\hQuery\Element
+ *     duzun\hQuery\Node
+ *
  *
  *  API Documentation at https://duzun.github.io/hQuery.php
  *
+ *  Copyright (C) 2014-2015 Dumitru Uzun
+ *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.2.5
+ *  @version 1.2.6
  */
 // ------------------------------------------------------------------------
 
@@ -18,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.2.5';
+    const VERSION = '1.2.6';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -2887,6 +2901,18 @@ class hQuery_Element extends hQuery_Node {
 
 };
 
+// ------------------------------------------------------------------------
+// namespaced aliases for PHP >= 5.3.0
+if ( function_exists('class_alias') ) {
+    foreach(array(
+        'hQuery',
+        'hQuery_Element',
+        'hQuery_Node',
+        'hQuery_Context',
+    ) as $c) {
+        class_alias($c, 'duzun\\' . strtr($c, '_', '\\'));
+    }
+}
 // ------------------------------------------------------------------------
 
 ?>
