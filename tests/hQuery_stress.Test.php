@@ -41,7 +41,7 @@ class TestHQueryStress extends PHPUnit_BaseClass {
         $mem = self::memer($mmr);
         $exe = self::timer($tmr);
         $this->assertLessThan(6000000, self::timer($tmr, false), 'should index 3Mb in less then 3 sec');
-        $count = self::fmtNumber(array_reduce($tags, function ($cary, $item) { return $cary + count($item); }, 0));
+        $count = self::fmtNumber(self::listSumCounts($tags));
         self::log( "Indexed   {$count} tags\tin\t{$exe}\t{$mem} RAM" );
 
         self::log("Original Charset: {$doc->charset}");
@@ -79,7 +79,7 @@ class TestHQueryStress extends PHPUnit_BaseClass {
             '.first:next',
             'img.click',
         );
-        $max_len = array_reduce($selectors, function ($i, $v) { return max($i, strlen($v)); }, 0);
+        $max_len = self::listMaxStrLen($selectors);
 
         $contexts = array(
             ' doc' => $doc,
@@ -130,6 +130,26 @@ class TestHQueryStress extends PHPUnit_BaseClass {
         }
         return $mm;
     }
+
+    // -----------------------------------------------------
+    public static function listMaxStrLen($list) {
+        // return array_reduce($list, function ($i, $v) { return max($i, strlen($v)); }, 0);
+        $ret = 0;
+        foreach($list as $v) {
+            $ret = max($ret, strlen($v));
+        }
+        return $ret;
+    }
+
+    public static function listSumCounts($list) {
+        // return array_reduce($list, function ($cary, $item) { return $cary + count($item); }, 0);
+        $cary = 0;
+        foreach($list as $item) {
+            $cary += count($item);
+        }
+        return $cary;
+    }
+
 
     // -----------------------------------------------------
 

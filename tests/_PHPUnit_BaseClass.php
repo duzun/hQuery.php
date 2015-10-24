@@ -7,15 +7,17 @@
 // -----------------------------------------------------
 define('PHPUNIT_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 define('ROOT_DIR', strtr(dirname(PHPUNIT_DIR), '\\', '/').'/');
+define('PHP_IS_NEW', version_compare(PHP_VERSION, '5.3.0') >= 0);
 // -----------------------------------------------------
-if ( version_compare(PHP_VERSION, '5.3.0') >= 0 ) {
-    spl_autoload_register(function ($class) {
+if ( PHP_IS_NEW ) {
+    function _hQuery_Test_autoloader($class) {
         if ( strncmp($class, 'duzun\\', 6) == 0 ) {
             $fn = realpath(ROOT_DIR .'psr-4' . strtr(substr($class, 5), '\\', DIRECTORY_SEPARATOR) . '.php');
             return include_once $fn;
         }
         return false;
-    });
+    }
+    spl_autoload_register('_hQuery_Test_autoloader');
 }
 require_once ROOT_DIR . 'hquery.php';
 // -----------------------------------------------------
@@ -94,8 +96,6 @@ abstract class PHPUnit_BaseClass extends PHPUnit_Framework_TestCase {
 }
 // -----------------------------------------------------
 // Delete the temp test user after all tests have fired
-register_shutdown_function(function () {
-    PHPUnit_BaseClass::deleteTestData();
-});
+register_shutdown_function('PHPUnit_BaseClass::deleteTestData');
 // -----------------------------------------------------
 ?>
