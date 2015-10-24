@@ -26,7 +26,10 @@
   "autoload": {
     "classmap": [
       "hquery.php"
-    ]
+    ],
+    "PSR-4": {
+      "duzun\\": "psr-4"
+    }
   },
   "support": {
     "email": "contact@duzun.me",
