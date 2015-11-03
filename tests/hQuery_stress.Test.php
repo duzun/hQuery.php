@@ -19,10 +19,10 @@ class TestHQueryStress extends PHPUnit_BaseClass {
     // -----------------------------------------------------
     // -----------------------------------------------------
     public function test_construct_and_index() {
-        $filename = dirname(__FILE__) . '/data/big_granito_1.html';
+        $filename = 'data/big_granito_1.html';
         $tmr = self::timer();
         $mmr = self::memer();
-        $html = file_get_contents($filename);
+        $html = self::file_get_contents($filename);
         $mem = self::memer($mmr);
         $exe = self::timer($tmr);
         self::log( "Loaded    " . self::fmtNumber(strlen($html) / 1024, 2) . "Kb\tin\t{$exe}\t{$mem} RAM");
@@ -34,7 +34,7 @@ class TestHQueryStress extends PHPUnit_BaseClass {
         $exe = self::timer($tmr);
         self::log( "Construct " . self::fmtNumber($doc->size / 1024, 2) . "Kb\tin\t{$exe}\t{$mem} RAM");
 
-        $doc->location($filename);
+        $doc->location(self::fn($filename));
         $tmr = self::timer();
         $mmr = self::memer();
         $tags = $doc->index();

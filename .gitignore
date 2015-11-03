@@ -3,15 +3,28 @@
 Desktop.ini
 .dropbox
 .dropbox.attr
+
 ## - Thumbnail cache files
 ._*
 Thumbs.db
+
 ## - Files that might appear on external disks
 .Spotlight-V100
 .Trashes
+
 ## - Node.js
 *node_modules*
 npm-debug.log
+
+## Commposer
+vendor/
+
+## Test data should be archived
+tests/data/*
+!tests/data/*.gz
+
+## Other
+
 *.log
 phpunit.phar
 

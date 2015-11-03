@@ -92,6 +92,36 @@ abstract class PHPUnit_BaseClass extends PHPUnit_Framework_TestCase {
     public static function deleteTestData() {
     }
     // -----------------------------------------------------
+    public static function file_get_contents($fn) {
+        $ffn = self::file_exists($fn);
+        return $ffn ? file_get_contents($ffn) : false;
+    }
+    
+    public static function file_exists($fn) {
+        $ffn = PHPUNIT_DIR . $fn;
+        if ( !file_exists($ffn) ) {
+            $zfn = $ffn . '.gz';
+            if ( !file_exists($zfn) ) {
+                return false;
+            }
+            $gz = file_get_contents($zfn);
+            if ( function_exists('gzdecode') ) {
+                $data = gzdecode($gz);
+            }
+            else {
+                $data = gzinflate(substr($gz, 10, -8));
+            }
+            if ( !file_put_contents($ffn, $data) ) return false;
+        }
+        return $ffn;
+    }
+    
+    public static function fn($fn) {
+        return self::file_exists($fn) ?: $fn;
+    }
+    
+    
+    // -----------------------------------------------------
 
 }
 // -----------------------------------------------------

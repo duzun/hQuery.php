@@ -109,7 +109,8 @@ class TestHQuery extends PHPUnit_BaseClass {
         $this->assertEquals('test-div', $a->parent->attr('id'));
 
         // 2)
-        $ff = TestHQueryTests::fromFile(dirname(__FILE__) . '/data/attr.html');
+        
+        $ff = TestHQueryTests::fromFile(self::file_exists('/data/attr.html'));
         $aa = $ff->find('a.aa');
         $this->assertEquals(3, count($aa));
     }
@@ -167,8 +168,8 @@ class TestHQuery extends PHPUnit_BaseClass {
     // -----------------------------------------------------
     // -----------------------------------------------------
     public function test_unjsonize() {
-        $ser  = file_get_contents(PHPUNIT_DIR . '/data/jsonize.ser');
-        $json = file_get_contents(PHPUNIT_DIR . '/data/jsonize.json');
+        $ser  = self::file_get_contents('data/jsonize.ser');
+        $json = self::file_get_contents('data/jsonize.json');
 
         $ser_ = str_replace("\n", "\r\n", $ser);
 
