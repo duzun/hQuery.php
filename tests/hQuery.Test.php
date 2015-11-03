@@ -110,7 +110,7 @@ class TestHQuery extends PHPUnit_BaseClass {
 
         // 2)
         
-        $ff = TestHQueryTests::fromFile(self::file_exists('/data/attr.html'));
+        $ff = TestHQueryTests::fromFile(self::file_exists('data/attr.html'));
         $aa = $ff->find('a.aa');
         $this->assertEquals(3, count($aa));
     }
