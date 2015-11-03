@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.3.0
+ *  @version 1.4.0
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.3.0';
+    const VERSION = '1.4.0';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -2212,6 +2212,138 @@ class hQuery extends hQuery_HTML_Parser {
     }
 
     /**
+     * gzdecode() (for PHP < 5.4.0)
+     */
+    public static function gzdecode($str) {
+        static $_gzdecode_support;
+        isset($_gzdecode_support) or $_gzdecode_support = function_exists('gzdecode');
+        return $_gzdecode_support ? gzdecode($str) : self::_gzdecode($str);
+    }
+
+    /**
+     * Alternative gzdecode() (for PHP < 5.4.0)
+     * source: http://nl1.php.net/manual/en/function.gzdecode.php#82879
+     */
+    protected static function _gzdecode($data) {
+        $len = strlen($data);
+        if ($len < 18 || strncmp($data,"\x1F\x8B", 2)) {
+            return null;  // Not GZIP format (See RFC 1952)
+        }
+        $method = ord(substr($data,2,1));  // Compression method
+        $flags  = ord(substr($data,3,1));  // Flags
+        if (($flags & 31) != $flags) {
+            // Reserved bits are set -- NOT ALLOWED by RFC 1952
+            return null;
+        }
+        // NOTE: $mtime may be negative (PHP integer limitations)
+        $mtime = unpack("V", substr($data,4,4)) and
+        $mtime = $mtime[1];
+        $xfl   = substr($data,8,1);
+        $os    = substr($data,8,1);
+        $headerlen = 10;
+        $extralen  = 0;
+        $extra     = "";
+        if ($flags & 4) {
+            // 2-byte length prefixed EXTRA data in header
+            if ($len - $headerlen - 2 < 8) {
+                return false;    // Invalid format
+            }
+            $extralen = unpack("v",substr($data,8,2));
+            $extralen = $extralen[1];
+            if ($len - $headerlen - 2 - $extralen < 8) {
+                return false;    // Invalid format
+            }
+            $extra = substr($data,10,$extralen);
+            $headerlen += 2 + $extralen;
+        }
+
+        $filenamelen = 0;
+        $filename = "";
+        if ($flags & 8) {
+            // C-style string file NAME data in header
+            if ($len - $headerlen - 1 < 8) {
+                return false;    // Invalid format
+            }
+            $filenamelen = strpos(substr($data,8+$extralen),chr(0));
+            if ($filenamelen === false || $len - $headerlen - $filenamelen - 1 < 8) {
+                return false;    // Invalid format
+            }
+            $filename = substr($data,$headerlen,$filenamelen);
+            $headerlen += $filenamelen + 1;
+        }
+
+        $commentlen = 0;
+        $comment = "";
+        if ($flags & 16) {
+            // C-style string COMMENT data in header
+            if ($len - $headerlen - 1 < 8) {
+                return false;    // Invalid format
+            }
+            $commentlen = strpos(substr($data,8+$extralen+$filenamelen),chr(0));
+            if ($commentlen === false || $len - $headerlen - $commentlen - 1 < 8) {
+                return false;    // Invalid header format
+            }
+            $comment = substr($data,$headerlen,$commentlen);
+            $headerlen += $commentlen + 1;
+        }
+
+        $headercrc = '';
+        if ($flags & 1) {
+            // 2-bytes (lowest order) of CRC32 on header present
+            if ($len - $headerlen - 2 < 8) {
+                return false;    // Invalid format
+            }
+            $calccrc = crc32(substr($data,0,$headerlen)) & 0xffff;
+            $headercrc = unpack('v', substr($data,$headerlen,2));
+            $headercrc = $headercrc[1];
+            if ($headercrc != $calccrc) {
+                return false;    // Bad header CRC
+            }
+            $headerlen += 2;
+        }
+
+        // GZIP FOOTER - These be negative due to PHP's limitations
+        $datacrc = unpack('V',substr($data,-8,4)) and
+        $datacrc = $datacrc[1];
+        $isize = unpack('V',substr($data,-4)) and
+        $isize = $isize[1];
+
+        // Perform the decompression:
+        $bodylen = $len-$headerlen-8;
+        if ($bodylen < 1) {
+            // This should never happen - IMPLEMENTATION BUG!
+            return null;
+        }
+        $body = substr($data,$headerlen,$bodylen);
+        $data = "";
+        if ($bodylen > 0) {
+            switch ($method) {
+            case 8:
+                // Currently the only supported compression method:
+                $data = gzinflate($body);
+                break;
+            default:
+                // Unknown compression method
+                return false;
+            }
+        }
+        else {
+            // I'm not sure if zero-byte body content is allowed.
+            // Allow it for now...  Do nothing...
+        }
+
+        // Verifiy decompressed size and CRC32:
+        // NOTE: This may fail with large data sizes depending on how
+        //       PHP's integer limitations affect strlen() since $isize
+        //       may be negative for large sizes.
+        if ($isize != strlen($data) || crc32($data) != $datacrc) {
+            // Bad format!  Length or CRC doesn't match!
+            return false;
+        }
+        return $data;
+    }
+
+    /**
      *  Read data from a cache file.
      *
      *  @param string $fn        - cache filename
@@ -2228,7 +2360,7 @@ class hQuery extends hQuery_HTML_Parser {
         $t = strlen($cnt);
         if(!empty($cnt)) {
             if($gz = !strncmp($cnt, "\x1F\x8B", 2)) {
-                $cnt = function_exists('gzdecode') ? gzdecode($cnt) : NULL;
+                $cnt = self::gzdecode($cnt);
             }
             if($cnt[0] == '#') {
                 $n = (int)substr($cnt, 1, 0x10);
@@ -2280,6 +2412,7 @@ class hQuery extends hQuery_HTML_Parser {
         @mkdir(dirname($fn), 0777, true);
         if($gzip) {
             $gl = is_int($gzip) ? $gzip : 1024;
+            // Cache as gzip only if built-in gzdecode() defined (more CPU for less IO)
             strlen($cnt) > $gl && function_exists('gzdecode') and
             $cnt = gzencode($cnt);
         }
@@ -2514,12 +2647,12 @@ class hQuery extends hQuery_HTML_Parser {
         }
 
         if(@$options['decode'] == 'gzip') {
-            if(function_exists('gzdecode')) {
+            // if(function_exists('gzdecode')) {
                 $_h['accept-encoding'] = 'gzip';
-            }
-            else {
-                $options['decode'] = NULL;
-            }
+            // }
+            // else {
+                // $options['decode'] = NULL;
+            // }
         }
 
         if(!isset($options['close']) || @$options['close']) {
@@ -2633,8 +2766,8 @@ class hQuery extends hQuery_HTML_Parser {
                      break;
                }
 
-               if($rsps != '' && @$options['decode'] == 'gzip' && @$_rh['CONTENT_ENCODING'] == 'gzip' && function_exists('gzdecode')) {
-                  $r = gzdecode($rsps);
+               if ( $rsps != '' && @$options['decode'] == 'gzip' && @$_rh['CONTENT_ENCODING'] == 'gzip' ) {
+                  $r = self::gzdecode($rsps);
                   if($r !== false) {
                      unset($_rh['CONTENT_ENCODING']);
                      $rsps = $r;
