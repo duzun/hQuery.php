@@ -26,7 +26,7 @@ tests/data/*
 ## Other
 
 *.log
-phpunit.phar
+phpunit*.phar
 
 *.url
 

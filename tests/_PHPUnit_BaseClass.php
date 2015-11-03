@@ -112,7 +112,8 @@ abstract class PHPUnit_BaseClass extends PHPUnit_Framework_TestCase {
     }
 
     public static function fn($fn) {
-        return self::file_exists($fn) ?: $fn;
+        $ret = self::file_exists($fn) or $ret = $fn;
+        return $ret;
     }
 
 

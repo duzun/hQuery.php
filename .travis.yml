@@ -1,21 +1,19 @@
 language: php
 
 php:
+  - 7.0
   - 5.6
   - 5.5
   - 5.4
   - 5.3
   - 5.2
-  - 7.0
-  - 7.1
+  - nightly
   - hhvm
 
 matrix:
     allow_failures:
-        - php: hhvm
         - php: 5.2
-        - php: 7.0
-        - php: 7.1
+        - php: nightly
 
 script: phpunit tests/
 
