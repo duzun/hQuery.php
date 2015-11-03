@@ -18,3 +18,8 @@ matrix:
 script: phpunit tests/
 
 sudo: false
+
+cache:
+    directories:
+        - tests/data/
+        
