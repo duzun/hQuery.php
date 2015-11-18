@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.4.0
+ *  @version 1.4.1
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.4.0';
+    const VERSION = '1.4.1';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -1887,7 +1887,7 @@ class hQuery extends hQuery_HTML_Parser {
         if(0 < $expires and $dir = self::$cache_path) {
             ksort($opt);
             $t = realpath($dir) and $dir = $t or mkdir($dir, 0766, true);
-            $dir .= DS;
+            $dir .= DIRECTORY_SEPARATOR;
             $cch_id = hash('sha1', $url, true);
             $t = hash('md5', self::jsonize($opt), true);
             $cch_id = bin2hex(substr($cch_id, 0, -strlen($t)) . (substr($cch_id, -strlen($t)) ^ $t));
