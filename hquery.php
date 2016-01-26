@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.4.2
+ *  @version 1.4.3
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.4.2';
+    const VERSION = '1.4.3';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -2710,7 +2710,7 @@ class hQuery extends hQuery_HTML_Parser {
                   case 303:
                   case 307: // repeat request using the same method and post data
                      if( @$options['redirects'] > 0 && $loc = @$_rh['LOCATION'] ) {
-                        $loc = self::abs_url($loc, (empty($options['scheme'])?'':$options['scheme'].'//').$host.':'.$port.(empty($options['path'])?'':$options['path']));
+                        $loc = self::abs_url($loc, (empty($options['scheme'])?'':$options['scheme'].'://').$host.':'.$port.(empty($options['path'])?'':$options['path']));
                         unset($_h['host'], $options['host'], $options['port'], $options['scheme'], $options['method']);
                         --$options['redirects'];
                         // ??? could save cookies for redirect
