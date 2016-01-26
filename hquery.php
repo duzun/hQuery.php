@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.4.3
+ *  @version 1.5.0
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.4.3';
+    const VERSION = '1.5.0';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -2555,9 +2555,14 @@ class hQuery extends hQuery_HTML_Parser {
      * @param mixed  $body - data to be sent as the contents of the request. If is array or object, a http query is built.
      * @param array  $options - list of option as key-value:
      *                              timeout - connection timeout in seconds
-     *                              host    - goes in headers, overrides $host (ex. $host == '127.0.0.1', $options['host'] == 'www.example.com')
+     *                              host    - goes to headers, overrides $host (ex. $host == '127.0.0.1', $options['host'] == 'www.example.com')
+     *                              port    - usefull when $host is not a full URL
      *                              scheme  - http, ssl, tls, udp, ...
      *                              close   - whether to close connection o not
+     *                              redirects - number of allowed redirects
+     *                              redirect_method - if (string), this is the new method for redirect request, else
+     *                                                if true, preserve method, else use 'GET' on redirect.
+     *                                                by default preserve on 307 and 308, GET on 301-303
      *
      * @return array [contents, headers, http-status-code, http-status-message]
      *
@@ -2704,14 +2709,35 @@ class hQuery extends hQuery_HTML_Parser {
                   $_rh[strtoupper(strtr($v[0], '- ', '__'))] = isset($v[1]) ? trim($v[1]) : NULL;
                }
                $rsps = NULL;
+               $_preserve_method = true;
                switch($rcode) {
                   case 301:
                   case 302:
                   case 303:
-                  case 307: // repeat request using the same method and post data
+                    $_preserve_method = false;
+                  case 307:
+                  case 308:
+                  // repeat request using the same method and post data
                      if( @$options['redirects'] > 0 && $loc = @$_rh['LOCATION'] ) {
                         $loc = self::abs_url($loc, (empty($options['scheme'])?'':$options['scheme'].'://').$host.':'.$port.(empty($options['path'])?'':$options['path']));
-                        unset($_h['host'], $options['host'], $options['port'], $options['scheme'], $options['method']);
+                        unset($_h['host'], $options['host'], $options['port'], $options['scheme']);
+                        if ( isset($options['redirect_method']) ) {
+                            $redirect_method = $options['redirect_method'];
+                            if ( is_string($redirect_method) ) {
+                                $options['method'] = $redirect_method = strtoupper($redirect_method);
+                                $_preserve_method = true;
+                                if ( $redirect_method != 'POST' && $redirect_method != 'PUT' ) {
+                                    $body = NULL;
+                                }
+                            }
+                            else {
+                                $_preserve_method = (bool)$redirect_method;
+                            }
+                        }
+                        if ( !$_preserve_method ) {
+                            $body = NULL;
+                            unset($options['method']);
+                        }
                         --$options['redirects'];
                         // ??? could save cookies for redirect
                         return self::http_wr($loc, $_h, $body, $options);
