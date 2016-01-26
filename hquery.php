@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.4.1
+ *  @version 1.4.2
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.4.1';
+    const VERSION = '1.4.2';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -2679,7 +2679,7 @@ class hQuery extends hQuery_HTML_Parser {
         $ret->options = $options;
 
        // ------------------- Connection and data transfer -------------------
-       $errno  =
+       $errno  = 0;
        $errstr =
        $rsps   = '';
        $h = $_rh = NULL;
