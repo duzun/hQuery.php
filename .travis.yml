@@ -7,6 +7,7 @@ php:
   - 5.4
   - 5.3
   - 5.2
+  - stable
   - nightly
   - hhvm
 
@@ -22,4 +23,12 @@ sudo: false
 cache:
     directories:
         - tests/data/
-        
+
+deploy:
+  provider: npm
+  email: contact@duzun.me
+  api_key:
+    secure: UeTmKdjg0MEmy8iK0ZmlmNww+hytHQoEkh7uhssV2Pizq2sSEKki9m64v7xe35Kwk38TcbMvrZkwtim/ZnZt1JJ2LOw8Ogz88OVviqAfkHOe2VRH8SrP3NpRFGFWLZ0JmvKGkvCLiDkLHiz+vSegUXDPwyGdpS932lyxJ5U3ntE=
+  on:
+    tags: true
+    repo: duzun/hquery.php
