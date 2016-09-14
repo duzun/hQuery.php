@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.5.1
+ *  @version 1.5.2
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.5.1';
+    const VERSION = '1.5.2';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -1545,7 +1545,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
    }
 
    /**
-    * @return false - no class, 0 - hasn't class, true - has class, [ids.cl]
+    * @return false - no class, 0 - doesn't have class, true - has class, [ids.cl]
     */
    protected function hasClass($id, $cl) {
       if(!is_array($cl)) $cl = preg_split('|\\s+|',trim($cl));
@@ -2867,6 +2867,8 @@ class hQuery_Element extends hQuery_Node {
             case 'nodeName' : return $this->nodeName(false);
             case 'parent'   : return $this->parent();
             case 'children' : return $this->children();
+            case 'nextElementSibling'     : return $this->nextElementSibling();
+            case 'previousElementSibling' : return $this->previousElementSibling();
             case 'className': $name = 'class'; break;
         }
         // return parent::__get($name);
@@ -3055,6 +3057,26 @@ class hQuery_Element extends hQuery_Node {
      */
     public function children() {
         $p = $this->_children();
+        return $p ? new self($this->doc, $p) : NULL;
+    }
+
+    /**
+     * Get previous element siblings for each of the elements of this collection
+     *
+     * @return hQuery_Element previousElementSibling
+     */
+    function previousElementSibling() {
+        $p = $this->_prev();
+        return $p ? new self($this->doc, $p) : NULL;
+    }
+
+    /**
+     * Get next element siblings for each of the elements of this collection
+     *
+     * @return hQuery_Element nextElementSibling
+     */
+    function nextElementSibling() {
+        $p = $this->_next();
         return $p ? new self($this->doc, $p) : NULL;
     }
 
