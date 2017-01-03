@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.5.2
+ *  @version 1.5.3
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.5.2';
+    const VERSION = '1.5.3';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -2522,16 +2522,22 @@ class hQuery extends hQuery_HTML_Parser {
      *
      */
     public static function abs_url($url, $base) {
-        if(!self::is_url_path($url)) {
-            $t = parse_url($base);
-            if(substr($url, 0, 2) == '//') {
-                $url = (empty($t['scheme']) ? 'http' : $t['scheme']) . ':' . $url;
+        if (!self::is_url_path($url)) {
+            $t = is_array($base) ? $base : parse_url($base);
+            if (strncmp($url, '//', 2) == 0) {
+                if ( !empty($t['scheme']) ) {
+                    $url = $t['scheme'] . ':' . $url;
+                }
             }
             else {
-                $base = $t['scheme'] . '://' . $t['host'] . (empty($t['port'])?'':':'.$t['port']);
-                if(!empty($t['path'])) {
-                    $s = dirname($t['path']);
-                    if($s && $s !== '.' && $s !== '/' && substr($url, 0, 1) !== '/') {
+                $base = (empty($t['scheme']) ? '//' : $t['scheme'] . '://') .
+                        $t['host'] . (empty($t['port']) ? '' : ':' . $t['port']);
+                if (!empty($t['path'])) {
+                    $s = dirname($t['path'] . 'f');
+                    if (DIRECTORY_SEPARATOR != '/') {
+                        $s = strtr($s, DIRECTORY_SEPARATOR, '/');
+                    }
+                    if ($s && $s !== '.' && $s !== '/' && substr($url, 0, 1) !== '/') {
                         $base .= '/' . ltrim($s, '/');
                     }
                 }
@@ -2540,12 +2546,13 @@ class hQuery extends hQuery_HTML_Parser {
         }
         else {
             $p = strpos($url, ':');
-            if( substr($url, $p+3, 1) === '/' && in_array(substr($url, 0, $p), array('http','https')) ) {
-                $url = substr($url, 0, $p+3) . ltrim(substr($url, $p+3), '/');
+            if (substr($url, $p + 3, 1) === '/' && in_array(substr($url, 0, $p), array('http', 'https'))) {
+                $url = substr($url, 0, $p + 3) . ltrim(substr($url, $p + 3), '/');
             }
         }
         return $url;
     }
+
     // ------------------------------------------------------------------------
     /**
      * Executes a HTTP write-read session.
@@ -2569,42 +2576,59 @@ class hQuery extends hQuery_HTML_Parser {
      * @author Dumitru Uzun
      *
      */
-    public static function http_wr($host, $head=NULL, $body=NULL, $options=NULL) {
+    public static function http_wr($host, $head = NULL, $body = NULL, $options = NULL) {
         self::$last_http_result =
         $ret = new stdClass;
         empty($options) and $options = array();
+
+        // If $host is a URL
         if($p = strpos($host, '://') and $p < 7) {
             $ret->url = $host;
             $p = parse_url($host);
-            if(!$p) throw new Exception('Wrong host specified'); // error
+            if(!$p) {
+                throw new Exception('Wrong host specified'); // error
+            }
             $host = $p['host'];
             $path = @$p['path'];
-            if(isset($p['query'])) $path .= '?' . $p['query'];
-            if(isset($p['port'])) $port = $p['port'];
+            if(isset($p['query'])) {
+                $path .= '?' . $p['query'];
+            }
+            if(isset($p['port'])) {
+                $port = $p['port'];
+            }
             unset($p['path'], $p['query']);
             $options += $p;
         }
+        // If $host is not an URL, but might contain path and port
         else {
             $p = explode('/', $host, 2); list($host, $path) = $p;
             $p = explode(':', $host, 2); list($host, $port) = $p;
         }
-        if(strncmp($path, '/', 1)) $path = '/' . $path;
+
+        if(strncmp($path, '/', 1)) {
+            $path = '/' . $path;
+        }
         // isset($path) or $path = '/';
 
         if(!isset($port)) {
-            if(isset($options['port'])) $port = $options['port'];
-            else switch($options['scheme']) {
-                case 'tls'  :
-                case 'ssl'  :
-                case 'https': $port = 443; break;
-                case 'ftp'  : $port = 21; break;
-                case 'sftp' : $port = 22; break;
-                case 'http' :
-                default     : $port = 80;
+            if(isset($options['port'])) {
+                $port = $options['port'];
+            }
+            else {
+                switch($options['scheme']) {
+                    case 'tls'  :
+                    case 'ssl'  :
+                    case 'https': $port = 443; break;
+                    case 'ftp'  : $port = 21; break;
+                    case 'sftp' : $port = 22; break;
+                    case 'http' :
+                    default     : $port = 80;
+                }
             }
         }
 
-        $ret->host = $host;
+        $ret->host =
+        $conhost = $host;
         $_h = array(
             'host'   => isset($options['host']) ? $options['host'] : $host,
             'accept' => 'text/html,application/xhtml+xml,application/xml;q =0.9,*/*;q=0.8',
@@ -2615,10 +2639,10 @@ class hQuery extends hQuery_HTML_Parser {
                 case 'ftp':
                 break;
                 case 'https':
-                    $host = 'tls://' . $host;
+                    $conhost = 'tls://' . $host;
                 break;
                 default:
-                    $host = $options['scheme'] . '://' . $host;
+                    $conhost = $options['scheme'] . '://' . $host;
             }
         }
 
@@ -2634,21 +2658,25 @@ class hQuery extends hQuery_HTML_Parser {
            $body .= $boundary;
            empty($options['method']) and $options['method'] = 'POST';
         }
-        else $body = NULL;
+        else {
+            $body = NULL;
+        }
 
         $meth = @$options['method'] and $meth = strtoupper($meth) or $meth = 'GET';
 
         if($head) {
-           if(!is_array($head)) $head = explode("\r\n", $head);
-           foreach($head as $i => $v) {
-              if(is_int($i)) {
-                 $v = explode(':', $v, 2);
-                 if(count($v) != 2) continue; // Invalid header
-                 list($i, $v) = $v;
-              }
-              $i = strtolower(strtr($i, ' _', '--'));
-              $_h[$i] = trim($v);
-           }
+            if(!is_array($head)) {
+                $head = explode("\r\n", $head);
+            }
+            foreach($head as $i => $v) {
+                if(is_int($i)) {
+                    $v = explode(':', $v, 2);
+                    if(count($v) != 2) continue; // Invalid header
+                    list($i, $v) = $v;
+                }
+                $i = strtolower(strtr($i, ' _', '--'));
+                $_h[$i] = trim($v);
+            }
         }
 
         if(@$options['decode'] == 'gzip') {
@@ -2683,143 +2711,149 @@ class hQuery extends hQuery_HTML_Parser {
 
         $ret->options = $options;
 
-       // ------------------- Connection and data transfer -------------------
-       $errno  = 0;
-       $errstr =
-       $rsps   = '';
-       $h = $_rh = NULL;
-       $fs = @fsockopen($host, $port, $errno, $errstr, $timeout);
-       if(!$fs) throw new Exception('unable to create socket "'.$host.':'.$port.'"'.$errstr, $errno);
-       if(!fwrite($fs, $rqst)) {
-          throw new Exception("unable to write");
-       }
-       else {
-          $l = $blen - 1;
-          // read headers
-          while($open = !feof($fs) && ($p = @fgets($fs, 1024))) {
-             if($p == "\r\n") break;
-             $rsps .= $p;
-          }
+        // ------------------- Connection and data transfer -------------------
+        $errno  = 0;
+        $errstr =
+        $rsps   = '';
+        $h = $_rh = NULL;
+        $fs = @fsockopen($conhost, $port, $errno, $errstr, $timeout);
+        if(!$fs) {
+            throw new Exception('unable to create socket "'.$conhost.':'.$port.'" '.$errstr, $errno);
+        }
+        if(!fwrite($fs, $rqst)) {
+            throw new Exception("unable to write");
+        }
+        else {
+            $l = $blen - 1;
+            // read headers
+            while($open = !feof($fs) && ($p = @fgets($fs, 1024))) {
+                if($p == "\r\n") break;
+                $rsps .= $p;
+            }
 
-          if($rsps) {
-               $h = explode("\r\n", rtrim($rsps));
-               list($rprot, $rcode, $rmsg) = explode(' ', array_shift($h), 3);
-               foreach($h as $v) {
-                  $v = explode(':', $v, 2);
-                  $_rh[strtoupper(strtr($v[0], '- ', '__'))] = isset($v[1]) ? trim($v[1]) : NULL;
-               }
-               $rsps = NULL;
-               $_preserve_method = true;
-               switch($rcode) {
-                  case 301:
-                  case 302:
-                  case 303:
-                    $_preserve_method = false;
-                  case 307:
-                  case 308:
-                  // repeat request using the same method and post data
-                     if( @$options['redirects'] > 0 && $loc = @$_rh['LOCATION'] ) {
-                        $loc = self::abs_url($loc, (empty($options['scheme'])?'':$options['scheme'].'://').$host.':'.$port.(empty($options['path'])?'':$options['path']));
-                        unset($_h['host'], $options['host'], $options['port'], $options['scheme']);
-                        if ( isset($options['redirect_method']) ) {
-                            $redirect_method = $options['redirect_method'];
-                            if ( is_string($redirect_method) ) {
-                                $options['method'] = $redirect_method = strtoupper($redirect_method);
-                                $_preserve_method = true;
-                                if ( $redirect_method != 'POST' && $redirect_method != 'PUT' ) {
-                                    $body = NULL;
-                                }
-                            }
-                            else {
-                                $_preserve_method = (bool)$redirect_method;
-                            }
-                        }
-                        if ( !$_preserve_method ) {
-                            $body = NULL;
-                            unset($options['method']);
-                        }
-                        --$options['redirects'];
-                        // ??? could save cookies for redirect
-                        return self::http_wr($loc, $_h, $body, $options);
-                     }
-                  break;
-               }
-               // Detect body length
-               if(@!$open || $rcode < 200 || $rcode == 204 || $rcode == 304 || $meth == 'HEAD') {
-                  $te = 1;
-               }
-               elseif(isset($_rh['TRANSFER_ENCODING']) && strtolower($_rh['TRANSFER_ENCODING']) === 'chunked') {
-                  $te = 3;
-               }
-               elseif(isset($_rh['CONTENT_LENGTH'])) {
-                  $bl = (int)$_rh['CONTENT_LENGTH'];
-                  $te = 2;
-               }
-               switch($te) {
-                  case 1:
-                     break;
-                  case 2:
-                     while($bl > 0 and $open &= !feof($fs) && ($p = @fread($fs, $bl))) {
-                        $rsps .= $p;
-                        $bl -= strlen($p);
-                     }
-                     break;
-                  case 3:
-                     while($open &= !feof($fs) && ($p = @fgets($fs, 1024))) {
-                        $_re = explode(';', rtrim($p));
-                        $cs = reset($_re);
-                        $bl = hexdec($cs);
-                        if(!$bl) break; // empty chunk
-                         while($bl > 0 and $open &= !feof($fs) && ($p = @fread($fs, $bl))) {
-                            $rsps .= $p;
-                            $bl -= strlen($p);
+            if($rsps) {
+                $h = explode("\r\n", rtrim($rsps));
+                list($rprot, $rcode, $rmsg) = explode(' ', array_shift($h), 3);
+                foreach($h as $v) {
+                   $v = explode(':', $v, 2);
+                   $_rh[strtoupper(strtr($v[0], '- ', '__'))] = isset($v[1]) ? trim($v[1]) : NULL;
+                }
+                $rsps = NULL;
+                $_preserve_method = true;
+                switch($rcode) {
+                   case 301:
+                   case 302:
+                   case 303:
+                         $_preserve_method = false;
+                   case 307:
+                   case 308:
+                   // repeat request using the same method and post data
+                      if( @$options['redirects'] > 0 && $loc = @$_rh['LOCATION'] ) {
+                         if ( !empty($options['host']) ) {
+                            $host = $options['host'];
                          }
-                         @fgets($fs, 3); // \r\n
-                     }
-                     if($open &= !feof($fs) && ($p = @fgets($fs, 1024))) {
-                        if($p = rtrim($p)) {
-                            // ??? Trailer Header
-                            $v = explode(':', $p, 2);
-                            $_rh[strtoupper(strtr($v[0], '- ', '__'))] = isset($v[1]) ? trim($v[1]) : NULL;
-                            @fgets($fs, 3); // \r\n
-                        }
-                     }
-                     break;
-                  default:
-                         while($open &= !feof($fs) && ($p = @fread($fs, 1024))) { // ???
-                            $rsps .= $p;
+                         $loc = self::abs_url($loc, compact('host', 'port', 'path') + array('scheme' => empty($options['scheme'])?'':$options['scheme']));
+                         unset($_h['host'], $options['host'], $options['port'], $options['scheme']);
+                         if ( isset($options['redirect_method']) ) {
+                             $redirect_method = $options['redirect_method'];
+                             if ( is_string($redirect_method) ) {
+                                 $options['method'] = $redirect_method = strtoupper($redirect_method);
+                                 $_preserve_method = true;
+                                 if ( $redirect_method != 'POST' && $redirect_method != 'PUT' && $redirect_method != 'DELETE' ) {
+                                     $body = NULL;
+                                 }
+                             }
+                             else {
+                                 $_preserve_method = (bool)$redirect_method;
+                             }
                          }
-                     break;
-               }
+                         if ( !$_preserve_method ) {
+                             $body = NULL;
+                             unset($options['method']);
+                         }
+                         --$options['redirects'];
+                         // ??? could save cookies for redirect
+                         return self::http_wr($loc, $_h, $body, $options);
+                      }
+                   break;
+                }
+                // Detect body length
+                if(@!$open || $rcode < 200 || $rcode == 204 || $rcode == 304 || $meth == 'HEAD') {
+                    $te = 1;
+                }
+                elseif(isset($_rh['TRANSFER_ENCODING']) && strtolower($_rh['TRANSFER_ENCODING']) === 'chunked') {
+                    $te = 3;
+                }
+                elseif(isset($_rh['CONTENT_LENGTH'])) {
+                    $bl = (int)$_rh['CONTENT_LENGTH'];
+                    $te = 2;
+                }
+                switch($te) {
+                   case 1:
+                      break;
+                   case 2:
+                      while($bl > 0 and $open &= !feof($fs) && ($p = @fread($fs, $bl))) {
+                         $rsps .= $p;
+                         $bl -= strlen($p);
+                      }
+                      break;
+                   case 3:
+                      while($open &= !feof($fs) && ($p = @fgets($fs, 1024))) {
+                         $_re = explode(';', rtrim($p));
+                         $cs = reset($_re);
+                         $bl = hexdec($cs);
+                         if(!$bl) break; // empty chunk
+                          while($bl > 0 and $open &= !feof($fs) && ($p = @fread($fs, $bl))) {
+                             $rsps .= $p;
+                             $bl -= strlen($p);
+                          }
+                          @fgets($fs, 3); // \r\n
+                      }
+                      if($open &= !feof($fs) && ($p = @fgets($fs, 1024))) {
+                         if($p = rtrim($p)) {
+                             // ??? Trailer Header
+                             $v = explode(':', $p, 2);
+                             $_rh[strtoupper(strtr($v[0], '- ', '__'))] = isset($v[1]) ? trim($v[1]) : NULL;
+                             @fgets($fs, 3); // \r\n
+                         }
+                      }
+                      break;
+                   default:
+                          while($open &= !feof($fs) && ($p = @fread($fs, 1024))) { // ???
+                             $rsps .= $p;
+                          }
+                      break;
+                }
 
-               if ( $rsps != '' && @$options['decode'] == 'gzip' && @$_rh['CONTENT_ENCODING'] == 'gzip' ) {
-                  $r = self::gzdecode($rsps);
-                  if($r !== false) {
-                     unset($_rh['CONTENT_ENCODING']);
-                     $rsps = $r;
-                  }
-               }
-               $ret->code    = $rcode;
-               $ret->msg     = $rmsg;
-               $ret->headers = isset($_rh) ? $_rh : NULL;
-               $ret->body    = $rsps;
-               $ret->method  = $meth;
-               // $ret->host    = $host;
-               $ret->port    = $port;
-               $ret->path    = $path;
-               $ret->request = $rqst;
+                if ( $rsps != '' && @$options['decode'] == 'gzip' && @$_rh['CONTENT_ENCODING'] == 'gzip' ) {
+                    $r = self::gzdecode($rsps);
+                    if($r !== false) {
+                        unset($_rh['CONTENT_ENCODING']);
+                        $rsps = $r;
+                    }
+                }
+                $ret->code    = $rcode;
+                $ret->msg     = $rmsg;
+                $ret->headers = isset($_rh) ? $_rh : NULL;
+                $ret->body    = $rsps;
+                $ret->method  = $meth;
+                // $ret->host    = $host;
+                $ret->port    = $port;
+                $ret->path    = $path;
+                $ret->request = $rqst;
 
-               return $ret;
+                return $ret;
 
-               // Old return:
-                      //     contents  headers  status-code  status-message
-               // return array( $rsps,    @$_rh,   $rcode,      $rmsg,           $host, $port, $path, $rqst  );
-          }
-       }
+                // Old return:
+                       //     contents  headers  status-code  status-message
+                // return array( $rsps,    @$_rh,   $rcode,      $rmsg,           $host, $port, $path, $rqst  );
+            }
+        }
        fclose($fs);
 
        return false; // no response
     }
+
     // ------------------------------------------------------------------------
 
 };
