@@ -69,12 +69,12 @@ class TestHQuery extends PHPUnit_BaseClass {
         $this->assertMehodExists('fromHTML', self::$className);
         $this->assertMehodExists('fromFile', self::$className);
         $this->assertMehodExists('fromURL' , self::$className);
-        
+
         // $f = glob(PHPUNIT_DIR . 'data/*');
         // foreach($f as $k => $v) if(is_file($v) && substr($v, -3) != '.gz') {
             // $g = gzencode(file_get_contents($v), 9);
             // file_put_contents($v.'.gz', $g);
-        // }        
+        // }
     }
 
     // -----------------------------------------------------
@@ -115,7 +115,7 @@ class TestHQuery extends PHPUnit_BaseClass {
         $this->assertEquals('test-div', $a->parent->attr('id'));
 
         // 2)
-        
+
         $ff = TestHQueryTests::fromFile(self::file_exists('data/attr.html'));
         $aa = $ff->find('a.aa');
         $this->assertEquals(3, count($aa));

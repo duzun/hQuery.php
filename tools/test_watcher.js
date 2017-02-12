@@ -107,17 +107,28 @@ function run_test_async() {
 
 function check_phpunit_phar(cb) {
     if ( !fs.existsSync(_phpunit_path) ) {
-        var file = fs.createWriteStream(_phpunit_path);
-        http.get(_phpunit_url, function(response) {
-            response.pipe(file);
-            response.on('end', function (err) {
-                cb(err);
-            });
-        });
+        download(_phpunit_url, _phpunit_path, 7, cb);
     }
     else {
         cb();
     }
+}
+
+function download(srcUrl, filePath, maxRedirects, cb) {
+    return http.get(srcUrl, function onGet(response) {
+        var statusCode = response.statusCode;
+        var newUrl = response.headers.location;
+        console.log('↓', srcUrl, '→', statusCode);
+        if ( statusCode >= 300 && statusCode < 400 && newUrl ) {
+            if ( !maxRedirects-- ) {
+                return cb(new Error('Redirects detected (to "'+newUrl+'"")'));
+            }
+            return download(newUrl, filePath, maxRedirects, cb);
+        }
+        var file = fs.createWriteStream(filePath);
+        response.pipe(file);
+        response.on('end', cb);
+    });
 }
 
 check_phpunit_phar(function () {

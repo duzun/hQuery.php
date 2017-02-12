@@ -26,7 +26,7 @@ require_once ROOT_DIR . 'hquery.php';
  * @backupGlobals disabled
  */
 // -----------------------------------------------------
-abstract class PHPUnit_BaseClass extends PHPUnit_Framework_TestCase {
+abstract class PHPUnit_BaseClass extends PHPUnit\Framework\TestCase {
     public static $log = true;
     public static $testName;
     public static $className;
