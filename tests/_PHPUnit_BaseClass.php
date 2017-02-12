@@ -9,6 +9,11 @@ define('PHPUNIT_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 define('ROOT_DIR', strtr(dirname(PHPUNIT_DIR), '\\', '/').'/');
 define('PHP_IS_NEW', version_compare(PHP_VERSION, '5.3.0') >= 0);
 // -----------------------------------------------------
+if ( !class_exists('PHPUnit_Framework_TestCase') ) {
+    class_alias('PHPUnit\Framework\TestCase', 'PHPUnit_Framework_TestCase');
+}
+
+// -----------------------------------------------------
 if ( PHP_IS_NEW ) {
     function _hQuery_Test_autoloader($class) {
         if ( strncmp($class, 'duzun\\', 6) == 0 ) {
@@ -26,7 +31,7 @@ require_once ROOT_DIR . 'hquery.php';
  * @backupGlobals disabled
  */
 // -----------------------------------------------------
-abstract class PHPUnit_BaseClass extends PHPUnit\Framework\TestCase {
+abstract class PHPUnit_BaseClass extends PHPUnit_Framework_TestCase {
     public static $log = true;
     public static $testName;
     public static $className;
