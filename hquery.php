@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.5.3
+ *  @version 1.6.0
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.5.3';
+    const VERSION = '1.6.0';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -1923,6 +1923,7 @@ class hQuery extends hQuery_HTML_Parser {
         if(empty($ret)) {
             $source_type = 'url';
             $read_time = microtime(true);
+            // var_export(compact('url', 'opt', 'hd'));
             $ret = self::http_wr($url, $hd, $body, $opt);
             $read_time = microtime(true) - $read_time;
             $html = $ret->body;
@@ -2554,6 +2555,40 @@ class hQuery extends hQuery_HTML_Parser {
     }
 
     // ------------------------------------------------------------------------
+    public static function parse_cookie($str) {
+        $ret = [];
+        if ( is_array($str) ) {
+            foreach($str as $k => $v) {
+                $ret[$k] = self::parse_cookie($v);
+            }
+            return $ret;
+        }
+
+        $str = explode(';', $str);
+        $t = explode('=', array_shift($str), 2);
+        $ret['key'] = $t[0];
+        $ret['value'] = $t[1];
+        foreach ($str as $t) {
+            $t = explode('=', trim($t), 2);
+            if ( count($t) == 2 ) {
+                $ret[strtolower($t[0])] = $t[1];
+            }
+            else {
+                $ret[strtolower($t[0])] = true;
+            }
+        }
+
+        if ( !empty($ret['expires']) && is_string($ret['expires']) ) {
+            $t = strtotime($ret['expires']);
+            if ( $t !== false and $t !== -1 ) {
+                $ret['expires'] = $t;
+            }
+        }
+
+        return $ret;
+    }
+
+    // ------------------------------------------------------------------------
     /**
      * Executes a HTTP write-read session.
      *
@@ -2735,8 +2770,24 @@ class hQuery extends hQuery_HTML_Parser {
                 $h = explode("\r\n", rtrim($rsps));
                 list($rprot, $rcode, $rmsg) = explode(' ', array_shift($h), 3);
                 foreach($h as $v) {
-                   $v = explode(':', $v, 2);
-                   $_rh[strtoupper(strtr($v[0], '- ', '__'))] = isset($v[1]) ? trim($v[1]) : NULL;
+                    $v = explode(':', $v, 2);
+                    $k = strtoupper(strtr($v[0], '- ', '__'));
+                    $v = isset($v[1]) ? trim($v[1]) : NULL;
+
+                    // Gather headers
+                    if ( isset($_rh[$k]) ) {
+                        if ( isset($v) ) {
+                            if ( is_array($_rh[$k]) ) {
+                                $_rh[$k][] = $v;
+                            }
+                            else {
+                                $_rh[$k] = [$_rh[$k], $v];
+                            }
+                        }
+                    }
+                    else {
+                        $_rh[$k] = $v;
+                    }
                 }
                 $rsps = NULL;
                 $_preserve_method = true;
@@ -2752,6 +2803,7 @@ class hQuery extends hQuery_HTML_Parser {
                          if ( !empty($options['host']) ) {
                             $host = $options['host'];
                          }
+                         is_array($loc) and $loc = end($loc);
                          $loc = self::abs_url($loc, compact('host', 'port', 'path') + array('scheme' => empty($options['scheme'])?'':$options['scheme']));
                          unset($_h['host'], $options['host'], $options['port'], $options['scheme']);
                          if ( isset($options['redirect_method']) ) {
@@ -2773,6 +2825,19 @@ class hQuery extends hQuery_HTML_Parser {
                          }
                          --$options['redirects'];
                          // ??? could save cookies for redirect
+                         if ( !empty($_rh['SET_COOKIE']) && !empty($options['use_cookies']) ) {
+                            $t = self::parse_cookie((array)$_rh['SET_COOKIE']);
+                            if ( $t ) {
+                                $now = time();
+                                // @TODO: Filter out cookies by $c['domain'] and $c['path'] (compare to $loc)
+                                foreach($t as $c) {
+                                    if ( empty($c['expires']) || $c['expires'] >= $now ) {
+                                        $_h['cookie'] = (empty($_h['cookie']) ? '' : $_h['cookie'] . '; ') .
+                                                        $c['key'] . '=' . $c['value'];
+                                    }
+                                }
+                            }
+                         }
                          return self::http_wr($loc, $_h, $body, $options);
                       }
                    break;
@@ -2811,10 +2876,28 @@ class hQuery extends hQuery_HTML_Parser {
                       }
                       if($open &= !feof($fs) && ($p = @fgets($fs, 1024))) {
                          if($p = rtrim($p)) {
-                             // ??? Trailer Header
-                             $v = explode(':', $p, 2);
-                             $_rh[strtoupper(strtr($v[0], '- ', '__'))] = isset($v[1]) ? trim($v[1]) : NULL;
-                             @fgets($fs, 3); // \r\n
+                            // ??? Trailer Header
+                            $v = explode(':', $p, 2);
+                            $k = strtoupper(strtr($v[0], '- ', '__'));
+                            $v = isset($v[1]) ? trim($v[1]) : NULL;
+                            $_rh[$k] = $v;
+
+                            // Gather headers
+                            if ( isset($_rh[$k]) ) {
+                                if ( isset($v) ) {
+                                    if ( is_array($_rh[$k]) ) {
+                                        $_rh[$k][] = $v;
+                                    }
+                                    else {
+                                        $_rh[$k] = [$_rh[$k], $v];
+                                    }
+                                }
+                            }
+                            else {
+                                $_rh[$k] = $v;
+                            }
+
+                            @fgets($fs, 3); // \r\n
                          }
                       }
                       break;

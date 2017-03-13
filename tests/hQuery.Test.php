@@ -169,6 +169,9 @@ class TestHQuery extends PHPUnit_BaseClass {
     // -----------------------------------------------------
     public function test_http_wr() {
         // @TODO
+        // $doc = TestHQueryTests::fromURL('http://www.nameit.com', NULL, NULL, ['redirects' => 10, 'use_cookies' => true]);
+        // self::log(gettype($doc));
+        // self::log(TestHQueryTests::$last_http_result);
     }
 
     // -----------------------------------------------------
