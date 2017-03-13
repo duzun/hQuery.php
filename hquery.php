@@ -2556,7 +2556,7 @@ class hQuery extends hQuery_HTML_Parser {
 
     // ------------------------------------------------------------------------
     public static function parse_cookie($str) {
-        $ret = [];
+        $ret = array();
         if ( is_array($str) ) {
             foreach($str as $k => $v) {
                 $ret[$k] = self::parse_cookie($v);
@@ -2781,7 +2781,7 @@ class hQuery extends hQuery_HTML_Parser {
                                 $_rh[$k][] = $v;
                             }
                             else {
-                                $_rh[$k] = [$_rh[$k], $v];
+                                $_rh[$k] = array($_rh[$k], $v);
                             }
                         }
                     }
@@ -2889,7 +2889,7 @@ class hQuery extends hQuery_HTML_Parser {
                                         $_rh[$k][] = $v;
                                     }
                                     else {
-                                        $_rh[$k] = [$_rh[$k], $v];
+                                        $_rh[$k] = array($_rh[$k], $v);
                                     }
                                 }
                             }
