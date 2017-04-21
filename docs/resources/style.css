@@ -340,6 +340,7 @@ td.name, td.attributes {
 
 .class .methods .name > div > code span, .function .value > code {
 	white-space: nowrap;
+	display: inline-block;
 }
 
 .class .methods td.name > div, .class td.value > div {
@@ -426,7 +427,24 @@ div.tree span.padding {
 /* Source code */
 #source {
 	margin: 1em 0 1em 1em;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	overflow: auto;
+}
+
+#source pre {
 	padding: 0;
+	border: none;
+	overflow: visible;
+}
+
+#source .numbers {
+	float: left;
+	background-color: transparent;
+}
+
+#source .code {
+
 }
 
 .php-keyword1 {
