@@ -39,7 +39,7 @@ abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
     public static $selected_doc = NULL;
     // ------------------------------------------------------------------------
-    protected $_prop; // Properties
+    protected $_prop = []; // Properties
     protected $doc; // Parent doc
     protected $ids; // contained elements' IDs
     protected $exc; // excluded elements' IDs
@@ -598,7 +598,7 @@ abstract class hQuery_Node implements Iterator, Countable {
 
 // - Magic ------------------------------------------------
     public function __get($name) {
-        if(array_key_exists($name, $this->_prop)) return $this->_prop[$name];
+        if($this->_prop && array_key_exists($name, $this->_prop)) return $this->_prop[$name];
         return $this->attr($name);
     }
     public function __set($name, $value) {
@@ -1013,7 +1013,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
     // ------------------------------------------------------------------------
     // The magic of properties
     public function __get($name) {
-        if(array_key_exists($name, $this->_prop)) return $this->_prop[$name];
+        if($this->_prop && array_key_exists($name, $this->_prop)) return $this->_prop[$name];
         switch($name) {
             case 'size':
                 return $this->strlen();
@@ -2990,7 +2990,7 @@ class hQuery_Element extends hQuery_Node {
         }
         // return parent::__get($name);
 
-        if(array_key_exists($name, $this->_prop)) return $this->_prop[$name];
+        if($this->_prop && array_key_exists($name, $this->_prop)) return $this->_prop[$name];
         switch($name) {
             case 'id':
             case 'class':
