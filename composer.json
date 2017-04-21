@@ -24,6 +24,8 @@
     "PHP"
   ],
   "main": "hquery.php",
+  "minimum-stability": "RC",
+  "prefer-stable": true,
   "autoload": {
     "classmap": [
       "hquery.php"
@@ -51,5 +53,9 @@
   },
   "require": {
     "php": ">=5.0.0"
+  },
+  "require-dev": {
+    "apigen/apigen": "~4.1@RC",
+    "phpunit/phpunit": "^6.1"
   }
 }

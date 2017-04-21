@@ -11,7 +11,7 @@ var _running = null;
 var _dir     = path.join(__dirname, '..');
 var _test_dir = path.join(_dir, 'tests');
 var _phpunit_url = 'https://phar.phpunit.de/phpunit.phar';
-var _phpunit_path = path.join(__dirname, 'phpunit.phar');
+var _phpunit_path = path.join(__dirname, '..', 'vendor/bin/phpunit');
 var _test_file = _test_dir;
 
 
