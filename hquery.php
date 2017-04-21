@@ -39,7 +39,7 @@ abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
     public static $selected_doc = NULL;
     // ------------------------------------------------------------------------
-    protected $_prop = []; // Properties
+    protected $_prop = array(); // Properties
     protected $doc; // Parent doc
     protected $ids; // contained elements' IDs
     protected $exc; // excluded elements' IDs
