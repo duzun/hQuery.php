@@ -102,3 +102,14 @@ $size = $doc->size;
   - Add more selectors
   - Improve selectors to be able to select by attributes
 
+# 💖 Support my projects
+
+I love Open Source. Whenever possible I share cool things with the world (check out [NPM](https://duzun.me/npm) and [GitHub](https://github.com/duzun/)).
+
+If you like what I'm doing and want to encorage me, please consider to:
+
+- Star and Share the projects you like (and use)
+- Send me some **Bitcoin** at this addres: `bitcoin:3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa` (or using the QR below)
+![bitcoin:3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa](https://cdn.duzun.me/files/qr_bitcoin-3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa.png)
+
+
