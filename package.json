@@ -62,9 +62,9 @@
   "scripts": {
     "verup": "node ./node_modules/verup",
     "version": "node ./node_modules/verup 0",
-    "preversion": "php ./tools/phpunit.phar ./tests/",
+    "preversion": "php vendor/bin/phpunit ./tests/",
     "apigen": "php vendor/bin/apigen generate -d ./docs --template-theme bootstrap -s ./hquery.php",
     "test": "php vendor/bin/phpunit ./tests/",
-    "test-dev": "node ./tools/test_watcher.js"
+    "test:watch": "node ./tools/test_watcher.js"
   }
 }

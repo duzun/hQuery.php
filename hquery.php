@@ -17,7 +17,7 @@
  *
  *  API Documentation at https://duzun.github.io/hQuery.php
  *
- *  Copyright (C) 2014-2015 Dumitru Uzun
+ *  Copyright (C) 2014-2017 Dumitru Uzun
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
