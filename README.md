@@ -46,10 +46,20 @@ hQuery::$cache_path = "/path/to/cache";
 ```php
 use duzun\hQuery; // Optional (PHP 5.3+)
 
+// GET the document
 $doc = hQuery::fromUrl('http://example.com/someDoc.html', ['Accept' => 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8']);
 
 var_dump($doc->headers); // See response headers
 var_dump(hQuery::$last_http_result); // See response details of last request
+
+// with POST
+$doc = hQuery::fromUrl(
+    'http://example.com/someDoc.html', // url
+    ['Accept' => 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8'], // headers
+    ['username' => 'Me', 'fullname' => 'Just Me'], // request body - could be a string as well
+    ['method' => 'POST', 'timeout' => 7, 'redirect' => 7, 'decode' => 'gzip'] // options
+);
+
 ```
 For building advanced requests (POST, parameters etc) see [hQuery::http_wr()](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_http_wr)
 
