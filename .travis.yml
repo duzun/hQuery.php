@@ -1,6 +1,7 @@
 language: php
 
 php:
+  - 7.1
   - 7.0
   - 5.6
   - 5.5
@@ -12,8 +13,10 @@ php:
 
 matrix:
     allow_failures:
-        - php: 5.2
         - php: nightly
+        - php: hhvm
+        - php: 5.3
+        - php: 5.2
 
 dist: trusty
 
