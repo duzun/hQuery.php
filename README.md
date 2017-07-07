@@ -102,8 +102,13 @@ $size = $doc->size;
 ```
 
 # Live Demo
-  On [DUzun.Me](https://duzun.me/playground/hquery#sel=%20a%20%3E%20img%3Aparent&url=https%3A%2F%2Fgithub.com%2Fduzun)
+    
+On [DUzun.Me](https://duzun.me/playground/hquery#sel=%20a%20%3E%20img%3Aparent&url=https%3A%2F%2Fgithub.com%2Fduzun)
 
+A lot of people ask for sources of my **Live Demo** page. Here we go: 
+
+[view-source:https://duzun.me/playground/hquery](https://github.com/duzun/hQuery.php/blob/master/examples/duzun.me_playground_hquery.php)
+ 
 #TODO
 
   - Unit tests everything
