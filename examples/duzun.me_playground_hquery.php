@@ -1,4 +1,10 @@
 <?php
+    /**
+     * This is source code of https://duzun.me/playground/hquery
+     * It is run inside a controller of my framework (thus $this),
+     * and is not intended to be run as an independent example.
+     */
+
     // Note: Autoloading handled by framework
 
     // Enable cache
@@ -6,9 +12,6 @@
 
     // Results acumulator
     $return = array();
-
-    // Load and setup hQuery.php
-    $this->load_library('hQuery');
 
     // Read $url and $sel from request ($_GET | $_POST | JSON Payload)
     $url = $this->input->payload('url');
