@@ -52,6 +52,9 @@
     }
   ],
   "devDependencies": {
+    "browser-sync": "^2.18",
+    "gulp": "^3.9",
+    "gulp-connect-php": "^1.0",
     "verup": "*",
     "watch": "^1.x"
   },
