@@ -119,6 +119,30 @@ class TestHQuery extends PHPUnit_BaseClass {
         $ff = TestHQueryTests::fromFile(self::file_exists('data/attr.html'));
         $aa = $ff->find('a.aa');
         $this->assertEquals(3, count($aa));
+
+        // self::log($ff->_info());
+
+        // 3)
+        $input = $ff->find('input');
+        $this->assertEquals(3, count($input));
+
+        $input = $ff->find('input', 'name=title');
+        $this->assertEquals(1, count($input));
+        $this->assertEquals('the title', $input->value);
+
+        $input = $ff->find('input', array('type'=>'text'));
+        $this->assertEquals(2, count($input));
+
+        $input = $ff->find('input', array('type'=>'text', 'name' => 'text'));
+        $this->assertEquals(1, count($input));
+        $this->assertEquals('the text', $input->attr('value'));
+
+
+        // @TODO
+        // $input = $ff->find('input[name=title]');
+        // $this->assertEquals(1, count($input));
+        // $this->assertEquals('the title', $input->value);
+
     }
 
     // -----------------------------------------------------

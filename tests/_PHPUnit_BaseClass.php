@@ -91,6 +91,7 @@ abstract class PHPUnit_BaseClass extends PHPUnit_Framework_TestCase {
             , str_pad(++$idx, 3, ' ', STR_PAD_LEFT)
             , ")\t"
             , implode(' ', $args)
+            , PHP_EOL
         ;
     }
     // -----------------------------------------------------

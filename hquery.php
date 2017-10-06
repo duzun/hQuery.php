@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.6.1
+ *  @version 1.6.2
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.6.1';
+    const VERSION = '1.6.2';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -187,7 +187,7 @@ abstract class hQuery_Node implements Iterator, Countable {
             $ret = self::array_select($this->doc()->tags, $id);
         }
         if($caseFolding) {
-            foreach($ret as &$n) $n = strtolower($n);
+            foreach($ret as $i => $n) $ret[$i] = strtolower($n);
             if($dm) $ret = array_unique($ret);
         }
         return count($ret) <= 1 ? reset($ret) : $ret;
@@ -1197,7 +1197,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
         $ar = array();
         foreach($this->attribs as $i => $a) $ar[$i] = self::html_attr2str($a);
         $inf['attribs']   = $ar              ;
-        $inf['attrs']     = $attrs           ;
+        $inf['attrs']     = $this->attrs     ;
         $inf['idx_attr']  = $this->idx_attr  ;
         $inf['tag_idx']   = $this->tag_idx   ;
         $inf['attr_idx']  = $this->attr_idx  ;
@@ -1962,20 +1962,19 @@ class hQuery extends hQuery_HTML_Parser {
      *
      *  @return hQuery_Element collection of matched elements
      */
-    public function find($sel, $attr=NULL, $ctx=NULL) {
+    public function find($sel, $_attr=NULL, $ctx=NULL) {
+        $attr = array();
         $c = func_num_args();
         for($i=1;$i<$c;$i++) {
             $a = func_get_arg($i);
-            if(is_int($a)) $pos = $a;
-            elseif(is_array($a))  $attr = array_merge($attr, $a);
-            elseif(is_string($a)) $attr = array_merge($attr, self::html_parseAttrStr($a));
-            elseif(is_object($a)) {
+            if(is_object($a)) {
                 if($a instanceof hQuery_Node) $ctx = $a;
                 else throw new Exception('Wrong context in ' . __METHOD__);
             }
+            elseif(is_array($a))  $attr = array_merge($attr, $a);
+            elseif(is_string($a)) $attr = array_merge($attr, self::html_parseAttrStr($a));
         }
         if(isset($ctx)) $ctx = $this->_get_ctx($ctx);
-        if(!isset($attr)) $attr = array();
 
         $sel = self::html_selector2struc($sel);
 
@@ -3059,15 +3058,16 @@ class hQuery_Element extends hQuery_Node {
      *
      */
     public function val() {
-        switch(strtoupper($this->nodeName(false))) {
+        $el = count($this) > 1 ? $this->get(0) : $this;
+        switch(strtoupper($el->nodeName(false))) {
             case 'TEXTAREA':
-                return $this->html();
+                return $el->html();
             case 'INPUT':
-                switch(strtoupper($this->attr('type'))) {
-                    case 'CHECKBOX': if ( $this->attr('checked') === false ) return false;
-                    default:         return $this->attr('value');
+                switch(strtoupper($el->attr('type'))) {
+                    case 'CHECKBOX': if ( $el->attr('checked') === false ) return false;
+                    default:         return $el->attr('value');
                 }
-            return $this->html();
+            return $el->html();
             case 'SELECT': // ???
 
             default: return false;
