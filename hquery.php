@@ -1595,9 +1595,10 @@ class hQuery_HTML_Parser extends hQuery_Node {
             $id = $this->find($id);
         }
         if ( $id instanceof hQuery_Node ) {
+            $exc = $id->exc;
             $id = $id->ids;
-            if ( !empty($this->exc) ) {
-                $id = array_diff_key($id, $this->exc);
+            if ( !empty($exc) ) {
+                $id = array_diff_key($id, $exc);
             }
         }
         if(is_array($id)) {
