@@ -28,7 +28,7 @@
 /**
  *  Base class for HTML Elements and Documents.
  *
- *  used internally
+ *  @internal
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
@@ -45,13 +45,16 @@ abstract class hQuery_Node implements Iterator, Countable {
     protected $exc; // excluded elements' IDs
 
     // ------------------------------------------------------------------------
-    public $tag_map; // map tag names (eg ['b' => 'string'])
+    public $tag_map; // map tag names (eg ['b' => 'strong', 'i' => 'em'])
+
     // ------------------------------------------------------------------------
+    // Memory efficiency tricks ;-)
     static $_ar_ = array()     ;
     static $_mi_ = PHP_INT_MAX ;
     static $_nl_ = NULL        ;
     static $_fl_ = false       ;
     static $_tr_ = true        ;
+
     // ------------------------------------------------------------------------
     protected function __construct($doc, $ids, $is_ctx=false) {
         $this->doc = $doc;
@@ -68,7 +71,15 @@ abstract class hQuery_Node implements Iterator, Countable {
         $this->ids = self::$_nl_; // If any reference exists, destroy its contents! P.S. Might be buggy, but hey, I own this property. Sincerly yours, hQuery_Node class.
         unset($this->doc, $this->ids);
     }
+
     // ------------------------------------------------------------------------
+    /**
+     * Get and attribute or all attributes of first element in the collection.
+     *
+     * @param  string  $attr   attribute name, or NULL to get all
+     * @param  boolean $to_str When $attr is NULL, if true, get the list of attributes as string
+     * @return array|string    If no $attr, return a list of attributes, or attribute's value otherwise.
+     */
     public function attr($attr=NULL, $to_str=false) {
         $k = key($this->ids);
         if($k === NULL) {
@@ -90,10 +101,24 @@ abstract class hQuery_Node implements Iterator, Countable {
         return !isset($this->doc) || $this === $this->doc;
     }
 
+    /**
+     * Get parent doc of this node.
+     *
+     * @return hQuery
+     */
     public function doc() {
         return isset($this->doc) ? $this->doc : $this;
     }
 
+    /**
+     *  Finds a collection of nodes inside current document/context (similar to jQuery.fn.find()).
+     *
+     *  @param string       $sel  - A valid CSS selector (some pseudo-selectors supported).
+     *  @param array|string $attr - OPTIONAL attributes as string or key-value pairs.
+     *  @param hQuery_Node  $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
+     *
+     *  @return hQuery_Element collection of matched elements or NULL
+     */
     public function find($sel, $attr=NULL) {
         return $this->doc()->find($sel, $attr, $this);
     }
@@ -301,7 +326,7 @@ abstract class hQuery_Node implements Iterator, Countable {
         return $keys ? array_keys($id) : $id;
     }
     // ------------------------------------------------------------------------
-    function _parent($ids=NULL, $n=0) {
+    protected function _parent($ids=NULL, $n=0) {
         $ret = self::$_ar_;
         $ids = $this->_my_ids($ids);
         if(!$ids) return $ret;
@@ -978,7 +1003,7 @@ class hQuery_Context extends hQuery_Node {
 /**
  *  HTML Parser Class
  *
- *  used internally
+ *  @internal
  */
 class hQuery_HTML_Parser extends hQuery_Node {
     public static $del_spaces          = false;
@@ -1152,7 +1177,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
         return $url;
     }
 
-    /* <meta charset="ISO-8859-2" /> */
+    /* <meta charset="utf-8" /> */
     /* <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" /> */
     public static function detect_charset($str) {
         $l    = 1024;
@@ -1544,29 +1569,33 @@ class hQuery_HTML_Parser extends hQuery_Node {
       return $ni ? $ni : self::$_nl_;
    }
 
-   /**
-    * @return false - no class, 0 - doesn't have class, true - has class, [ids.cl]
-    */
-   protected function hasClass($id, $cl) {
-      if(!is_array($cl)) $cl = preg_split('|\\s+|',trim($cl));
-      if(is_array($id)) {
-         $ret = self::$_ar_;
-         foreach($id as $id => $e) {
-            $c = $this->hasClass($id, $cl);
-            if($c) $ret[$id] = $e;
-            elseif($c === false) return $c;
-         }
-         return $ret;
-      }
-      if(!isset($this->$attrs[$id])) return 0;    // $id has no attributes at all (but indexed)
-      foreach($cl as $cl) {
-        if(!isset($this->class_idx[$cl])) return self::$_fl_; // class doesn't exist
-        $cl = $this->class_idx[$cl];
-        $aid = $this->attrs[$id];
-        if(!(is_array($cl) ? isset($cl[$aid]) : $cl == $aid)) return 0;
-      }
-      return self::$_tr_;
-   }
+    /**
+     * Checks whether $this element/collection has a(ll) class(es).
+     *
+     * @param int|array $id - The context to check
+     * @param string|array $cl - class(es) to check
+     * @return false - no class, 0 - doesn't have class, true - has class, [ids.cl]
+     */
+    protected function hasClass($id, $cl) {
+        if(!is_array($cl)) $cl = preg_split('|\\s+|',trim($cl));
+        if(is_array($id)) {
+            $ret = self::$_ar_;
+            foreach($id as $id => $e) {
+                $c = $this->hasClass($id, $cl);
+                if($c) $ret[$id] = $e;
+                elseif($c === false) return $c;
+            }
+            return $ret;
+        }
+        if(!isset($this->$attrs[$id])) return 0;    // $id has no attributes at all (but indexed)
+        foreach($cl as $cl) {
+            if(!isset($this->class_idx[$cl])) return self::$_fl_; // class doesn't exist
+            $cl = $this->class_idx[$cl];
+            $aid = $this->attrs[$id];
+            if( is_array($cl) ? !isset($cl[$aid]) : $cl != $aid ) return 0;
+        }
+        return self::$_tr_;
+    }
 
     protected function filter($ids, $name=NULL, $class=NULL, $attr=NULL, $ctx=NULL) {
       $aids = NULL;
@@ -1956,11 +1985,11 @@ class hQuery extends hQuery_HTML_Parser {
     /**
      *  Finds a collection of nodes inside current document/context (similar to jQuery.fn.find()).
      *
-     *  @param string       $sel  - A valid CSS selector.
+     *  @param string       $sel  - A valid CSS selector (some pseudo-selectors supported).
      *  @param array|string $attr - OPTIONAL attributes as string or key-value pairs.
-     *  @param hQuery_Node    $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
+     *  @param hQuery_Node  $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
      *
-     *  @return hQuery_Element collection of matched elements
+     *  @return hQuery_Element collection of matched elements or NULL
      */
     public function find($sel, $_attr=NULL, $ctx=NULL) {
         $attr = array();
@@ -3009,7 +3038,7 @@ class hQuery_Element extends hQuery_Node {
         }
     }
     // ------------------------------------------------------------------------
-    // Iterator methods:
+    // ArrayAccess methods:
 
     public function offsetSet($offset, $value) {
         if(is_null($offset)) {
