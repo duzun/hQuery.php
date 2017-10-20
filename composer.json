@@ -55,7 +55,7 @@
     "php": ">=5.0.0"
   },
   "require-dev": {
-    "apigen/apigen": "~4.1@RC",
+    "apigen/apigen": "~4.1",
     "phpunit/phpunit": "^6.1"
   }
 }
