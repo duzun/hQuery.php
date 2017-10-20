@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.6.2
+ *  @version 1.7.0
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.6.2';
+    const VERSION = '1.7.0';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -130,7 +130,8 @@ abstract class hQuery_Node implements Iterator, Countable {
                 $this->exc = $e->ids;
             }
             else {
-                foreach($e->ids as $b => $e) $this->exc[$b] = $e;
+                // foreach($e->ids as $b => $e) $this->exc[$b] = $e;
+                $this->exc = $e->ids + $this->exc;
                 ksort($this->exc);
             }
         }
@@ -143,32 +144,41 @@ abstract class hQuery_Node implements Iterator, Countable {
 
         $ret = '';
         $doc = $this->doc;
-        foreach($this->ids as $p => $q) {
-            if(isset($this->exc, $this->exc[$p])) continue;
+        $ids = $this->ids;
+        if ( !empty($this->exc) ) {
+            $ids = array_diff_key($ids, $this->exc);
+        }
+        foreach($ids as $p => $q) {
+            // if(isset($this->exc, $this->exc[$p])) continue;
             ++$p;
             if($p < $q) $ret .= substr($doc->html, $p, $q-$p);
         }
         return $ret;
     }
 
-   // ------------------------------------------------------------------------
-   /**
-    * @return string .innerHTML
-    */
-   public function html($id=NULL) {
-      if($this->isDoc()) return $this->html; // doc
+    // ------------------------------------------------------------------------
+    /**
+     * @return string .innerHTML
+     */
+    public function html($id=NULL) {
+        if($this->isDoc()) return $this->html; // doc
 
-      $id = $this->_my_ids($id);
-      if($id === false) return self::$_fl_;
-      $doc = $this->doc;
-      $ret = self::$_nl_;
-      foreach($id as $p => $q) {
-         if(isset($this->exc, $this->exc[$p])) continue;
-         ++$p;
-         if($p<$q) $ret .= substr($doc->html, $p, $q-$p);
-      }
-      return $ret;
-   }
+        $id = $this->_my_ids($id);
+        if($id === false) return self::$_fl_;
+
+        $doc = $this->doc;
+        if ( !empty($this->exc) ) {
+            $id = array_diff_key($id, $this->exc);
+        }
+
+        $ret = self::$_nl_;
+        foreach($id as $p => $q) {
+            // if(isset($this->exc, $this->exc[$p])) continue;
+            ++$p;
+            if($p<$q) $ret .= substr($doc->html, $p, $q-$p);
+        }
+        return $ret;
+    }
 
    /**
     * @return string .outerHtml
@@ -259,17 +269,19 @@ abstract class hQuery_Node implements Iterator, Countable {
     }
     // ------------------------------------------------------------------------
     /**
-     * Make a context array of ids (if x in $ids && exists y in $ids such that x in y then del x from $ids)
+     * Make a context array of ids:
+     *     if x in $ids && exists y in $ids such that x in y then del x from $ids
      *
      * @return array ids
      */
     protected function _ctx_ids($ids=NULL) {
         $m = -1;
+        $exc = $this->exc;
         if(!isset($ids)) $ids = $this->ids;
         elseif(is_int($ids)) $ids = isset($this->ids[$ids]) ? array($ids => $this->ids[$ids]) : self::$_fl_;
         else {
             foreach($ids as $b => $e) {
-                if($b <= $m || $b+1 >= $e) unset($ids[$b]);
+                if($b <= $m || $b+1 >= $e and empty($exc[$b])) unset($ids[$b]);
                 else $m = $e;
             }
         }
@@ -1511,7 +1523,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
         return $this->tag_idx;
     }
 
-   // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     protected function _get_ctx($ctx) {
         if ( !($ctx instanceof parent) ) {
             if(is_array($ctx) || is_int($ctx)) {
@@ -1523,7 +1535,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
         }
         return $ctx && count($ctx) ? $ctx : self::$_fl_; // false for error - something is not ok
     }
-   // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     protected function _find($name, $class=NULL, $attr=NULL, $ctx=NULL, $rec=true) {
       // if(!in_array($name, array('meta', 'head'))) debug(compact('name', 'class', 'attr','ctx', 'rec'));
 
@@ -1567,17 +1579,27 @@ class hQuery_HTML_Parser extends hQuery_Node {
       }
 
       return $ni ? $ni : self::$_nl_;
-   }
+    }
 
     /**
      * Checks whether $this element/collection has a(ll) class(es).
      *
-     * @param int|array $id - The context to check
+     * @param int|array|string|hQuery_Node $id - The context to check
      * @param string|array $cl - class(es) to check
-     * @return false - no class, 0 - doesn't have class, true - has class, [ids.cl]
+     * @return false - no class, 0 - doesn't have any class, true - has class, [id => true]
      */
-    protected function hasClass($id, $cl) {
+    public function hasClass($id, $cl) {
         if(!is_array($cl)) $cl = preg_split('|\\s+|',trim($cl));
+
+        if ( is_string($id) && !is_numeric($id) ) {
+            $id = $this->find($id);
+        }
+        if ( $id instanceof hQuery_Node ) {
+            $id = $id->ids;
+            if ( !empty($this->exc) ) {
+                $id = array_diff_key($id, $this->exc);
+            }
+        }
         if(is_array($id)) {
             $ret = self::$_ar_;
             foreach($id as $id => $e) {
@@ -1587,7 +1609,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
             }
             return $ret;
         }
-        if(!isset($this->$attrs[$id])) return 0;    // $id has no attributes at all (but indexed)
+        if(!isset($this->attrs[$id])) return 0;    // $id has no attributes at all (but indexed)
         foreach($cl as $cl) {
             if(!isset($this->class_idx[$cl])) return self::$_fl_; // class doesn't exist
             $cl = $this->class_idx[$cl];
@@ -2974,7 +2996,7 @@ class hQuery extends hQuery_HTML_Parser {
  *  Represents an HTML Element ( eg div, input etc )
  *  or a collection of elements ( eq jQuery([div, span, ...]) )
  */
-class hQuery_Element extends hQuery_Node {
+class hQuery_Element extends hQuery_Node implements ArrayAccess {
     // ------------------------------------------------------------------------
     // Iterator
     protected $_ich = NULL; // Iterator Cache
@@ -3046,19 +3068,18 @@ class hQuery_Element extends hQuery_Node {
         }
         if(is_int($offset)) {
             $i = array_slice($this->ids, $offset, 1, true);
-            // ???
+            // ??? can't manipulate collection's contents
         }
         else {
-            $this->__set($offset, $value);
+            $this->__set($offset, $value); // set a property
         }
     }
 
     public function offsetGet($offset) {
-        if(is_int($offset)) {
-            $i = array_slice($this->ids, $offset, 1, true);
-            return $i ? new self($this->doc, $i) : NULL;
-        }
-        return $this->__get($offset);
+        return is_int($offset)
+            ? $this->get($offset)   // an element from collection
+            : $this->__get($offset) // a property
+        ;
     }
 
     public function offsetExists($offset) {
@@ -3080,11 +3101,26 @@ class hQuery_Element extends hQuery_Node {
             unset($this->_prop[$offset]);
         }
     }
-    // ------------------------------------------------------------------------
 
+    // ------------------------------------------------------------------------
+    /**
+     * Override current() for iterations.
+     *
+     * @return hQuery_Element
+     */
+    public function current() {
+        $k = key($this->ids);
+        if($k === NULL) return false;
+        if(count($this->ids) == 1) return $this;
+        if(!isset($this->_ich[$k])) $this->_ich[$k] = new self($this->doc, array($k=>$this->ids[$k]));
+        return $this->_ich[$k];
+    }
+
+    // ------------------------------------------------------------------------
     /**
      * Get value of an :input element.
      *
+     * @return mixed value of the first element in the collection.
      */
     public function val() {
         $el = count($this) > 1 ? $this->get(0) : $this;
@@ -3104,16 +3140,16 @@ class hQuery_Element extends hQuery_Node {
     }
 
     /**
-     * Override current() for iterations.
+     * Checks whether $this element/collection has a(ll) class(es).
      *
-     * @return hQuery_Element
+     * @param string|array $cl - class(es) to check
+     * @return true - has class, false - no class, 0 - doesn't have any class,
      */
-    public function current() {
-        $k = key($this->ids);
-        if($k === NULL) return false;
-        if(count($this->ids) == 1) return $this;
-        if(!isset($this->_ich[$k])) $this->_ich[$k] = new self($this->doc, array($k=>$this->ids[$k]));
-        return $this->_ich[$k];
+    public function hasClass($className) {
+        $ret = $this->doc()->hasClass($this, $className);
+        if ( count($this) < 2 ) return reset($ret);
+
+        return max($ret);
     }
 
     /**

@@ -143,12 +143,59 @@ class TestHQuery extends PHPUnit_BaseClass {
         // $this->assertEquals(1, count($input));
         // $this->assertEquals('the title', $input->value);
 
+        return $ff;
     }
 
     // -----------------------------------------------------
-    public function test_prop_charset() {
-        $charset = self::$inst->charset;
-        $this->assertEquals('ISO-8859-2', strtoupper($charset));
+    public function test_hasClass() {
+        $doc = self::$inst;
+
+        $a    = $doc->find('a');
+        $div  = $doc->find('div.test-div');
+        $body = $doc->find('body');
+        $all  = $doc->find('.test-class');
+
+        $this->assertEmpty($a->hasClass('test-class'), 'a should have no class');
+        $this->assertEmpty($body->hasClass('test-div'), 'a should have no class');
+        $this->assertNotEmpty($div->hasClass('test-class'), 'div.test-div should have .test-div class');
+        $this->assertNotEmpty($all->hasClass('test-class test-div'), 'At least one div should have .test-div and .test-class classes');
+        $this->assertEmpty($body->hasClass('test-class test-div'), 'body doesn\'t have both classes .test-div and .test-class');
+
+        // More speciffic
+        $this->assertEquals(0, $a->hasClass('test-class'), 'a should have no class');
+        $this->assertEquals(false, $body->hasClass('test-div'), 'body should not have .test-div class');
+        $this->assertEquals(true, $div->hasClass('test-div'), 'a should have .test-div class');
+    }
+
+    // -----------------------------------------------------
+    /**
+     * @depends test_find
+     */
+    public function test_hQuery_Element_ArrayAccess($doc) {
+        $e = $doc->find('input');
+
+        // Short forms of $e->get(0)->attr('name')
+        $this->assertEquals('title', $e->get(0)->attr('name'));
+        $this->assertEquals('title', $e[0]->name);
+        $this->assertEquals('title', $e[0]['name']);
+        $this->assertEquals('title', $e['name']);
+        $this->assertEquals('title', $e->name);
+
+        $this->assertEquals('text', $e[1]['name']);
+        $this->assertEquals('random', $e[2]['name']);
+
+        return $doc;
+    }
+
+    // -----------------------------------------------------
+    /**
+     * @depends test_hQuery_Element_ArrayAccess
+     */
+    public function test_prop_charset($doc) {
+        $this->assertEquals('utf-8', strtolower($doc->charset));
+        $this->assertEquals('iso-8859-2', strtolower(self::$inst->charset));
+
+        return $doc;
     }
     // -----------------------------------------------------
     public function test_prop_size() {
