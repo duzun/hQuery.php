@@ -88,10 +88,32 @@ $banners = $doc->find('a > img:parent');
 $links  = array();
 $images = array();
 $titles = array();
-foreach($banners as $pos => $a) {
-    $links[$pos] = $a->attr('href');
-    $titles[$pos] = trim($a->text()); // strip all HTML tags and leave just text
-    $images[$pos] = $a->find('img')->attr('src');
+
+// If the result of find() is not empty
+// $banners is a collection of elements (hQuery_Element)
+if ( $banners ) {
+    
+    // Iterate over the result
+    foreach($banners as $pos => $a) {
+        $links[$pos] = $a->attr('href'); // get absolute URL from href property
+        $titles[$pos] = trim($a->text()); // strip all HTML tags and leave just text
+
+        // Filter the result
+        if ( !$a->hasClass('logo') ) {
+            $img = $a->find('img')[0]; // ArrayAccess
+            if ( $img ) $images[$pos] = $img->src; // short for $img->attr('src')
+        }
+    }
+
+    // If at least one element has the class .home
+    if ( $banners->hasClass('home') ) {
+        echo 'There is .home button!', PHP_EOL;
+
+        // ArrayAccess for elements and properties.
+        if ( $banners[0]['href'] == '/' ) {
+            echo 'And it is the first one!';
+        }
+    }
 }
 
 // Read charset of the original document (internally it is converted to UTF-8)
