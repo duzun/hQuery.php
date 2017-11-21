@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.7.0
+ *  @version 1.7.1
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.7.0';
+    const VERSION = '1.7.1';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -2893,6 +2893,7 @@ class hQuery extends hQuery_HTML_Parser {
                       }
                    break;
                 }
+
                 // Detect body length
                 if(@!$open || $rcode < 200 || $rcode == 204 || $rcode == 304 || $meth == 'HEAD') {
                     $te = 1;
@@ -2904,6 +2905,10 @@ class hQuery extends hQuery_HTML_Parser {
                     $bl = (int)$_rh['CONTENT_LENGTH'];
                     $te = 2;
                 }
+                else {
+                    $te = 0; // useless, just to avoid Notice: Undefined variable: te...
+                }
+
                 switch($te) {
                    case 1:
                       break;
