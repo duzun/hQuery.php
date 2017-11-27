@@ -96,6 +96,7 @@ class TestHQueryStress extends PHPUnit_BaseClass {
                 $exe = self::timer($tmr);
                 $pad = str_repeat(' ', $max_len - strlen($sel));
                 self::log("{$name}.find('$sel')$pad\t-> ".str_pad(count($a), 5, ' ', STR_PAD_LEFT)."  in {$exe}");
+                $this->assertNotNull($a);
             }
         }
 

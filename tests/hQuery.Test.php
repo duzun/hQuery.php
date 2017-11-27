@@ -191,6 +191,25 @@ class TestHQuery extends PHPUnit_BaseClass {
     /**
      * @depends test_hQuery_Element_ArrayAccess
      */
+    public function test_attr($doc) {
+        $e = $doc->find('#img1');
+
+        // It's magic!
+        $this->assertEquals($e->src, $e->attr('src'));
+        $this->assertEquals($e->src1, $e->attr('src1'));
+        $this->assertEquals($e->src2, $e->attr('src2'));
+
+        // Standard way of accessing attributes:
+        $this->assertEquals('/path/to/img.png', $e->attr('src'));
+        $this->assertEquals('other/img/here.jpg', $e->attr('src2'));
+        $this->assertEquals('//example.com/full/path.gif', $e->attr('src3'));
+
+        return $doc;
+    }
+    // -----------------------------------------------------
+    /**
+     * @depends test_attr
+     */
     public function test_prop_charset($doc) {
         $this->assertEquals('utf-8', strtolower($doc->charset));
         $this->assertEquals('iso-8859-2', strtolower(self::$inst->charset));
