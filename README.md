@@ -41,6 +41,22 @@ use duzun\hQuery;
 hQuery::$cache_path = "/path/to/cache";
 ```
 
+### Open a local HTML document
+###### [hQuery::fromFile](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromFile)( string `$filename`, boolean `$use_include_path` = false, resource `$context` = NULL )
+```php
+$doc = hQuery::fromFile('/path/to/filesystem/doc.html');
+```
+
+### Load HTML from a string
+###### [hQuery::fromHTML](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromHTML)( string `$html`, string `$url` = NULL )
+```php
+$doc = hQuery::fromHTML('<html><head><title>Sample HTML Doc</title><body>Contents...</body></html>');
+
+// Set base_url, in case the document is loaded from local source.
+// Note: The base_url is used to retrive absolute URLs from relative ones
+$doc->base_url = 'http://desired-host.net/path';
+```
+
 ### Open a remote HTML document
 ###### [hQuery::fromUrl](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL)( string `$url`, array `$headers` = NULL, array|string `$body` = NULL, array `$options` = NULL )
 ```php
@@ -61,22 +77,17 @@ $doc = hQuery::fromUrl(
 );
 
 ```
-For building advanced requests (POST, parameters etc) see [hQuery::http_wr()](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_http_wr)
 
-### Open a local HTML document
-###### [hQuery::fromFile](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromFile)( string `$filename`, boolean `$use_include_path` = false, resource `$context` = NULL )
-```php
-$doc = hQuery::fromFile('/path/to/filesystem/doc.html');
-```
-### Load HTML from a string
-###### [hQuery::fromHTML](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromHTML)( string `$html`, string `$url` = NULL )
-```php
-$doc = hQuery::fromHTML('<html><head><title>Sample HTML Doc</title><body>Contents...</body></html>');
+For building advanced requests (POST, parameters etc) see [hQuery::http_wr()](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_http_wr),
+though I recomend using a specialized library for making requests 
+and `hQuery::fromHTML($html, $url=NULL)` for processing results.
+See [Guzzle](http://docs.guzzlephp.org/en/stable/) for eg.
 
-// Set base_url, in case the document is loaded from local source.
-// Note: The base_url is used to retrive absolute URLs from relative ones
-$doc->base_url = 'http://desired-host.net/path';
-```
+Another option is to use [stream_context_create()](https://secure.php.net/manual/en/function.stream-context-create.php)
+to create a `$context`, then call `hQuery::fromFile($url, false, $context)` to make the request and get the `hQuery` `$document`.
+
+Fon an example of using `$context` to make a HTTP request with proxy see [#26](https://github.com/duzun/hQuery.php/issues/26#issuecomment-351032382).
+
 
 ### Processing the results
 ###### [hQuery::find](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_find)( string `$sel`, array|string `$attr` = NULL, hQuery_Node `$ctx` = NULL )
@@ -135,7 +146,8 @@ A lot of people ask for sources of my **Live Demo** page. Here we go:
 
   - Unit tests everything
   - Document everything
-  - Cookie support
+  - ~~Cookie support~~ (implemented in mem for redirects)
+  - Use [HTTPlug](http://httplug.io/) internally
   - Add more selectors
   - Improve selectors to be able to select by attributes
 
@@ -148,5 +160,3 @@ If you like what I'm doing and want to encorage me, please consider to:
 - Star and Share the projects you like (and use)
 - Send me some **Bitcoin** at this addres: `bitcoin:3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa` (or using the QR below)
 ![bitcoin:3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa](https://cdn.duzun.me/files/qr_bitcoin-3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa.png)
-
-

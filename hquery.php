@@ -1895,7 +1895,7 @@ class hQuery extends hQuery_HTML_Parser {
      *
      *  @param string   $filename         - a valid filename
      *  @param bool     $use_include_path - OPTIONAL passed to file_get_contents()
-     *  @param resource $context          - OPTIONAL A valid context resource created with stream_context_create().
+     *  @param resource $context          - OPTIONAL A valid context resource created with stream_context_create(). See file_get_contents()
      *
      *  @return hQuery $doc
      */

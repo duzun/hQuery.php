@@ -57,5 +57,8 @@
   "require-dev": {
     "apigen/apigen": "~4.1",
     "phpunit/phpunit": "^6.1"
+  },
+  "suggest": {
+    "php-http/curl-client": "Planing to use this lib automatically when available"
   }
 }
