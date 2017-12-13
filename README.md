@@ -41,14 +41,25 @@ use duzun\hQuery;
 hQuery::$cache_path = "/path/to/cache";
 ```
 
-### Open a local HTML document
+### Load HTML from a file
 ###### [hQuery::fromFile](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromFile)( string `$filename`, boolean `$use_include_path` = false, resource `$context` = NULL )
+
 ```php
+// Local
 $doc = hQuery::fromFile('/path/to/filesystem/doc.html');
+
+// Remote
+$doc = hQuery::fromFile('https://example.com/');
 ```
+
+Where `$context` is created with [stream_context_create()](https://secure.php.net/manual/en/function.stream-context-create.php).
+
+Fon an example of using `$context` to make a HTTP request with proxy see [#26](https://github.com/duzun/hQuery.php/issues/26#issuecomment-351032382).
+
 
 ### Load HTML from a string
 ###### [hQuery::fromHTML](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromHTML)( string `$html`, string `$url` = NULL )
+
 ```php
 $doc = hQuery::fromHTML('<html><head><title>Sample HTML Doc</title><body>Contents...</body></html>');
 
@@ -57,7 +68,7 @@ $doc = hQuery::fromHTML('<html><head><title>Sample HTML Doc</title><body>Content
 $doc->base_url = 'http://desired-host.net/path';
 ```
 
-### Open a remote HTML document
+### Load a remote HTML document
 ###### [hQuery::fromUrl](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL)( string `$url`, array `$headers` = NULL, array|string `$body` = NULL, array `$options` = NULL )
 ```php
 use duzun\hQuery; // Optional (PHP 5.3+)
@@ -84,9 +95,7 @@ and `hQuery::fromHTML($html, $url=NULL)` for processing results.
 See [Guzzle](http://docs.guzzlephp.org/en/stable/) for eg.
 
 Another option is to use [stream_context_create()](https://secure.php.net/manual/en/function.stream-context-create.php)
-to create a `$context`, then call `hQuery::fromFile($url, false, $context)` to make the request and get the `hQuery` `$document`.
-
-Fon an example of using `$context` to make a HTTP request with proxy see [#26](https://github.com/duzun/hQuery.php/issues/26#issuecomment-351032382).
+to create a `$context`, then call `hQuery::fromFile($url, false, $context)`.
 
 
 ### Processing the results
