@@ -49,7 +49,7 @@ hQuery::$cache_path = "/path/to/cache";
 $doc = hQuery::fromFile('/path/to/filesystem/doc.html');
 
 // Remote
-$doc = hQuery::fromFile('https://example.com/');
+$doc = hQuery::fromFile('https://example.com/', false, $context);
 ```
 
 Where `$context` is created with [stream_context_create()](https://secure.php.net/manual/en/function.stream-context-create.php).
