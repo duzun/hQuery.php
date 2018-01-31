@@ -2748,7 +2748,7 @@ class hQuery extends hQuery_HTML_Parser {
             $body = NULL;
         }
 
-        $meth = @$options['method'] and $meth = strtoupper($meth) or $meth = 'GET';
+        !empty($options['method']) and $meth = strtoupper($options['method']) or $meth = 'GET';
 
         if($head) {
             if(!is_array($head)) {
@@ -2964,7 +2964,10 @@ class hQuery extends hQuery_HTML_Parser {
                       break;
                 }
 
-                if ( $rsps != '' && @$options['decode'] == 'gzip' && @$_rh['CONTENT_ENCODING'] == 'gzip' ) {
+                if ( $rsps != '' &&
+                    isset($options['decode']) && $options['decode'] == 'gzip' &&
+                    isset($_rh['CONTENT_ENCODING']) && $_rh['CONTENT_ENCODING'] == 'gzip'
+                ) {
                     $r = self::gzdecode($rsps);
                     if($r !== false) {
                         unset($_rh['CONTENT_ENCODING']);
