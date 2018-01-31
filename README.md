@@ -38,7 +38,12 @@ include_once '/path/to/libs/hquery.php';
 use duzun\hQuery;
 
 // Set the cache path - must be a writable folder
+// If not set, hQuery::fromURL() whould make a new request on each call
 hQuery::$cache_path = "/path/to/cache";
+
+// Time to keed request data in cache, seconds
+// A value of 0 disables cahce
+hQuery::$cache_expires = 3600; // default one hour
 ```
 
 ### Load HTML from a file
