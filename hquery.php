@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.7.1
+ *  @version 1.7.2
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.7.1';
+    const VERSION = '1.7.2';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
