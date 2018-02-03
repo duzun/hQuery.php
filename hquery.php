@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.7.2
+ *  @version 1.7.3
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.7.2';
+    const VERSION = '1.7.3';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -2264,12 +2264,26 @@ class hQuery extends hQuery_HTML_Parser {
     }
 
     /**
+     * Find a function to decode gzip data.
+     * @return string A gzip decode function name, or false if not found
+     */
+    public static function gz_supported() {
+        function_exists('zlib_decode') and $_gzdecode = 'zlib_decode' or
+        function_exists('gzdecode')    and $_gzdecode = 'gzdecode'    or
+        $_gzdecode = false;
+        return $_gzdecode;
+    }
+    /**
      * gzdecode() (for PHP < 5.4.0)
      */
     public static function gzdecode($str) {
-        static $_gzdecode_support;
-        isset($_gzdecode_support) or $_gzdecode_support = function_exists('gzdecode');
-        return $_gzdecode_support ? gzdecode($str) : self::_gzdecode($str);
+        static $_gzdecode;
+        if ( !isset($_gzdecode) ) {
+            $_gzdecode = self::gz_supported() or
+            $_gzdecode = get_called_class().'::_gzdecode';
+        }
+
+        return $_gzdecode($str);
     }
 
     /**
@@ -2465,7 +2479,7 @@ class hQuery extends hQuery_HTML_Parser {
         if($gzip) {
             $gl = is_int($gzip) ? $gzip : 1024;
             // Cache as gzip only if built-in gzdecode() defined (more CPU for less IO)
-            strlen($cnt) > $gl && function_exists('gzdecode') and
+            strlen($cnt) > $gl && self::gz_supported() and
             $cnt = gzencode($cnt);
         }
         return self::flock_put_contents($fn, $cnt);
@@ -2766,7 +2780,7 @@ class hQuery extends hQuery_HTML_Parser {
         }
 
         if(@$options['decode'] == 'gzip') {
-            // if(function_exists('gzdecode')) {
+            // if(self::gz_supported()) {
                 $_h['accept-encoding'] = 'gzip';
             // }
             // else {
@@ -2972,6 +2986,9 @@ class hQuery extends hQuery_HTML_Parser {
                     if($r !== false) {
                         unset($_rh['CONTENT_ENCODING']);
                         $rsps = $r;
+                    }
+                    else {
+                        throw new Exception("Can't gzdecode(response), try ['decode' => false] option");
                     }
                 }
                 $ret->code    = $rcode;
