@@ -40,7 +40,8 @@ class TestHQueryStress extends PHPUnit_BaseClass {
         $tags = $doc->index();
         $mem = self::memer($mmr);
         $exe = self::timer($tmr);
-        $this->assertLessThan(6000000, self::timer($tmr, false), 'should index 3Mb in less then 3 sec');
+        $time = version_compare(PHP_VERSION, '5.5.0') >= 0 ? 6e6 : 30e6; // travis runs PHP 5.4 slower for some reason
+        $this->assertLessThan($time, self::timer($tmr, false), 'should index 3Mb in less then '.($time/1e6).' sec');
         $count = self::fmtNumber(self::listSumCounts($tags));
         self::log( "Indexed   {$count} tags\tin\t{$exe}\t{$mem} RAM" );
 
