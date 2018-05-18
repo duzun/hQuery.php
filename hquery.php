@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.7.3
+ *  @version 1.7.3a
  */
 // ------------------------------------------------------------------------
 
@@ -598,12 +598,18 @@ abstract class hQuery_Node implements Iterator, Countable {
        }
        if($el instanceof self) { if($el === $this) return self::$_fl_; $el = $el->ids; } else
        $el = $this->_ctx_ids($this->_doc_ids($el, true));
-       foreach($el as $b => $e) if(!$this->has($b)) return self::$_fl_;
+       foreach($el as $b => $e) if(!$this->_has($b)) return self::$_fl_;
        return self::$_tr_;
     }
 
-    /// filter all ids of $el that are contained in $this->ids
-    function _filter($el, $eq=false) {
+    /**
+     * Filter all ids of $el that are contained in(side) $this->ids
+     *
+     * @param  hQuery_Node|array $el A node or list of ids
+     * @param  boolean           $eq if false, filter strict contents, otherwise $el might be in $this->ids
+     * @return hQuery_Node|array same type as $el
+     */
+    function _filter_contains($el, $eq=false) {
       if($el instanceof self) $o = $el;
       $el = $this->_doc_ids($el);
       $ret = self::$_ar_;
@@ -612,6 +618,7 @@ abstract class hQuery_Node implements Iterator, Countable {
       $ie = reset($el); // current child
       $ib = key($el);
       foreach($this->ids as $b => $e) {
+         // skip up to first $el in $this
          while($ib < $b || !$eq && $ib == $b) {
            $ie = next($el);
            if($ie === false) { $ib = -1; break 2; }
@@ -1004,7 +1011,7 @@ class hQuery_Context extends hQuery_Node {
             $el = $this->_ctx_ids($this->_doc_ids($el, true));
         }
         foreach($el as $b => $e) {
-            if(!$this->has($b, $eq)) unset($el[$b]);
+            if(!$this->_has($b, $eq)) unset($el[$b]);
         }
 
         return new self($el, $this->doc);
@@ -1563,14 +1570,14 @@ class hQuery_HTML_Parser extends hQuery_Node {
 
       if(isset($aids)) {
          $ni = $this->get_ids_byAid($aids, true, true);
-         if($ni && $ctx) $ni = $ctx->_filter($ni);
+         if($ni && $ctx) $ni = $ctx->_filter_contains($ni);
          if(!$ni) return self::$_nl_;
          if($name) $ni = array_intersect_key($ni, $this->tag_idx[$name]);
       }
       else {
          if($name) {
             $ni = $this->tag_idx[$name];
-            if($ni && $ctx) $ni = $ctx->_filter($ni);
+            if($ni && $ctx) $ni = $ctx->_filter_contains($ni);
          }
          else {
             if($ctx) $ni = $ctx->_sub_ids(false);
@@ -1620,7 +1627,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
         return self::$_tr_;
     }
 
-    protected function filter($ids, $name=NULL, $class=NULL, $attr=NULL, $ctx=NULL) {
+    protected function _filter($ids, $name=NULL, $class=NULL, $attr=NULL, $ctx=NULL) {
       $aids = NULL;
       if($class) {
          if($attr)    $aids = $this->get_aids_byClassAttr($class, $attr, true);
@@ -1649,13 +1656,13 @@ class hQuery_HTML_Parser extends hQuery_Node {
       if(isset($ctx)) {
          $ctx = $this->_get_ctx($ctx);
          if(!$ctx) throw new Exception(__CLASS__.'->'.__FUNCTION__.': Invalid context!');
-         $ids = $ctx->_filter($ids);
+         $ids = $ctx->_filter_contains($ids);
          if(!$ids) return $ids;
       }
       unset($ctx);
       return $ids;
-   }
-   // ------------------------------------------------------------------------
+    }
+    // ------------------------------------------------------------------------
 
    /**
     * @return [aids]
@@ -2053,7 +2060,7 @@ class hQuery extends hQuery_HTML_Parser {
                     // y of x > y > ...
                     else {
                         $ch = $this->_children($rc);
-                        $rc = $this->filter($ch, $c['n'], $c['c'], $at);
+                        $rc = $this->_filter($ch, $c['n'], $c['c'], $at);
                     }
                     unset($ch);
                     if(!$rc) break;
@@ -2950,7 +2957,6 @@ class hQuery extends hQuery_HTML_Parser {
                             $v = explode(':', $p, 2);
                             $k = strtoupper(strtr($v[0], '- ', '__'));
                             $v = isset($v[1]) ? trim($v[1]) : NULL;
-                            $_rh[$k] = $v;
 
                             // Gather headers
                             if ( isset($_rh[$k]) ) {
