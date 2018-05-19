@@ -52,10 +52,10 @@
     }
   ],
   "devDependencies": {
-    "browser-sync": "^2.18",
+    "browser-sync": "^2.24",
     "gulp": "^3.9",
     "gulp-connect-php": "^1.0",
-    "verup": "*",
+    "verup": "^1.6",
     "watch": "^1.x"
   },
   "directories": {
