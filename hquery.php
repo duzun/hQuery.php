@@ -2286,11 +2286,10 @@ class hQuery extends hQuery_HTML_Parser {
     public static function gzdecode($str) {
         static $_gzdecode;
         if ( !isset($_gzdecode) ) {
-            $_gzdecode = self::gz_supported() or
-            $_gzdecode = get_called_class().'::_gzdecode';
+            $_gzdecode = self::gz_supported();
         }
 
-        return $_gzdecode($str);
+        return $_gzdecode ? $_gzdecode($str) : self::_gzdecode($str);
     }
 
     /**
