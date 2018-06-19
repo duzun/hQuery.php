@@ -21,7 +21,7 @@
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 1.7.3a
+ *  @version 1.7.4
  */
 // ------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  */
 abstract class hQuery_Node implements Iterator, Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '1.7.3';
+    const VERSION = '1.7.4';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -1160,6 +1160,7 @@ class hQuery_HTML_Parser extends hQuery_Node {
 
     public function __toString() { return $this->html; }
 
+    // ------------------------------------------------------------------------
     public static function get_url_base($url, $array=false) {
         if($ub = self::get_url_path($url)) {
             $up = $ub;
@@ -1183,19 +1184,95 @@ class hQuery_HTML_Parser extends hQuery_Node {
     }
 
     public function url2abs($url) {
-        if(isset($this->_prop['baseURL']) && !preg_match('|^([a-z]{1,20}:)?\/\/|', $url)) {
-            if($url[0] == '/') { // abs path
-                $bu = $this->_prop['hostURL'];
-                $url = substr($url, 1);
+        if( isset($this->_prop['baseURL']) ) {
+            return self::abs_url($url, $this->_prop['baseURL']);
+        }
+
+        // if(isset($this->_prop['baseURL']) && !preg_match('|^([a-z]{1,20}:)?\/\/|', $url)) {
+        //     if($url[0] == '/') { // abs path
+        //         $bu = $this->_prop['hostURL'];
+        //         $url = substr($url, 1);
+        //     }
+        //     else {
+        //         $bu = $this->_prop['baseURL'];
+        //     }
+        //     $url = $bu . $url;
+        // }
+        return $url;
+    }
+
+    // ------------------------------------------------------------------------
+    /**
+     * Check whether $path is a valid url.
+     *
+     * @param string $path - a path to check
+     *
+     * @return bool TRUE if $path is a valid URL, FALSE otherwise
+     */
+    public static function is_url_path($path) {
+        return preg_match('/^[a-zA-Z]+\:\/\//', $path);
+    }
+
+    /**
+     * Check whether $path is an absolute path.
+     *
+     * @param string $path - a path to check
+     *
+     * @return bool TRUE if $path is an absolute path, FALSE otherwise
+     */
+    public static function is_abs_path($path) {
+        $ds = array('\\'=>1,'/'=>2);
+        if( isset($ds[substr($path, 0, 1)]) ||
+            substr($path, 1, 1) == ':' && isset($ds[substr($path, 2, 1)])
+        ) {
+            return true;
+        }
+        if(($l=strpos($path, '://')) && $l < 32) return $l;
+        return false;
+    }
+
+    /**
+     * Given a $url (relative or absolute) and a $base url, returns absolute url for $url.
+     *
+     * @param string $url  - relative or absolute URL
+     * @param string $base - Base URL for $url
+     *
+     * @return string absolute URL for $url
+     *
+     */
+    public static function abs_url($url, $base) {
+        if (!self::is_url_path($url)) {
+            $t = is_array($base) ? $base : parse_url($base);
+            if (strncmp($url, '//', 2) == 0) {
+                if ( !empty($t['scheme']) ) {
+                    $url = $t['scheme'] . ':' . $url;
+                }
             }
             else {
-                $bu = $this->_prop['baseURL'];
+                $base = (empty($t['scheme']) ? '//' : $t['scheme'] . '://') .
+                        $t['host'] . (empty($t['port']) ? '' : ':' . $t['port']);
+                if (!empty($t['path'])) {
+                    $s = dirname($t['path'] . 'f');
+                    if (DIRECTORY_SEPARATOR != '/') {
+                        $s = strtr($s, DIRECTORY_SEPARATOR, '/');
+                    }
+                    if ($s && $s !== '.' && $s !== '/' && substr($url, 0, 1) !== '/') {
+                        $base .= '/' . ltrim($s, '/');
+                    }
+                }
+                $url = rtrim($base, '/') . '/' . ltrim($url, '/');
             }
-            $url = $bu . $url;
+        }
+        else {
+            $p = strpos($url, ':');
+            if (substr($url, $p + 3, 1) === '/' && in_array(substr($url, 0, $p), array('http', 'https'))) {
+                $url = substr($url, 0, $p + 3) . ltrim(substr($url, $p + 3), '/');
+            }
         }
         return $url;
     }
 
+    // ------------------------------------------------------------------------
     /* <meta charset="utf-8" /> */
     /* <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" /> */
     public static function detect_charset($str) {
@@ -2553,76 +2630,6 @@ class hQuery extends hQuery_HTML_Parser {
             fclose($f);
         }
         return $ret;
-    }
-    // ------------------------------------------------------------------------
-    /**
-     * Check whether $path is a valid url.
-     *
-     * @param string $path - a path to check
-     *
-     * @return bool TRUE if $path is a valid URL, FALSE otherwise
-     */
-    public static function is_url_path($path) {
-        return preg_match('/^[a-zA-Z]+\:\/\//', $path);
-    }
-
-    /**
-     * Check whether $path is an absolute path.
-     *
-     * @param string $path - a path to check
-     *
-     * @return bool TRUE if $path is an absolute path, FALSE otherwise
-     */
-    public static function is_abs_path($path) {
-        $ds = array('\\'=>1,'/'=>2);
-        if( isset($ds[substr($path, 0, 1)]) ||
-            substr($path, 1, 1) == ':' && isset($ds[substr($path, 2, 1)])
-        ) {
-            return true;
-        }
-        if(($l=strpos($path, '://')) && $l < 32) return $l;
-        return false;
-    }
-
-    /**
-     * Given a $url (relative or absolute) and a $base url, returns absolute url for $url.
-     *
-     * @param string $url  - relative or absolute URL
-     * @param string $base - Base URL for $url
-     *
-     * @return string absolute URL for $url
-     *
-     */
-    public static function abs_url($url, $base) {
-        if (!self::is_url_path($url)) {
-            $t = is_array($base) ? $base : parse_url($base);
-            if (strncmp($url, '//', 2) == 0) {
-                if ( !empty($t['scheme']) ) {
-                    $url = $t['scheme'] . ':' . $url;
-                }
-            }
-            else {
-                $base = (empty($t['scheme']) ? '//' : $t['scheme'] . '://') .
-                        $t['host'] . (empty($t['port']) ? '' : ':' . $t['port']);
-                if (!empty($t['path'])) {
-                    $s = dirname($t['path'] . 'f');
-                    if (DIRECTORY_SEPARATOR != '/') {
-                        $s = strtr($s, DIRECTORY_SEPARATOR, '/');
-                    }
-                    if ($s && $s !== '.' && $s !== '/' && substr($url, 0, 1) !== '/') {
-                        $base .= '/' . ltrim($s, '/');
-                    }
-                }
-                $url = rtrim($base, '/') . '/' . ltrim($url, '/');
-            }
-        }
-        else {
-            $p = strpos($url, ':');
-            if (substr($url, $p + 3, 1) === '/' && in_array(substr($url, 0, $p), array('http', 'https'))) {
-                $url = substr($url, 0, $p + 3) . ltrim(substr($url, $p + 3), '/');
-            }
-        }
-        return $url;
     }
 
     // ------------------------------------------------------------------------

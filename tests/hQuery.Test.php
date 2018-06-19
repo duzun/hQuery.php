@@ -37,7 +37,9 @@ class TestHQuery extends PHPUnit_BaseClass {
             '<head>'.
                 '<meta charset="ISO-8859-2" />'.
                 // '<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" />'
+                '<meta content="/logo.png" property="og:image" />'.
                 '<title>Sample HTML Doc</title>'.
+                '<link rel="shortcut icon" href="/favicon.ico" />'.
             '</head>'.
             '<body class="test-class">'.
                 '<div id="test-div" class="test-class test-div">'.
@@ -48,6 +50,8 @@ class TestHQuery extends PHPUnit_BaseClass {
                     ' between tags'.
                     '<span id="aSpan">Span text</span>'.
                 '</div>'.
+                '<a id="outterLink" href="//not-my-site.com/next.html">Not My Site</a>'.
+                '<img id="outterImg" src="https://cdn.duzun.me/images/logo.png" />'.
                 'Contents...'.
             '</body>'.
             '</html>'
@@ -150,7 +154,7 @@ class TestHQuery extends PHPUnit_BaseClass {
     public function test_hasClass() {
         $doc = self::$inst;
 
-        $a    = $doc->find('a');
+        $a    = $doc->find('a:first');
         $div  = $doc->find('div.test-div');
         $body = $doc->find('body');
         $all  = $doc->find('.test-class');
@@ -204,6 +208,34 @@ class TestHQuery extends PHPUnit_BaseClass {
         $this->assertEquals('other/img/here.jpg', $e->attr('src2'));
         $this->assertEquals('//example.com/full/path.gif', $e->attr('src3'));
 
+
+        // Relative vs Absolute URL paths
+
+        // a[href] relative URL
+        $a = self::$inst->find('a:first');
+        $this->assertEquals(self::$baseUrl . 'path', $a->href);
+
+        // a[href] absolute URL
+        $a = self::$inst->find('a#outterLink');
+        $this->assertEquals('https://not-my-site.com/next.html', $a->href);
+
+        // img[src] absolute URL
+        $a = self::$inst->find('img#outterImg');
+        $this->assertEquals('https://cdn.duzun.me/images/logo.png', $a->src);
+
+        // link[href] relative URL
+        $a = self::$inst->find('link', ['rel' => 'shortcut icon']);
+        $this->assertEquals(self::$baseUrl . 'favicon.ico', $a->href);
+
+        // meta[content] - not a URL
+        $m = self::$inst->find('meta', array('property' => 'og:image'));
+        $c = $m->attr('content');
+
+        $this->assertEquals('/logo.png', $c);
+
+        $c = self::$inst->url2abs($c);
+        $this->assertEquals(self::$baseUrl . 'logo.png', $c);
+
         return $doc;
     }
     // -----------------------------------------------------
@@ -246,15 +278,21 @@ class TestHQuery extends PHPUnit_BaseClass {
     }
 
     // -----------------------------------------------------
-    // public function test_extract_text_contents() {
-        // $div = self::$inst->find('#test-div');
-        // $div->exclude('*');
-        // $html = $div->html();
-        // $text = $div->text();
-        // $pos = $div->pos();
-        // $_pos = strpos(self::$inst->html(), $div->html());
-        // self::log(compact(/*'pos', '_pos', */'html', 'text'), self::$inst->html());
-    // }
+//     public function test_extract_text_contents() {
+//         $div = self::$inst->find('#test-div');
+//         $div->exclude('*');
+//         $html = $div->html();
+//         $text = $div->text();
+//         $pos = $div->pos();
+//         $_pos = strpos(self::$inst->html(), $div->html());
+//         self::log(compact(/*'pos', '_pos', */'html', 'text'), self::$inst->html());
+//         $this->assertEquals('This is some text'.
+//                     '<a href="/path">'.
+//                         'This is a link'.
+//                     '</a>'.
+//                     ' between tags'.
+//                     '<span id="aSpan">Span text</span>', $html);
+//     }
 
     // -----------------------------------------------------
     public function test_http_wr() {
