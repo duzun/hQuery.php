@@ -59,7 +59,7 @@ $doc = hQuery::fromFile('https://example.com/', false, $context);
 
 Where `$context` is created with [stream_context_create()](https://secure.php.net/manual/en/function.stream-context-create.php).
 
-Fon an example of using `$context` to make a HTTP request with proxy see [#26](https://github.com/duzun/hQuery.php/issues/26#issuecomment-351032382).
+For an example of using `$context` to make a HTTP request with proxy see [#26](https://github.com/duzun/hQuery.php/issues/26#issuecomment-351032382).
 
 
 ### Load HTML from a string
