@@ -15,7 +15,7 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
   - Doesn't require cURL to be installed
   - Automatically handles redirects (301, 302, 303)
   - Caches response for multiple processing tasks
-  - PHP 5+
+  - PHP 5.3+
   - No dependencies
 
 # Install
@@ -31,11 +31,11 @@ or using `npm install hquery.php`, `require_once 'node_modules/hquery.php/hquery
 
 ### Basic setup:
 ```php
+// Optionally use namespaces
+use duzun\hQuery;
+
 // Either use commposer, either include this file:
 include_once '/path/to/libs/hquery.php';
-
-// Optionally use namespaces (PHP >= 5.3.0 only)
-use duzun\hQuery;
 
 // Set the cache path - must be a writable folder
 // If not set, hQuery::fromURL() whould make a new request on each call
@@ -76,7 +76,7 @@ $doc->base_url = 'http://desired-host.net/path';
 ### Load a remote HTML document
 ###### [hQuery::fromUrl](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL)( string `$url`, array `$headers` = NULL, array|string `$body` = NULL, array `$options` = NULL )
 ```php
-use duzun\hQuery; // Optional (PHP 5.3+)
+use duzun\hQuery;
 
 // GET the document
 $doc = hQuery::fromUrl('http://example.com/someDoc.html', ['Accept' => 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8']);

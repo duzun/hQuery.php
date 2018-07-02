@@ -2,7 +2,7 @@
   "name": "duzun/hquery",
   "type": "library",
   "description": "An extremely fast web scraper that parses megabytes of HTML in a blink of an eye. No dependencies. PHP5+",
-  "version": "1.7.4",
+  "version": "2.0.0",
   "license": "MIT",
   "authors": [
     {
@@ -27,12 +27,12 @@
   "minimum-stability": "RC",
   "prefer-stable": true,
   "autoload": {
+    "psr-4": {
+      "duzun\\": "src/"
+    },
     "classmap": [
       "hquery.php"
-    ],
-    "psr-4": {
-      "duzun\\": "psr-4"
-    }
+    ]
   },
   "support": {
     "email": "contact@duzun.me",
@@ -52,7 +52,7 @@
     ]
   },
   "require": {
-    "php": ">=5.0.0"
+    "php": ">=5.3"
   },
   "require-dev": {
     "apigen/apigen": "~4.1",

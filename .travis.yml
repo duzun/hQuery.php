@@ -11,15 +11,11 @@ php:
 
 matrix:
     include:
-        - php: 5.2
-          dist: precise
         - php: 5.3
           dist: precise
     allow_failures:
         - php: nightly
         - php: hhvm
-        - php: 5.3
-        - php: 5.2
 
 dist: trusty
 
@@ -38,4 +34,4 @@ deploy:
     secure: UeTmKdjg0MEmy8iK0ZmlmNww+hytHQoEkh7uhssV2Pizq2sSEKki9m64v7xe35Kwk38TcbMvrZkwtim/ZnZt1JJ2LOw8Ogz88OVviqAfkHOe2VRH8SrP3NpRFGFWLZ0JmvKGkvCLiDkLHiz+vSegUXDPwyGdpS932lyxJ5U3ntE=
   on:
     tags: true
-    repo: duzun/hquery.php
+    repo: hquery.php

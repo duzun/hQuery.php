@@ -1,4 +1,5 @@
 <?php
+use duzun\hQuery;
 // -----------------------------------------------------
 /**
  *  @author Dumitru Uzun (DUzun.Me)
@@ -7,24 +8,19 @@
 // -----------------------------------------------------
 define('PHPUNIT_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 define('ROOT_DIR', strtr(dirname(PHPUNIT_DIR), '\\', '/').'/');
-define('PHP_IS_NEW', version_compare(PHP_VERSION, '5.3.0') >= 0);
+// define('PHP_IS_NEW', version_compare(PHP_VERSION, '5.3.0') >= 0);
 // -----------------------------------------------------
 if ( !class_exists('PHPUnit_Framework_TestCase') ) {
     class_alias('PHPUnit\Framework\TestCase', 'PHPUnit_Framework_TestCase');
 }
 
 // -----------------------------------------------------
-if ( PHP_IS_NEW ) {
-    function _hQuery_Test_autoloader($class) {
-        if ( strncmp($class, 'duzun\\', 6) == 0 ) {
-            $fn = realpath(ROOT_DIR .'psr-4' . strtr(substr($class, 5), '\\', DIRECTORY_SEPARATOR) . '.php');
-            return include_once $fn;
-        }
-        return false;
-    }
-    spl_autoload_register('_hQuery_Test_autoloader');
-}
-require_once ROOT_DIR . 'hquery.php';
+// if ( PHP_IS_NEW ) {
+    require_once ROOT_DIR . 'autoload.php';
+// }
+// else {
+//     require_once ROOT_DIR . 'hquery.php';
+// }
 // -----------------------------------------------------
 // -----------------------------------------------------
 /**
