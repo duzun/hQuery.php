@@ -68,6 +68,10 @@
     "preversion": "php vendor/bin/phpunit ./tests/",
     "apigen": "php vendor/bin/apigen generate -d ./docs --template-theme bootstrap -s ./hquery.php",
     "test": "php vendor/bin/phpunit ./tests/",
-    "test:watch": "node ./tools/test_watcher.js"
+    "test:watch": "node ./tools/test_watcher.js",
+    "test:5.3": "travis-local run --php=5.3",
+    "test:5.6": "travis-local run --php=5.6",
+    "test:7.0": "travis-local run --php=7.0",
+    "test:7.1": "travis-local run --php=7.1"
   }
 }

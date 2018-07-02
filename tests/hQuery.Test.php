@@ -224,7 +224,7 @@ class TestHQuery extends PHPUnit_BaseClass {
         $this->assertEquals('https://cdn.duzun.me/images/logo.png', $a->src);
 
         // link[href] relative URL
-        $a = self::$inst->find('link', ['rel' => 'shortcut icon']);
+        $a = self::$inst->find('link', array('rel' => 'shortcut icon'));
         $this->assertEquals(self::$baseUrl . 'favicon.ico', $a->href);
 
         // meta[content] - not a URL
