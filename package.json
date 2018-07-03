@@ -20,6 +20,8 @@
   ],
   "files": [
     "hquery.php",
+    "autoload.php",
+    "src/",
     "README.md",
     "composer.json",
     "LICENSE"
