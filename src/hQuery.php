@@ -16,7 +16,7 @@ class_exists('duzun\\hQuery\\HTML_Parser', false) or require_once __DIR__ . DIRE
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 2.0.0
+ *  @version 2.0.1
  */
 class hQuery extends hQuery\HTML_Parser {
 
@@ -438,6 +438,7 @@ class hQuery extends hQuery\HTML_Parser {
         $_gzdecode = false;
         return $_gzdecode;
     }
+
     /**
      * gzdecode() (for PHP < 5.4.0)
      */
@@ -452,125 +453,71 @@ class hQuery extends hQuery\HTML_Parser {
 
     /**
      * Alternative gzdecode() (for PHP < 5.4.0)
-     * source: http://nl1.php.net/manual/en/function.gzdecode.php#82879
+     * source: https://github.com/Polycademy/upgradephp/blob/master/upgrade.php
      */
-    protected static function _gzdecode($data) {
-        $len = strlen($data);
-        if ($len < 18 || strncmp($data,"\x1F\x8B", 2)) {
-            return null;  // Not GZIP format (See RFC 1952)
+    protected static function _gzdecode($gzdata, $maxlen=NULL) {
+        #-- decode header
+        $len = strlen($gzdata);
+        if ($len < 20) {
+            return;
         }
-        $method = ord(substr($data,2,1));  // Compression method
-        $flags  = ord(substr($data,3,1));  // Flags
-        if (($flags & 31) != $flags) {
-            // Reserved bits are set -- NOT ALLOWED by RFC 1952
-            return null;
+        $head = substr($gzdata, 0, 10);
+        $head = unpack("n1id/C1cm/C1flg/V1mtime/C1xfl/C1os", $head);
+        list($ID, $CM, $FLG, $MTIME, $XFL, $OS) = array_values($head);
+        $FTEXT = 1<<0;
+        $FHCRC = 1<<1;
+        $FEXTRA = 1<<2;
+        $FNAME = 1<<3;
+        $FCOMMENT = 1<<4;
+        $head = unpack("V1crc/V1isize", substr($gzdata, $len-8, 8));
+        list($CRC32, $ISIZE) = array_values($head);
+
+        #-- check gzip stream identifier
+        if ($ID != 0x1f8b) {
+            trigger_error("gzdecode: not in gzip format", E_USER_WARNING);
+            return;
         }
-        // NOTE: $mtime may be negative (PHP integer limitations)
-        $mtime = unpack("V", substr($data,4,4)) and
-        $mtime = $mtime[1];
-        $xfl   = substr($data,8,1);
-        $os    = substr($data,8,1);
-        $headerlen = 10;
-        $extralen  = 0;
-        $extra     = "";
-        if ($flags & 4) {
-            // 2-byte length prefixed EXTRA data in header
-            if ($len - $headerlen - 2 < 8) {
-                return false;    // Invalid format
-            }
-            $extralen = unpack("v",substr($data,8,2));
-            $extralen = $extralen[1];
-            if ($len - $headerlen - 2 - $extralen < 8) {
-                return false;    // Invalid format
-            }
-            $extra = substr($data,10,$extralen);
-            $headerlen += 2 + $extralen;
+        #-- check for deflate algorithm
+        if ($CM != 8) {
+            trigger_error("gzdecode: cannot decode anything but deflated streams", E_USER_WARNING);
+            return;
+        }
+        #-- start of data, skip bonus fields
+        $s = 10;
+        if ($FLG & $FEXTRA) {
+            $s += $XFL;
+        }
+        if ($FLG & $FNAME) {
+            $s = strpos($gzdata, "\000", $s) + 1;
+        }
+        if ($FLG & $FCOMMENT) {
+            $s = strpos($gzdata, "\000", $s) + 1;
+        }
+        if ($FLG & $FHCRC) {
+            $s += 2;  // cannot check
         }
 
-        $filenamelen = 0;
-        $filename = "";
-        if ($flags & 8) {
-            // C-style string file NAME data in header
-            if ($len - $headerlen - 1 < 8) {
-                return false;    // Invalid format
-            }
-            $filenamelen = strpos(substr($data,8+$extralen),chr(0));
-            if ($filenamelen === false || $len - $headerlen - $filenamelen - 1 < 8) {
-                return false;    // Invalid format
-            }
-            $filename = substr($data,$headerlen,$filenamelen);
-            $headerlen += $filenamelen + 1;
-        }
-
-        $commentlen = 0;
-        $comment = "";
-        if ($flags & 16) {
-            // C-style string COMMENT data in header
-            if ($len - $headerlen - 1 < 8) {
-                return false;    // Invalid format
-            }
-            $commentlen = strpos(substr($data,8+$extralen+$filenamelen),chr(0));
-            if ($commentlen === false || $len - $headerlen - $commentlen - 1 < 8) {
-                return false;    // Invalid header format
-            }
-            $comment = substr($data,$headerlen,$commentlen);
-            $headerlen += $commentlen + 1;
-        }
-
-        $headercrc = '';
-        if ($flags & 1) {
-            // 2-bytes (lowest order) of CRC32 on header present
-            if ($len - $headerlen - 2 < 8) {
-                return false;    // Invalid format
-            }
-            $calccrc = crc32(substr($data,0,$headerlen)) & 0xffff;
-            $headercrc = unpack('v', substr($data,$headerlen,2));
-            $headercrc = $headercrc[1];
-            if ($headercrc != $calccrc) {
-                return false;    // Bad header CRC
-            }
-            $headerlen += 2;
-        }
-
-        // GZIP FOOTER - These be negative due to PHP's limitations
-        $datacrc = unpack('V',substr($data,-8,4)) and
-        $datacrc = $datacrc[1];
-        $isize = unpack('V',substr($data,-4)) and
-        $isize = $isize[1];
-
-        // Perform the decompression:
-        $bodylen = $len-$headerlen-8;
-        if ($bodylen < 1) {
-            // This should never happen - IMPLEMENTATION BUG!
-            return null;
-        }
-        $body = substr($data,$headerlen,$bodylen);
-        $data = "";
-        if ($bodylen > 0) {
-            switch ($method) {
-            case 8:
-                // Currently the only supported compression method:
-                $data = gzinflate($body);
-                break;
-            default:
-                // Unknown compression method
-                return false;
-            }
+        #-- get data, uncompress
+        $gzdata = substr($gzdata, $s, $len-$s);
+        if ($maxlen) {
+            $gzdata = gzinflate($gzdata, $maxlen);
+            return($gzdata);  // no checks(?!)
         }
         else {
-            // I'm not sure if zero-byte body content is allowed.
-            // Allow it for now...  Do nothing...
+            $gzdata = gzinflate($gzdata);
         }
 
-        // Verifiy decompressed size and CRC32:
-        // NOTE: This may fail with large data sizes depending on how
-        //       PHP's integer limitations affect strlen() since $isize
-        //       may be negative for large sizes.
-        if ($isize != strlen($data) || crc32($data) != $datacrc) {
-            // Bad format!  Length or CRC doesn't match!
-            return false;
+        #-- check+fin
+        $chk = crc32($gzdata);
+        if ($CRC32 != $chk) {
+            trigger_error("gzdecode: checksum failed (real$chk != comp$CRC32)", E_USER_WARNING);
         }
-        return $data;
+        elseif ($ISIZE != strlen($gzdata)) {
+            trigger_error("gzdecode: stream size mismatch", E_USER_WARNING);
+        }
+        else {
+            return($gzdata);
+        }
     }
 
     /**
