@@ -1,0 +1,45 @@
+\subsubsection*{Code style}
+
+Regarding code style like indentation and whitespace, {\bfseries follow the conventions you see used in the source already.}
+
+\subsection*{Modifying the code}
+
+First, ensure that you have \href{http://nodejs.org/}{\tt Node.\+js} and \href{http://npmjs.org/}{\tt npm} installed. You also need P\+HP 5 with php.\+exe in the \$\+P\+A\+TH.
+
+
+\begin{DoxyEnumerate}
+\item Fork and clone the repo.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Run {\ttfamily npm install} to install all dependencies.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Run {\ttfamily npm run test-\/dev} to run unit tests automatically when you change a file.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Run {\ttfamily npm run apigen} to generate documentation.
+\end{DoxyEnumerate}
+
+Assuming that you don\textquotesingle{}t see any red, you\textquotesingle{}re ready to go. Just be sure to run {\ttfamily npm run test} after making any changes, to ensure that nothing is broken.
+
+\subsection*{Submitting pull requests}
+
+
+\begin{DoxyEnumerate}
+\item Create a new branch, please don\textquotesingle{}t work in your {\ttfamily master} branch directly.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Add failing tests for the change you want to make while {\ttfamily npm run test-\/dev} is running.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Fix stuff.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item See if the tests pass. Repeat steps 2-\/4 until done.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Update the documentation to reflect any changes.
+\end{DoxyEnumerate}
+\begin{DoxyEnumerate}
+\item Push to your fork and submit a pull request. 
+\end{DoxyEnumerate}
