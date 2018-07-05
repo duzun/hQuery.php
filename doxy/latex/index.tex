@@ -1,0 +1,185 @@
+An extremely fast and efficient web scraper that parses megabytes of H\+T\+ML in a blink of an eye.
+
+\href{https://duzun.github.io/hQuery.php/docs/class-hQuery.html}{\tt A\+PI Documentation}
+
+\section*{Features}
+
+
+\begin{DoxyItemize}
+\item Very fast parsing and lookup
+\item Parses broken H\+T\+ML
+\item j\+Query-\/like style of D\+OM traversal
+\item Low memory usage
+\item Can handle big H\+T\+ML documents (I have tested up to 20\+Mb, but the limit is the amount of R\+AM you have)
+\item Doesn\textquotesingle{}t require c\+U\+RL to be installed
+\item Automatically handles redirects (301, 302, 303)
+\item Caches response for multiple processing tasks
+\item P\+HP 5.\+3+
+\item No dependencies
+\end{DoxyItemize}
+
+\section*{Install}
+
+Just `include\+\_\+once \textquotesingle{}\mbox{\hyperlink{hquery_8php_source}{hquery.\+php}}';{\ttfamily in your project and start using}h\+Query\`{}.
+
+Alternatively {\ttfamily composer require duzun/hquery}
+
+or using {\ttfamily npm install \mbox{\hyperlink{hquery_8php_source}{hquery.\+php}}}, `require\+\_\+once \textquotesingle{}node\+\_\+modules/hquery.\+php/hquery.php';\`{}.
+
+\section*{Usage}
+
+\#\#\# Basic setup\+: 
+\begin{DoxyCode}
+\textcolor{comment}{// Optionally use namespaces}
+use \mbox{\hyperlink{namespaceduzun_1_1hQuery}{duzun\(\backslash\)hQuery}};
+
+\textcolor{comment}{// Either use commposer, either include this file:}
+include\_once \textcolor{stringliteral}{'/path/to/libs/hquery.php'};
+
+\textcolor{comment}{// Set the cache path - must be a writable folder}
+\textcolor{comment}{// If not set, hQuery::fromURL() whould make a new request on each call}
+hQuery::$cache\_path = \textcolor{stringliteral}{"/path/to/cache"};
+
+\textcolor{comment}{// Time to keed request data in cache, seconds}
+\textcolor{comment}{// A value of 0 disables cahce}
+hQuery::$cache\_expires = 3600; \textcolor{comment}{// default one hour}
+\end{DoxyCode}
+
+
+\subsubsection*{Load H\+T\+ML from a file}
+
+\subparagraph*{\href{https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromFile}{\tt h\+Query\+::from\+File}( string {\ttfamily \$filename}, boolean {\ttfamily \$use\+\_\+include\+\_\+path} = false, resource {\ttfamily \$context} = N\+U\+LL )}
+
+
+\begin{DoxyCode}
+\textcolor{comment}{// Local}
+$doc = hQuery::fromFile(\textcolor{stringliteral}{'/path/to/filesystem/doc.html'});
+
+\textcolor{comment}{// Remote}
+$doc = hQuery::fromFile(\textcolor{stringliteral}{'https://example.com/'}, \textcolor{keyword}{false}, $context);
+\end{DoxyCode}
+
+
+Where {\ttfamily \$context} is created with \href{https://secure.php.net/manual/en/function.stream-context-create.php}{\tt stream\+\_\+context\+\_\+create()}.
+
+For an example of using {\ttfamily \$context} to make a H\+T\+TP request with proxy see \href{https://github.com/duzun/hQuery.php/issues/26#issuecomment-351032382}{\tt \#26}.
+
+\subsubsection*{Load H\+T\+ML from a string}
+
+\subparagraph*{\href{https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromHTML}{\tt h\+Query\+::from\+H\+T\+ML}( string {\ttfamily \$html}, string {\ttfamily \$url} = N\+U\+LL )}
+
+
+\begin{DoxyCode}
+$doc = hQuery::fromHTML(\textcolor{stringliteral}{'<html><head><title>Sample HTML Doc</title><body>Contents...</body></html>'});
+
+\textcolor{comment}{// Set base\_url, in case the document is loaded from local source.}
+\textcolor{comment}{// Note: The base\_url is used to retrive absolute URLs from relative ones}
+$doc->base\_url = \textcolor{stringliteral}{'http://desired-host.net/path'};
+\end{DoxyCode}
+
+
+\subsubsection*{Load a remote H\+T\+ML document}
+
+\#\#\#\#\#\# \href{https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL}{\tt h\+Query\+::from\+Url}( string {\ttfamily \$url}, array {\ttfamily \$headers} = N\+U\+LL, array$\vert$string {\ttfamily \$body} = N\+U\+LL, array {\ttfamily \$options} = N\+U\+LL ) 
+\begin{DoxyCode}
+use \mbox{\hyperlink{namespaceduzun_1_1hQuery}{duzun\(\backslash\)hQuery}};
+
+\textcolor{comment}{// GET the document}
+$doc = hQuery::fromUrl(\textcolor{stringliteral}{'http://example.com/someDoc.html'}, [\textcolor{stringliteral}{'Accept'} => \textcolor{stringliteral}{'
+      text/html,application/xhtml+xml;q=0.9,*/*;q=0.8'}]);
+
+var\_dump($doc->headers); \textcolor{comment}{// See response headers}
+var\_dump(hQuery::$last\_http\_result); \textcolor{comment}{// See response details of last request}
+
+\textcolor{comment}{// with POST}
+$doc = hQuery::fromUrl(
+    \textcolor{stringliteral}{'http://example.com/someDoc.html'}, \textcolor{comment}{// url}
+    [\textcolor{stringliteral}{'Accept'} => \textcolor{stringliteral}{'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8'}], \textcolor{comment}{// headers}
+    [\textcolor{stringliteral}{'username'} => \textcolor{stringliteral}{'Me'}, \textcolor{stringliteral}{'fullname'} => \textcolor{stringliteral}{'Just Me'}], \textcolor{comment}{// request body - could be a string as well}
+    [\textcolor{stringliteral}{'method'} => \textcolor{stringliteral}{'POST'}, \textcolor{stringliteral}{'timeout'} => 7, \textcolor{stringliteral}{'redirect'} => 7, \textcolor{stringliteral}{'decode'} => \textcolor{stringliteral}{'gzip'}] \textcolor{comment}{// options}
+);
+\end{DoxyCode}
+
+
+For building advanced requests (P\+O\+ST, parameters etc) see \href{https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_http_wr}{\tt h\+Query\+::http\+\_\+wr()}, though I recomend using a specialized library for making requests and {\ttfamily h\+Query\+::from\+H\+T\+ML(\$html, \$url=N\+U\+LL)} for processing results. See \href{http://docs.guzzlephp.org/en/stable/}{\tt Guzzle} for eg.
+
+Another option is to use \href{https://secure.php.net/manual/en/function.stream-context-create.php}{\tt stream\+\_\+context\+\_\+create()} to create a {\ttfamily \$context}, then call {\ttfamily h\+Query\+::from\+File(\$url, false, \$context)}.
+
+\subsubsection*{Processing the results}
+
+\#\#\#\#\#\# \href{https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_find}{\tt h\+Query\+::find}( string {\ttfamily \$sel}, array$\vert$string {\ttfamily \$attr} = N\+U\+LL, h\+Query\+\_\+\+Node {\ttfamily \$ctx} = N\+U\+LL ) 
+\begin{DoxyCode}
+\textcolor{comment}{// Find all banners (images inside anchors)}
+$banners = $doc->find(\textcolor{stringliteral}{'a > img:parent'});
+
+\textcolor{comment}{// Extract links and images}
+$links  = array();
+$images = array();
+$titles = array();
+
+\textcolor{comment}{// If the result of find() is not empty}
+\textcolor{comment}{// $banners is a collection of elements (hQuery\_Element)}
+\textcolor{keywordflow}{if} ( $banners ) \{
+
+    \textcolor{comment}{// Iterate over the result}
+    \textcolor{keywordflow}{foreach}($banners as $pos => $a) \{
+        $links[$pos] = $a->attr(\textcolor{stringliteral}{'href'}); \textcolor{comment}{// get absolute URL from href property}
+        $titles[$pos] = trim($a->text()); \textcolor{comment}{// strip all HTML tags and leave just text}
+
+        \textcolor{comment}{// Filter the result}
+        \textcolor{keywordflow}{if} ( !$a->hasClass(\textcolor{stringliteral}{'logo'}) ) \{
+            $img = $a->find(\textcolor{stringliteral}{'img'})[0]; \textcolor{comment}{// ArrayAccess}
+            \textcolor{keywordflow}{if} ( $img ) $images[$pos] = $img->src; \textcolor{comment}{// short for $img->attr('src')}
+        \}
+    \}
+
+    \textcolor{comment}{// If at least one element has the class .home}
+    \textcolor{keywordflow}{if} ( $banners->hasClass(\textcolor{stringliteral}{'home'}) ) \{
+        echo \textcolor{stringliteral}{'There is .home button!'}, PHP\_EOL;
+
+        \textcolor{comment}{// ArrayAccess for elements and properties.}
+        \textcolor{keywordflow}{if} ( $banners[0][\textcolor{stringliteral}{'href'}] == \textcolor{charliteral}{'/'} ) \{
+            echo \textcolor{stringliteral}{'And it is the first one!'};
+        \}
+    \}
+\}
+
+\textcolor{comment}{// Read charset of the original document (internally it is converted to UTF-8)}
+$charset = $doc->charset;
+
+\textcolor{comment}{// Get the size of the document ( strlen($html) )}
+$size = $doc->size;
+\end{DoxyCode}
+
+
+\section*{Live Demo}
+
+On \href{https://duzun.me/playground/hquery#sel=%20a%20%3E%20img%3Aparent&url=https%3A%2F%2Fgithub.com%2Fduzun}{\tt D\+Uzun.\+Me}
+
+A lot of people ask for sources of my {\bfseries Live Demo} page. Here we go\+:
+
+\href{https://github.com/duzun/hQuery.php/blob/master/examples/duzun.me_playground_hquery.php}{\tt view-\/source\+:https\+://duzun.\+me/playground/hquery}
+
+\#\+T\+O\+DO
+
+
+\begin{DoxyItemize}
+\item Unit tests everything
+\item Document everything
+\item $\sim$$\sim$\+Cookie support$\sim$$\sim$ (implemented in mem for redirects)
+\item Use \href{http://httplug.io/}{\tt H\+T\+T\+Plug} internally
+\item Add more selectors
+\item Improve selectors to be able to select by attributes
+\end{DoxyItemize}
+
+\section*{💖 Support my projects}
+
+I love Open Source. Whenever possible I share cool things with the world (check out \href{https://duzun.me/npm}{\tt N\+PM} and \href{https://github.com/duzun/}{\tt Git\+Hub}).
+
+If you like what I\textquotesingle{}m doing and want to encorage me, please consider to\+:
+
+
+\begin{DoxyItemize}
+\item Star and Share the projects you like (and use)
+\item Send me some {\bfseries Bitcoin} at this addres\+: {\ttfamily bitcoin\+:3\+M\+Va\+N\+Qocuy\+R\+Uz\+U\+Ns\+Tbmz\+Q\+C8r\+P\+U\+Q\+M\+C9qafa} (or using the QR below)  
+\end{DoxyItemize}
