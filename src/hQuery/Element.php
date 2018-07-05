@@ -160,6 +160,7 @@ class Element extends Node implements \ArrayAccess {
      */
     public function hasClass($className) {
         $ret = $this->doc()->hasClass($this, $className);
+        if ( !is_array($ret) ) return $ret;
         if ( count($this) < 2 ) return reset($ret);
 
         return max($ret);
@@ -214,8 +215,8 @@ class Element extends Node implements \ArrayAccess {
      */
     public function slice($idx, $len=NULL) {
         $c = $this->count();
-        if($idx < $c) $p += $c;
-        if($idx < $c) $ids = array(); else
+        if($idx < $c) $ids = array();
+        else
         if(isset($len)) {
             if($idx == 0 && $len == $c) {
                 return $this; // ???

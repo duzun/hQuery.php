@@ -1,7 +1,7 @@
 {
   "name": "hquery.php",
   "description": "An extremely fast web scraper that parses megabytes of HTML in a blink of an eye. No dependencies. PHP5+",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": {
     "name": "Dumitru Uzun",
     "email": "contact@duzun.me",

@@ -49,7 +49,7 @@ class TestHQuery extends PHPUnit_BaseClass {
                         'This is a link'.
                     '</a>'.
                     ' between tags'.
-                    '<span id="aSpan">Span text</span>'.
+                    '<span id="aSpan" class="span">Span text</span>'.
                 '</div>'.
                 '<a id="outterLink" href="//not-my-site.com/next.html">Not My Site</a>'.
                 '<img id="outterImg" src="https://cdn.duzun.me/images/logo.png" />'.
@@ -157,13 +157,27 @@ class TestHQuery extends PHPUnit_BaseClass {
         $a    = $doc->find('a:first');
         $div  = $doc->find('div.test-div');
         $body = $doc->find('body');
+        $head = $doc->find('head');
         $all  = $doc->find('.test-class');
+        $empty = $head->slice(0, 0);
+
+        $this->assertNotEmpty($div->hasClass('test-class'), 'div.test-div should have .test-class class');
+        $this->assertNotEmpty($div->hasClass(array('test-class', 'test-div')), 'div.test-div should have .test-div and .test-class class');
+        $this->assertEmpty($div->hasClass(array('test-class', 'test-div', 'span')), 'div.test-div shouldn\'t have .no-class class');
+        $this->assertNotEmpty($all->hasClass('test-class test-div'), 'At least one div should have .test-div and .test-class classes');
 
         $this->assertEmpty($a->hasClass('test-class'), 'a should have no class');
-        $this->assertEmpty($body->hasClass('test-div'), 'a should have no class');
-        $this->assertNotEmpty($div->hasClass('test-class'), 'div.test-div should have .test-div class');
-        $this->assertNotEmpty($all->hasClass('test-class test-div'), 'At least one div should have .test-div and .test-class classes');
+        $this->assertEmpty($body->hasClass('test-div'), 'body should not have "test-dev" class');
         $this->assertEmpty($body->hasClass('test-class test-div'), 'body doesn\'t have both classes .test-div and .test-class');
+
+        // Some edge cases
+        $this->assertEmpty($a->hasClass('non-existent-class'), 'non existent classes should not throw');
+        $this->assertEmpty($head->hasClass('non-existent-class'), 'non existent classes should not throw even on elements with non attributes at all');
+        $this->assertEmpty($div->hasClass(array('non-existent-class', 'span')), 'non existent classes should not throw even when in combination with existing classes');
+        $this->assertEmpty($a->hasClass(''), 'empty class doesn\'t exist');
+        $this->assertEmpty($a->hasClass(array()), 'empty class doesn\'t exist');
+        $this->assertEmpty($empty->hasClass('test-class'), 'empty collection should not have any class');
+        $this->assertEmpty($empty->hasClass('non-existent-class'), 'non existent classes should not throw even on empty collections');
 
         // More speciffic
         $this->assertEquals(0, $a->hasClass('test-class'), 'a should have no class');
@@ -295,12 +309,12 @@ class TestHQuery extends PHPUnit_BaseClass {
 //     }
 
     // -----------------------------------------------------
-    public function test_http_wr() {
+    // public function test_http_wr() {
         // @TODO
         // $doc = TestHQueryTests::fromURL('http://www.nameit.com', NULL, NULL, ['redirects' => 10, 'use_cookies' => true]);
         // self::log(gettype($doc));
         // self::log(TestHQueryTests::$last_http_result);
-    }
+    // }
 
     // -----------------------------------------------------
     // -----------------------------------------------------
