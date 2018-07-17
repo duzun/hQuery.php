@@ -51,3 +51,7 @@ class Context extends Node {
         return new self($el, $this->doc);
     }
 }
+
+// ------------------------------------------------------------------------
+// PSR-0 alias
+class_exists('hQuery_Context', false) or class_alias('duzun\\hQuery\\Context', 'hQuery_Context', false);

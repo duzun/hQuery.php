@@ -277,3 +277,7 @@ class Element extends Node implements \ArrayAccess {
     }
 
 }
+
+// ------------------------------------------------------------------------
+// PSR-0 alias
+class_exists('hQuery_Element', false) or class_alias('duzun\\hQuery\\Element', 'hQuery_Element', false);

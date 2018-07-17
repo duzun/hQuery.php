@@ -8,7 +8,7 @@ class_exists('duzun\\hQuery\\HTML_Parser', false) or require_once __DIR__ . DIRE
  *  Main Class, represents an HTML document.
  *
  *  An extremely fast web scraper that parses megabytes of HTML in a blink of an eye.
- *  PHP5+, no dependencies.
+ *  PHP5.3+, no dependencies.
  *
  *  API Documentation at https://duzun.github.io/hQuery.php
  *
@@ -16,7 +16,7 @@ class_exists('duzun\\hQuery\\HTML_Parser', false) or require_once __DIR__ . DIRE
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 2.0.2
+ *  @version 2.0.3
  */
 class hQuery extends hQuery\HTML_Parser {
 
@@ -1056,3 +1056,7 @@ class hQuery extends hQuery\HTML_Parser {
     // ------------------------------------------------------------------------
 
 }
+
+// ------------------------------------------------------------------------
+// PSR-0 alias
+class_exists('hQuery', false) or class_alias('duzun\\hQuery', 'hQuery', false);

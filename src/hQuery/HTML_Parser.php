@@ -1,5 +1,6 @@
 <?php
 namespace duzun\hQuery;
+
 // ------------------------------------------------------------------------
 class_exists('duzun\\hQuery\\Node', false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'Node.php';
 
@@ -916,3 +917,7 @@ class HTML_Parser extends Node {
       return $ret;
    }
 }
+
+// ------------------------------------------------------------------------
+// PSR-0 alias
+class_exists('hQuery_HTML_Parser', false) or class_alias('duzun\\hQuery\\HTML_Parser', 'hQuery_HTML_Parser', false);

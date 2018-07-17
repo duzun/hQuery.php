@@ -11,7 +11,7 @@ namespace duzun\hQuery;
  */
 abstract class Node implements \Iterator, \Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '2.0.2';
+    const VERSION = '2.0.3';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -951,3 +951,7 @@ abstract class Node implements \Iterator, \Countable {
     }
     // ------------------------------------------------------------------------
 }
+
+// ------------------------------------------------------------------------
+// PSR-0 alias
+class_exists('hQuery_Node', false) or class_alias('duzun\\hQuery\\Node', 'hQuery_Node', false);
