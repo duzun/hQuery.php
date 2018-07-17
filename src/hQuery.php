@@ -16,7 +16,7 @@ class_exists('duzun\\hQuery\\HTML_Parser', false) or require_once __DIR__ . DIRE
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 2.0.3
+ *  @version 2.1.0
  */
 class hQuery extends hQuery\HTML_Parser {
 

@@ -11,18 +11,20 @@ namespace duzun\hQuery;
  */
 abstract class Node implements \Iterator, \Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '2.0.3';
+    const VERSION = '2.1.0';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
     // ------------------------------------------------------------------------
     public static $selected_doc = NULL;
+
     // ------------------------------------------------------------------------
     protected $_prop = array(); // Properties
     protected $doc; // Parent doc
     protected $ids; // contained elements' IDs
     protected $exc; // excluded elements' IDs
 
+    protected static $_mb_encodings;
     // ------------------------------------------------------------------------
     public $tag_map; // map tag names (eg ['b' => 'strong', 'i' => 'em'])
 
@@ -923,17 +925,37 @@ abstract class Node implements \Iterator, \Countable {
         }
         return $ret;
     }
+
     // ------------------------------------------------------------------------
-    static function convert_encoding($a, $to, $from=NULL) {
+    static function is_mb_charset_supported($charset) {
+        if ( !isset(self::$_mb_encodings) ) {
+            if ( !function_exists('mb_list_encodings') ) return false;
+            self::$_mb_encodings = array_change_key_case(
+                array_flip(mb_list_encodings()),
+                CASE_UPPER
+            );
+        }
+        return isset(self::$_mb_encodings[strtoupper($charset)]);
+    }
+
+    // ------------------------------------------------------------------------
+    static function convert_encoding($a, $to, $from=NULL, $use_mb=NULL) {
         static $meth = NULL;
         isset($meth) or $meth = function_exists('mb_convert_encoding');
-        isset($from) or $from = $meth ? mb_internal_encoding() : iconv_get_encoding('internal_encoding');
+
+        if ( !isset($use_mb) ) {
+            $use_mb = $meth && self::is_mb_charset_supported($to) && (!isset($from) || self::is_mb_charset_supported($from));
+        }
+        elseif( $use_mb && !$meth ) {
+            $use_mb = false;
+        }
+        isset($from) or $from = $use_mb ? mb_internal_encoding() : iconv_get_encoding('internal_encoding');
 
         if(is_array($a)) {
             $ret = array();
             foreach($a as $n => $v) {
-                $ret[is_string($n)?self::convert_encoding($n,$to,$from):$n] = is_string($v) || is_array($v) || $v instanceof stdClass
-                    ? self::convert_encoding($v, $to, $from)
+                $ret[is_string($n)?self::convert_encoding($n,$to,$from,$use_mb):$n] = is_string($v) || is_array($v) || $v instanceof stdClass
+                    ? self::convert_encoding($v, $to, $from, $use_mb)
                     : $v;
             }
             return $ret;
@@ -941,13 +963,13 @@ abstract class Node implements \Iterator, \Countable {
         elseif($a instanceof stdClass) {
             $ret = (object)array();
             foreach($a as $n => $v) {
-                $ret->{is_string($n)?self::convert_encoding($n,$to,$from):$n} = is_string($v) || is_array($v) || $v instanceof stdClass
-                    ? self::convert_encoding($v, $to, $from)
+                $ret->{is_string($n)?self::convert_encoding($n,$to,$from, $use_mb):$n} = is_string($v) || is_array($v) || $v instanceof stdClass
+                    ? self::convert_encoding($v, $to, $from, $use_mb)
                     : $v;
             }
             return $ret;
         }
-        return is_string($a) ? $meth ? mb_convert_encoding($a, $to, $from) : iconv($from, $to, $a) : $a;
+        return is_string($a) ? $use_mb ? mb_convert_encoding($a, $to, $from) : iconv($from, $to, $a) : $a;
     }
     // ------------------------------------------------------------------------
 }
