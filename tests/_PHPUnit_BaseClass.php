@@ -17,6 +17,7 @@ if ( !class_exists('PHPUnit_Framework_TestCase') ) {
 // -----------------------------------------------------
 // if ( PHP_IS_NEW ) {
     require_once ROOT_DIR . 'autoload.php';
+    require_once ROOT_DIR . 'vendor/autoload.php';
 // }
 // else {
 //     require_once ROOT_DIR . 'hquery.php';
