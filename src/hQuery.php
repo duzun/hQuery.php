@@ -1,6 +1,13 @@
 <?php
 namespace duzun;
 // ------------------------------------------------------------------------
+use Psr\Http\Message\MessageInterface;
+use Psr\Http\Message\RequestInterface;
+// use Psr\Http\Message\ResponseInterface;
+
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\MessageFactoryDiscovery;
+// ------------------------------------------------------------------------
 class_exists('duzun\\hQuery\\HTML_Parser', false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'HTML_Parser.php';
 
 // ------------------------------------------------------------------------
@@ -16,7 +23,7 @@ class_exists('duzun\\hQuery\\HTML_Parser', false) or require_once __DIR__ . DIRE
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 2.1.0
+ *  @version 2.2.0
  */
 class hQuery extends hQuery\HTML_Parser {
 
@@ -24,21 +31,40 @@ class hQuery extends hQuery\HTML_Parser {
     // Response headers when using self::fromURL()
     public $headers;
 
+    /**
+     * Optional cache path to store HTTP responses (see fromURL())
+     * @var string
+     */
     public static $cache_path;
+
+    /**
+     * Cache expires in seconds. Only if $cache_path is set.
+     * @var integer
+     */
     public static $cache_expires = 3600;
 
     // ------------------------------------------------------------------------
     public static $_mockup_class; // Used internally for teting
+
     // ------------------------------------------------------------------------
     /**
-     *  Parse and HTML string.
+     *  Parse an HTML string.
      *
-     *  @param string $html - source of some HTML document
+     *  @param string|Psr\Http\Message\MessageInterface $html - source of some HTML document
      *  @param string $url  - OPTIONAL location of the document. Used for relative URLs inside the document.
      *
      *  @return hQuery $doc
      */
     public static function fromHTML($html, $url=NULL) {
+        if ( $html instanceof MessageInterface ) {
+            $message = $html;
+            $html = $message->getBody() . '';
+
+            if ( !isset($url) && $message instanceof RequestInterface ) {
+                $url = $message->getUri() . '';
+            }
+        }
+
         $index_time = microtime(true);
         if ( isset(self::$_mockup_class) ) {
             $doc = new self::$_mockup_class($html, false);
@@ -48,6 +74,15 @@ class hQuery extends hQuery\HTML_Parser {
         }
         if($url) {
             $doc->location($url);
+        }
+        if ( !empty($message) ) {
+            $doc->message = $message;
+            $doc->headers = $message->getHeaders();
+            $doc->source_type = 'message';
+
+            if ( !empty(self::$last_http_result) && self::$last_http_result->response === $message ) {
+                self::$last_http_result->body = $html;
+            }
         }
         $doc->index();
         $index_time = microtime(true) - $index_time;
@@ -83,7 +118,7 @@ class hQuery extends hQuery\HTML_Parser {
      *  @param array|string  $body    - OPTIONAL body of the request (for POST or PUT)
      *  @param array         $options - OPTIONAL request options (see self::http_wr() for more details)
      *
-     *  @return hQuery $doc
+     *  @return hQuery $doc for 200 response code, FALSE otherwise
      */
     public static function fromURL($url, $headers=NULL, $body=NULL, $options=NULL) {
         $opt = array(
@@ -162,8 +197,68 @@ class hQuery extends hQuery\HTML_Parser {
         if($doc) {
             $doc->headers = $hdrs;
             $doc->source_type = $source_type;
-            isset($read_time) and $doc->read_time = $read_time * 1000;
+            isset($read_time) and $doc->read_time = $read_time * 1e3;
             if(!empty($cch_meta)) $doc->cch_meta = $cch_meta;
+        }
+
+        return $doc;
+    }
+
+    /**
+     * Send a HTTP request and create a hQuery document from the response (PSR-7).
+     *
+     * @param  Psr\Http\Message\RequestInterface $request
+     * @param  Http\Client\HttpClient $client An optional HTTP client. If missing, HttpClientDiscovery is used to create one.
+     * @return hQuery $doc
+     */
+    public static function sendRequest(RequestInterface $request, $client=NULL) {
+        // if ( !class_exists('Http\Discovery\HttpClientDiscovery') ) {
+        //     throw new Exception('Http\Discovery\HttpClientDiscovery not found. Install a client (eg. `require php-http/curl-client`)');
+        // }
+        if ( !isset($client) ) {
+            $client = self::$http_client;
+        }
+        static $httpClient;
+        if ( !isset($client) ) {
+            if ( !isset($httpClient) ) {
+                $httpClient = HttpClientDiscovery::find();
+            }
+            $client = $httpClient;
+        }
+
+        $read_time = microtime(true);
+        $response = $client->sendRequest($request);
+        $read_time = microtime(true) - $read_time;
+
+        $source_type = 'request';
+
+        $code = $response->getStatusCode();
+        $url  = $request->getUri().'';
+
+        self::$last_http_result = (object)array(
+            'body'    => '', // to be set in fromHTML() - this avoids double call to __toString() on body
+            'code'    => $code,
+            'url'     => $url,
+            'headers' => $response->getHeaders(),
+            // 'cached'  => false,
+            'request' => $request,
+            'response' => $response,
+        );
+
+        if($code != 200) {
+            return false;
+        }
+
+        $doc = self::fromHTML($response, $url);
+        if($doc) {
+            // Set $doc url if not set yet
+            if ( !$doc->baseURI() and $url ) {
+                $doc->location($url);
+            }
+
+            $doc->source_type = $source_type;
+            isset($read_time) and $doc->read_time = $read_time * 1e3;
+            // if(!empty($cch_meta)) $doc->cch_meta = $cch_meta;
         }
 
         return $doc;

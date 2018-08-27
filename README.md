@@ -12,9 +12,9 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
   - jQuery-like style of DOM traversal
   - Low memory usage
   - Can handle big HTML documents (I have tested up to 20Mb, but the limit is the amount of RAM you have)
-  - Doesn't require cURL to be installed
-  - Automatically handles redirects (301, 302, 303)
+  - Doesn't require cURL to be installed and automatically handles redirects (see [hQuery::fromUrl()](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL))
   - Caches response for multiple processing tasks
+  - [PSR-7](https://www.php-fig.org/psr/psr-7/) friendly (see hQuery::fromHTML($message))
   - PHP 5.3+
   - No dependencies
 
@@ -34,7 +34,7 @@ or using `npm install hquery.php`, `require_once 'node_modules/hquery.php/hquery
 // Optionally use namespaces
 use duzun\hQuery;
 
-// Either use commposer, either include this file:
+// Either use commposer, or include this file:
 include_once '/path/to/libs/hquery.php';
 
 // Set the cache path - must be a writable folder
@@ -45,6 +45,10 @@ hQuery::$cache_path = "/path/to/cache";
 // A value of 0 disables cahce
 hQuery::$cache_expires = 3600; // default one hour
 ```
+
+I would recomend using [php-http/cache-plugin](http://docs.php-http.org/en/latest/plugins/cache.html)
+with a [PSR-7 client](http://docs.php-http.org/en/latest/clients.html) for better flexibility.
+
 
 ### Load HTML from a file
 ###### [hQuery::fromFile](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromFile)( string `$filename`, boolean `$use_include_path` = false, resource `$context` = NULL )
@@ -69,7 +73,7 @@ For an example of using `$context` to make a HTTP request with proxy see [#26](h
 $doc = hQuery::fromHTML('<html><head><title>Sample HTML Doc</title><body>Contents...</body></html>');
 
 // Set base_url, in case the document is loaded from local source.
-// Note: The base_url is used to retrive absolute URLs from relative ones
+// Note: The base_url property is used to retrive absolute URLs from relative ones.
 $doc->base_url = 'http://desired-host.net/path';
 ```
 
@@ -95,9 +99,41 @@ $doc = hQuery::fromUrl(
 ```
 
 For building advanced requests (POST, parameters etc) see [hQuery::http_wr()](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_http_wr),
-though I recomend using a specialized library for making requests 
+though I recomend using a specialized ([PSR-7](https://www.php-fig.org/psr/psr-7/)?) library for making requests
 and `hQuery::fromHTML($html, $url=NULL)` for processing results.
 See [Guzzle](http://docs.guzzlephp.org/en/stable/) for eg.
+
+Here is a [PSR-7](https://www.php-fig.org/psr/psr-7/) example:
+
+
+```sh
+composer require php-http/message php-http/discovery php-http/curl-client
+```
+
+If you don't have [cURL PHP extension](https://secure.php.net/curl),
+just replace `php-http/curl-client` with `php-http/socket-client` in the above command.
+
+
+```php
+use duzun\hQuery;
+
+use Http\Discovery\HttpClientDiscovery;
+use Http\Discovery\MessageFactoryDiscovery;
+
+$client = HttpClientDiscovery::find();
+$messageFactory = MessageFactoryDiscovery::find();
+
+$request = $messageFactory->createRequest(
+  'GET', 
+  'http://example.com/someDoc.html',
+  ['Accept' => 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8']
+);
+
+$response = $client->sendRequest($request);
+
+$doc = hQuery::fromHTML($response, $request->getUri());
+
+```
 
 Another option is to use [stream_context_create()](https://secure.php.net/manual/en/function.stream-context-create.php)
 to create a `$context`, then call `hQuery::fromFile($url, false, $context)`.
@@ -161,9 +197,9 @@ A lot of people ask for sources of my **Live Demo** page. Here we go:
   - Unit tests everything
   - Document everything
   - ~~Cookie support~~ (implemented in mem for redirects)
-  - Use [HTTPlug](http://httplug.io/) internally
-  - Add more selectors
   - Improve selectors to be able to select by attributes
+  - Add more selectors
+  - Use [HTTPlug](http://httplug.io/) internally
 
 # 💖 Support my projects
 

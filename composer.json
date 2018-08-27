@@ -2,14 +2,14 @@
   "name": "duzun/hquery",
   "type": "library",
   "description": "An extremely fast web scraper that parses megabytes of HTML in a blink of an eye. No dependencies. PHP5+",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "license": "MIT",
   "authors": [
     {
       "name": "Dumitru Uzun",
       "email": "contact@duzun.me",
       "homepage": "https://DUzun.Me",
-      "role": "Developer"
+      "role": "Author"
     }
   ],
   "homepage": "https://duzun.me/playground/hquery",
@@ -59,9 +59,13 @@
   },
   "require-dev": {
     "apigen/apigen": "~4.1",
-    "phpunit/phpunit": "^6.1"
+    "phpunit/phpunit": "^6.1",
+    "php-http/mock-client": "^1.1",
+    "guzzlehttp/psr7": "^1.4"
   },
   "suggest": {
-    "php-http/curl-client": "Planing to use this lib automatically when available"
+    "php-http/message": "Might be required by hQuery::fromHTML($message) or hQuery::fromURL()",
+    "php-http/discovery": "Might be required by hQuery::sendRequest()",
+    "php-http/socket-client": "Could be used to make HTTP requests before calling hQuery::fromHTML($message)"
   }
 }

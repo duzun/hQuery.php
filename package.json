@@ -1,7 +1,7 @@
 {
   "name": "hquery.php",
   "description": "An extremely fast web scraper that parses megabytes of HTML in a blink of an eye. No dependencies. PHP5+",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "author": {
     "name": "Dumitru Uzun",
     "email": "contact@duzun.me",
@@ -26,27 +26,16 @@
     "composer.json",
     "LICENSE"
   ],
+  "directories": {
+    "test": "tests",
+    "docs": "docs"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/duzun/hQuery.php.git"
   },
   "bugs": {
     "url": "https://github.com/duzun/hQuery.php/issues"
-  },
-  "verup": {
-    "files": [
-      "composer.json",
-      "src/hQuery.php",
-      "src/hQuery/Node.php",
-      "index.html",
-      "LICENSE",
-      "README.md"
-    ],
-    "regs": [
-      "((?:\\$|(?:\\s*\\*?\\s*@)|(?:^\\s*(?:var|,)?\\s+))ver(?:sion)?[\\s\\:='\"]+)([0-9]+(?:\\.[0-9]+){2,2})",
-      "^(\\s*const\\s+VERSION[\\s='\"]+)([0-9]+(?:\\.[0-9]+){2,2})",
-      "^(\\s?\\*.*v)([0-9]+(?:\\.[0-9]+){2,2})"
-    ]
   },
   "license": [
     {
@@ -55,15 +44,11 @@
     }
   ],
   "devDependencies": {
-    "browser-sync": "^2.24",
+    "browser-sync": "^2.24.7",
     "gulp": "^3.9",
     "gulp-connect-php": "^1.0",
-    "verup": "^1.6",
+    "verup": "^1.7.0",
     "watch": "^1.x"
-  },
-  "directories": {
-    "test": "tests",
-    "docs": "docs"
   },
   "scripts": {
     "verup": "node ./node_modules/verup",
@@ -77,5 +62,23 @@
     "test:5.6": "travis-local run --php=5.6",
     "test:7.0": "travis-local run --php=7.0",
     "test:7.1": "travis-local run --php=7.1"
+  },
+  "extra": {
+    "verup": {
+      "files": [
+        "composer.json",
+        "package-lock.json",
+        "src/hQuery.php",
+        "src/hQuery/Node.php",
+        "index.html",
+        "LICENSE",
+        "README.md"
+      ],
+      "regs": [
+        "((?:\\$|(?:\\s*\\*?\\s*@)|(?:^\\s*(?:var|,)?\\s+))ver(?:sion)?[\\s\\:='\"]+)([0-9]+(?:\\.[0-9]+){2,2})",
+        "^(\\s*const\\s+VERSION[\\s='\"]+)([0-9]+(?:\\.[0-9]+){2,2})",
+        "^(\\s?\\*.*v)([0-9]+(?:\\.[0-9]+){2,2})"
+      ]
+    }
   }
 }

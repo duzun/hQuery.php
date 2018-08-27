@@ -1,6 +1,11 @@
 <?php
 use duzun\hQuery;
 use duzun\hQuery\Element;
+
+use Http\Mock\Client;
+use Http\Message\ResponseFactory;
+use Http\Discovery\MessageFactoryDiscovery;
+
 // -----------------------------------------------------
 /**
  *  @author DUzun.Me
@@ -24,40 +29,43 @@ class TestHQueryTests extends hQuery {
 class TestHQuery extends PHPUnit_BaseClass {
     // -----------------------------------------------------
     public static $inst;
+    public static $messageFactory;
+    public static $log       = true;
     public static $className = 'duzun\hQuery';
     public static $baseUrl   = 'https://DUzun.Me/';
-    public static $log       = true;
+    public static $bodyHTML  =
+        '<doctype html>'.
+        '<html>'.
+        '<head>'.
+            '<meta charset="ISO-8859-2" />'.
+            // '<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" />'
+            '<meta content="/logo.png" property="og:image" />'.
+            '<title>Sample HTML Doc</title>'.
+            '<link rel="shortcut icon" href="/favicon.ico" />'.
+        '</head>'.
+        '<body class="test-class">'.
+            '<div id="test-div" class="test-class test-div">'.
+                'This is some text'.
+                '<a href="/path">'.
+                    'This is a link'.
+                '</a>'.
+                ' between tags'.
+                '<span id="aSpan" class="span">Span text</span>'.
+            '</div>'.
+            '<a id="outterLink" href="//not-my-site.com/next.html">Not My Site</a>'.
+            '<img id="outterImg" src="https://cdn.duzun.me/images/logo.png" />'.
+            'Contents...'.
+        '</body>'.
+        '</html>'
+    ;
 
     // Before any test
     public static function setUpBeforeClass() {
         hQuery::$_mockup_class = 'TestHQueryTests';
+        self::$messageFactory = MessageFactoryDiscovery::find();
 
-        self::$inst = TestHQueryTests::fromHTML(
-            '<doctype html>'.
-            '<html>'.
-            '<head>'.
-                '<meta charset="ISO-8859-2" />'.
-                // '<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" />'
-                '<meta content="/logo.png" property="og:image" />'.
-                '<title>Sample HTML Doc</title>'.
-                '<link rel="shortcut icon" href="/favicon.ico" />'.
-            '</head>'.
-            '<body class="test-class">'.
-                '<div id="test-div" class="test-class test-div">'.
-                    'This is some text'.
-                    '<a href="/path">'.
-                        'This is a link'.
-                    '</a>'.
-                    ' between tags'.
-                    '<span id="aSpan" class="span">Span text</span>'.
-                '</div>'.
-                '<a id="outterLink" href="//not-my-site.com/next.html">Not My Site</a>'.
-                '<img id="outterImg" src="https://cdn.duzun.me/images/logo.png" />'.
-                'Contents...'.
-            '</body>'.
-            '</html>'
-            , self::$baseUrl . 'index.html'
-        );
+        self::$inst = TestHQueryTests::fromHTML(self::$bodyHTML, self::$baseUrl . 'index.html');
+
         self::log(get_class(self::$inst));
     }
 
@@ -80,6 +88,47 @@ class TestHQuery extends PHPUnit_BaseClass {
             // $g = gzencode(file_get_contents($v), 9);
             // file_put_contents($v.'.gz', $g);
         // }
+    }
+
+    // -----------------------------------------------------
+    public function test_fromHTML() {
+        $url = strtolower(self::$baseUrl . 'index.html');
+
+        // $response = $this->createMock('Psr\Http\Message\ResponseInterface');
+        $response = self::$messageFactory->createResponse(
+            '200',
+            'ok',
+            ['host' => parse_url(self::$baseUrl, PHP_URL_HOST), 'origin' => self::$baseUrl],
+            self::$bodyHTML
+        );
+
+        // Document from a Psr\Http\Message\ResponseInterface object
+        $doc = TestHQueryTests::fromHTML($response, $url);
+        $this->assertEquals(self::$bodyHTML, $doc->html());
+        $this->assertEquals($url, $doc->location());
+
+        $request = self::$messageFactory->createRequest(
+            'GET',
+            $url,
+            [],
+            self::$bodyHTML
+        );
+
+        // Document from a Psr\Http\Message\RequestInterface object
+        $doc = TestHQueryTests::fromHTML($request);
+        $this->assertEquals(self::$bodyHTML, $doc->html());
+        $this->assertEquals($url, $doc->location());
+
+        // Document from hQuery::sendRequest($request, $client)
+        $client = new Client();
+        $client->addResponse($response);
+
+        $doc = TestHQueryTests::sendRequest($request, $client);
+        $this->assertEquals(self::$bodyHTML, $doc->html());
+        $this->assertEquals($url, $doc->location());
+
+        // And to make sure the $doc is realy ok
+        $this->assertEquals('Sample HTML Doc', $doc->find('head title')->text);
     }
 
     // -----------------------------------------------------
