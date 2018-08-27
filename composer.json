@@ -61,7 +61,8 @@
     "apigen/apigen": "~4.1",
     "phpunit/phpunit": "^6.1",
     "php-http/mock-client": "^1.1",
-    "guzzlehttp/psr7": "^1.4"
+    "guzzlehttp/psr7": "^1.4",
+    "php-http/discovery": "^1.4"
   },
   "suggest": {
     "php-http/message": "Might be required by hQuery::fromHTML($message) or hQuery::fromURL()",

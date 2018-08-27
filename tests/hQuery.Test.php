@@ -62,7 +62,6 @@ class TestHQuery extends PHPUnit_BaseClass {
     // Before any test
     public static function setUpBeforeClass() {
         hQuery::$_mockup_class = 'TestHQueryTests';
-        self::$messageFactory = MessageFactoryDiscovery::find();
 
         self::$inst = TestHQueryTests::fromHTML(self::$bodyHTML, self::$baseUrl . 'index.html');
 
@@ -93,6 +92,7 @@ class TestHQuery extends PHPUnit_BaseClass {
     // -----------------------------------------------------
     public function test_fromHTML() {
         $url = strtolower(self::$baseUrl . 'index.html');
+        empty(self::$messageFactory) and self::$messageFactory = MessageFactoryDiscovery::find();
 
         // $response = $this->createMock('Psr\Http\Message\ResponseInterface');
         $response = self::$messageFactory->createResponse(
