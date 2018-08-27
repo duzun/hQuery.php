@@ -29,6 +29,8 @@ cache:
         - $HOME/.composer/cache
 
 install:
+    # remove composer lock to allow installing env speciffic versions
+    - rm -f composer.lock
     # flags to pass to install
     - flags="--prefer-dist --no-interaction --optimize-autoloader --no-suggest --no-progress"
     # install dependencies using system provided composer binary
