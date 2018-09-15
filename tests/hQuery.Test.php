@@ -3,7 +3,6 @@ use duzun\hQuery;
 use duzun\hQuery\Element;
 
 use Http\Mock\Client;
-use Http\Message\ResponseFactory;
 use Http\Discovery\MessageFactoryDiscovery;
 
 // -----------------------------------------------------
@@ -33,30 +32,31 @@ class TestHQuery extends PHPUnit_BaseClass {
     public static $log       = true;
     public static $className = 'duzun\hQuery';
     public static $baseUrl   = 'https://DUzun.Me/';
-    public static $bodyHTML  =
-        '<doctype html>'.
-        '<html>'.
-        '<head>'.
-            '<meta charset="ISO-8859-2" />'.
-            // '<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" />'
-            '<meta content="/logo.png" property="og:image" />'.
-            '<title>Sample HTML Doc</title>'.
-            '<link rel="shortcut icon" href="/favicon.ico" />'.
-        '</head>'.
-        '<body class="test-class">'.
-            '<div id="test-div" class="test-class test-div">'.
-                'This is some text'.
-                '<a href="/path">'.
-                    'This is a link'.
-                '</a>'.
-                ' between tags'.
-                '<span id="aSpan" class="span">Span text</span>'.
-            '</div>'.
-            '<a id="outterLink" href="//not-my-site.com/next.html">Not My Site</a>'.
-            '<img id="outterImg" src="https://cdn.duzun.me/images/logo.png" />'.
-            'Contents...'.
-        '</body>'.
-        '</html>'
+    public static $bodyHTML  = <<<EOS
+<doctype html>
+<html>
+<head>
+    <meta charset="ISO-8859-2" />
+    <!-- <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" /> -->
+    <meta content="/logo.png" property="og:image" />
+    <title>Sample HTML Doc</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+</head>
+<body class="test-class">
+    <div id="test-div" class="test-class test-div">
+        This is some text
+        <a href="/path">
+            This is a link
+        </a>
+         between tags
+        <span id="aSpan" class="span">Span text</span>
+    </div>
+    <a id="outterLink" href="//not-my-site.com/next.html">Not My Site</a>
+    <img id="outterImg" src="https://cdn.duzun.me/images/logo.png" />
+    Contents...
+</body>
+</html>
+EOS
     ;
 
     // Before any test
@@ -92,40 +92,57 @@ class TestHQuery extends PHPUnit_BaseClass {
     // -----------------------------------------------------
     public function test_fromHTML() {
         $url = strtolower(self::$baseUrl . 'index.html');
-        empty(self::$messageFactory) and self::$messageFactory = MessageFactoryDiscovery::find();
 
-        // $response = $this->createMock('Psr\Http\Message\ResponseInterface');
-        $response = self::$messageFactory->createResponse(
-            '200',
-            'ok',
-            ['host' => parse_url(self::$baseUrl, PHP_URL_HOST), 'origin' => self::$baseUrl],
-            self::$bodyHTML
-        );
-
-        // Document from a Psr\Http\Message\ResponseInterface object
-        $doc = TestHQueryTests::fromHTML($response, $url);
+        // self::$inst is initialized with ::fromHTML() method
+        $doc = self::$inst;
         $this->assertEquals(self::$bodyHTML, $doc->html());
-        $this->assertEquals($url, $doc->location());
+        $this->assertEquals(self::$baseUrl . 'index.html', $doc->location());
 
-        $request = self::$messageFactory->createRequest(
-            'GET',
-            $url,
-            [],
-            self::$bodyHTML
-        );
+        // Optional stuff
+        if ( class_exists('Http\Discovery\MessageFactoryDiscovery') ) {
+            empty(self::$messageFactory) and self::$messageFactory = MessageFactoryDiscovery::find();
 
-        // Document from a Psr\Http\Message\RequestInterface object
-        $doc = TestHQueryTests::fromHTML($request);
-        $this->assertEquals(self::$bodyHTML, $doc->html());
-        $this->assertEquals($url, $doc->location());
+            // $response = $this->createMock('Psr\Http\Message\ResponseInterface');
+            $response = self::$messageFactory->createResponse(
+                '200',
+                'ok',
+                array('host' => parse_url(self::$baseUrl, PHP_URL_HOST), 'origin' => self::$baseUrl),
+                self::$bodyHTML
+            );
 
-        // Document from hQuery::sendRequest($request, $client)
-        $client = new Client();
-        $client->addResponse($response);
+            // Document from a Psr\Http\Message\ResponseInterface object
+            $doc = TestHQueryTests::fromHTML($response, $url);
+            $this->assertEquals(self::$bodyHTML, $doc->html());
+            $this->assertEquals($url, $doc->location());
 
-        $doc = TestHQueryTests::sendRequest($request, $client);
-        $this->assertEquals(self::$bodyHTML, $doc->html());
-        $this->assertEquals($url, $doc->location());
+            $request = self::$messageFactory->createRequest(
+                'GET',
+                $url,
+                array(),
+                self::$bodyHTML
+            );
+
+            // Document from a Psr\Http\Message\RequestInterface object
+            $doc = TestHQueryTests::fromHTML($request);
+            $this->assertEquals(self::$bodyHTML, $doc->html());
+            $this->assertEquals($url, $doc->location());
+        }
+        else {
+            self::log('Http\Discovery\MessageFactoryDiscovery not found!');
+        }
+
+        if ( class_exists('Http\Mock\Client') ) {
+            // Document from hQuery::sendRequest($request, $client)
+            $client = new Client();
+            $client->addResponse($response);
+
+            $doc = TestHQueryTests::sendRequest($request, $client);
+            $this->assertEquals(self::$bodyHTML, $doc->html());
+            $this->assertEquals($url, $doc->location());
+        }
+        else {
+            self::log('Http\Mock\Client not found!');
+        }
 
         // And to make sure the $doc is realy ok
         $this->assertEquals('Sample HTML Doc', $doc->find('head title')->text);
@@ -162,7 +179,7 @@ class TestHQuery extends PHPUnit_BaseClass {
         $this->assertNotEmpty($a);
         $this->assertTrue($a instanceof Element);
         $this->assertEquals('a', $a->nodeName);
-        $this->assertEquals('This is a link', $a->text);
+        $this->assertEquals('This is a link', trim($a->text));
         $this->assertEquals('https://DUzun.Me/path', $a->attr('href'));
         $this->assertEquals('div', $a->parent->nodeName);
         $this->assertEquals('test-div', $a->parent->attr('id'));
@@ -337,7 +354,9 @@ class TestHQuery extends PHPUnit_BaseClass {
     public function test_text() {
         $div = self::$inst->find('#test-div');
         $text = $div->text();
-        $this->assertEquals('This is some textThis is a link between tagsSpan text', $text);
+
+        $this->assertEquals("This is some text\n        \n            This is a link\n        \n         between tags\n        Span text", trim($text));
+        $this->assertEquals('This is some text This is a link between tags Span text', preg_replace('/\\s+/', ' ', trim($text)));
     }
 
     // -----------------------------------------------------

@@ -1,3 +1,7 @@
+/*jshint
+    node: true,
+    esversion: 6
+*/
 
 var spawn = require('child_process').spawn;
 var watch = require('watch');
@@ -107,7 +111,16 @@ function run_test_async() {
 
 function check_phpunit_phar(cb) {
     if ( !fs.existsSync(_phpunit_path) ) {
-        download(_phpunit_url, _phpunit_path, 7, cb);
+        let which, _path;
+        try {
+            which = require('which');
+        } catch(e) {}
+        if ( which ) {
+            _path = which.sync('phpunit', {nothrow: true});
+            if ( _path ) _phpunit_path = _path;
+        }
+        if ( _path ) cb();
+        else download(_phpunit_url, _phpunit_path, 7, cb);
     }
     else {
         cb();

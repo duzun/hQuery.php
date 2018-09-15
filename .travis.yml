@@ -34,7 +34,7 @@ install:
     # flags to pass to install
     - flags="--prefer-dist --no-interaction --optimize-autoloader --no-suggest --no-progress"
     # install dependencies using system provided composer binary
-    - composer install $flags
+    - if php -r "die(+(version_compare(PHP_VERSION,'5.5')!=1));"; then composer install $flags; else composer dump-autoload; fi
 
 script: phpunit tests/
 
