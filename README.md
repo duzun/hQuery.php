@@ -103,7 +103,7 @@ though I recomend using a specialized ([PSR-7](https://www.php-fig.org/psr/psr-7
 and `hQuery::fromHTML($html, $url=NULL)` for processing results.
 See [Guzzle](http://docs.guzzlephp.org/en/stable/) for eg.
 
-Here is a [PSR-7](https://www.php-fig.org/psr/psr-7/) example:
+#### [PSR-7](https://www.php-fig.org/psr/psr-7/) example:
 
 
 ```sh
