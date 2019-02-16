@@ -1,4 +1,4 @@
-hQuery.php   [![Build Status](https://travis-ci.org/duzun/hQuery.php.svg?branch=master)](https://travis-ci.org/duzun/hQuery.php)
+hQuery.php   [![Build Status](https://travis-ci.org/duzun/hQuery.php.svg?branch=master)](https://travis-ci.org/duzun/hQuery.php) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/duzuns)
 ==========
 
 An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye.
@@ -205,8 +205,9 @@ A lot of people ask for sources of my **Live Demo** page. Here we go:
 
 I love Open Source. Whenever possible I share cool things with the world (check out [NPM](https://duzun.me/npm) and [GitHub](https://github.com/duzun/)).
 
-If you like what I'm doing and want to encorage me, please consider to:
+If you like what I'm doing and this project helps you reduce time to develop, please consider to:
 
 - Star and Share the projects you like (and use)
+- Give me a cup of coffee - [PayPal.me/duzuns](https://www.paypal.me/duzuns) (contact at duzun.me)
 - Send me some **Bitcoin** at this addres: `bitcoin:3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa` (or using the QR below)
 ![bitcoin:3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa](https://cdn.duzun.me/files/qr_bitcoin-3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa.png)
