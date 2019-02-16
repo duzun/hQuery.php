@@ -60,7 +60,7 @@ EOS
     ;
 
     // Before any test
-    public static function setUpBeforeClass() {
+    public static function mySetUpBeforeClass() {
         hQuery::$_mockup_class = 'TestHQueryTests';
 
         self::$inst = TestHQueryTests::fromHTML(self::$bodyHTML, self::$baseUrl . 'index.html');
@@ -69,7 +69,7 @@ EOS
     }
 
     // After all tests
-    public static function tearDownAfterClass() {
+    public static function myTearDownAfterClass() {
         self::$inst = NULL;
     }
 

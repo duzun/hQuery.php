@@ -8,12 +8,11 @@ use duzun\hQuery;
 // -----------------------------------------------------
 define('PHPUNIT_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 define('ROOT_DIR', strtr(dirname(PHPUNIT_DIR), '\\', '/').'/');
-// define('PHP_IS_NEW', version_compare(PHP_VERSION, '5.3.0') >= 0);
-// -----------------------------------------------------
-if ( !class_exists('PHPUnit_Framework_TestCase') ) {
-    class_alias('PHPUnit\Framework\TestCase', 'PHPUnit_Framework_TestCase');
+if ( !class_exists('PHPUnit_Runner_Version') ) {
+    class_alias('PHPUnit\Runner\Version', 'PHPUnit_Runner_Version');
 }
 
+// define('PHP_IS_NEW', version_compare(PHP_VERSION, '5.3.0') >= 0);
 // -----------------------------------------------------
 // if ( PHP_IS_NEW ) {
     require_once ROOT_DIR . 'autoload.php';
@@ -23,32 +22,33 @@ if ( !class_exists('PHPUnit_Framework_TestCase') ) {
 //     require_once ROOT_DIR . 'hquery.php';
 // }
 // -----------------------------------------------------
+
+// We have to make some adjustments for PHPUnit_BaseClass to work with
+// PHPUnit 8.0 and still keep backward compatibility
+if ( version_compare(PHPUnit_Runner_Version::id(), '8.0.0') >= 0 ) {
+    require_once PHPUNIT_DIR . '_PU8_TestCase.php';
+}
+else {
+    require_once PHPUNIT_DIR . '_PU7_TestCase.php';
+}
+
+// -----------------------------------------------------
 // -----------------------------------------------------
 /**
  * @backupGlobals disabled
  */
 // -----------------------------------------------------
-abstract class PHPUnit_BaseClass extends PHPUnit_Framework_TestCase {
+abstract class PHPUnit_BaseClass extends PU_TestCase {
     public static $log = true;
     public static $testName;
     public static $className;
     // -----------------------------------------------------
-    // Before any test
-    public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
-    }
-    // After all tests
-    public static function tearDownAfterClass() {
-        parent::tearDownAfterClass();
-    }
-
-    // -----------------------------------------------------
     // Before every test
-    public function setUp() {
+    public function mySetUp() {
         self::$testName = $this->getName();
         self::$className = get_class($this);
 
-        parent::setUp();
+        // parent::mySetUp();
     }
     // -----------------------------------------------------
     /**

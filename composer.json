@@ -59,9 +59,9 @@
   },
   "require-dev": {
     "apigen/apigen": "~4.1",
-    "php-http/mock-client": "^1.1",
-    "guzzlehttp/psr7": "^1.4",
-    "php-http/discovery": "^1.4"
+    "php-http/mock-client": "^1.2",
+    "guzzlehttp/psr7": "^1.5",
+    "php-http/discovery": "^1.6"
   },
   "suggest": {
     "php-http/message": "Might be required by hQuery::fromHTML($message) or hQuery::fromURL()",
