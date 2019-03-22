@@ -1174,33 +1174,33 @@
         },
         {
             "name": "nette/finder",
-            "version": "v2.4.2",
+            "version": "v2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/finder.git",
-                "reference": "ee951a656cb8ac622e5dd33474a01fd2470505a0"
+                "reference": "6be1b83ea68ac558aff189d640abe242e0306fe2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/finder/zipball/ee951a656cb8ac622e5dd33474a01fd2470505a0",
-                "reference": "ee951a656cb8ac622e5dd33474a01fd2470505a0",
+                "url": "https://api.github.com/repos/nette/finder/zipball/6be1b83ea68ac558aff189d640abe242e0306fe2",
+                "reference": "6be1b83ea68ac558aff189d640abe242e0306fe2",
                 "shasum": ""
             },
             "require": {
-                "nette/utils": "~2.4",
-                "php": ">=5.6.0"
+                "nette/utils": "^2.4 || ~3.0.0",
+                "php": ">=7.1"
             },
             "conflict": {
                 "nette/nette": "<2.2"
             },
             "require-dev": {
-                "nette/tester": "~2.0",
+                "nette/tester": "^2.0",
                 "tracy/tracy": "^2.3"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.4-dev"
+                    "dev-master": "2.5-dev"
                 }
             },
             "autoload": {
@@ -1232,20 +1232,20 @@
                 "iterator",
                 "nette"
             ],
-            "time": "2018-06-28T11:49:23+00:00"
+            "time": "2019-02-28T18:13:25+00:00"
         },
         {
             "name": "nette/http",
-            "version": "v2.4.10",
+            "version": "v2.4.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/http.git",
-                "reference": "a36e6bad0aae8bacf849c150b5e0ecacef0d9eca"
+                "reference": "3d75d11a880fe223bfa6bc7ca9822bdfe789e5a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/http/zipball/a36e6bad0aae8bacf849c150b5e0ecacef0d9eca",
-                "reference": "a36e6bad0aae8bacf849c150b5e0ecacef0d9eca",
+                "url": "https://api.github.com/repos/nette/http/zipball/3d75d11a880fe223bfa6bc7ca9822bdfe789e5a6",
+                "reference": "3d75d11a880fe223bfa6bc7ca9822bdfe789e5a6",
                 "shasum": ""
             },
             "require": {
@@ -1304,7 +1304,7 @@
                 "session",
                 "url"
             ],
-            "time": "2018-09-03T19:16:55+00:00"
+            "time": "2019-03-13T19:04:45+00:00"
         },
         {
             "name": "nette/mail",
@@ -1830,16 +1830,16 @@
         },
         {
             "name": "php-http/discovery",
-            "version": "1.6.0",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/discovery.git",
-                "reference": "02b7ea21eafa0757af04140890a67d8ed45f83b2"
+                "reference": "684855f2c2e9d0a61868b8f8d6bd0295c8a4b651"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/discovery/zipball/02b7ea21eafa0757af04140890a67d8ed45f83b2",
-                "reference": "02b7ea21eafa0757af04140890a67d8ed45f83b2",
+                "url": "https://api.github.com/repos/php-http/discovery/zipball/684855f2c2e9d0a61868b8f8d6bd0295c8a4b651",
+                "reference": "684855f2c2e9d0a61868b8f8d6bd0295c8a4b651",
                 "shasum": ""
             },
             "require": {
@@ -1890,7 +1890,7 @@
                 "message",
                 "psr7"
             ],
-            "time": "2019-01-23T12:41:22+00:00"
+            "time": "2019-02-23T07:42:53+00:00"
         },
         {
             "name": "php-http/httplug",
@@ -2072,16 +2072,16 @@
         },
         {
             "name": "php-http/mock-client",
-            "version": "1.2.0",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/mock-client.git",
-                "reference": "d41093eb00235685d7a7b55f6d77b076c7e83955"
+                "reference": "d364c4a2847229dd37237d0083887889d3bd8564"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/mock-client/zipball/d41093eb00235685d7a7b55f6d77b076c7e83955",
-                "reference": "d41093eb00235685d7a7b55f6d77b076c7e83955",
+                "url": "https://api.github.com/repos/php-http/mock-client/zipball/d364c4a2847229dd37237d0083887889d3bd8564",
+                "reference": "d364c4a2847229dd37237d0083887889d3bd8564",
                 "shasum": ""
             },
             "require": {
@@ -2102,7 +2102,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.2-dev"
+                    "dev-master": "1.3-dev"
                 }
             },
             "autoload": {
@@ -2128,7 +2128,7 @@
                 "mock",
                 "psr7"
             ],
-            "time": "2019-01-20T10:55:22+00:00"
+            "time": "2019-02-21T08:51:08+00:00"
         },
         {
             "name": "php-http/promise",
@@ -2541,16 +2541,16 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "e3d826245268269cd66f8326bd8bc066687b4a19"
+                "reference": "82ebae02209c21113908c229e9883c419720738a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/e3d826245268269cd66f8326bd8bc066687b4a19",
-                "reference": "e3d826245268269cd66f8326bd8bc066687b4a19",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/82ebae02209c21113908c229e9883c419720738a",
+                "reference": "82ebae02209c21113908c229e9883c419720738a",
                 "shasum": ""
             },
             "require": {
@@ -2562,7 +2562,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.9-dev"
+                    "dev-master": "1.11-dev"
                 }
             },
             "autoload": {
@@ -2595,20 +2595,20 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2018-08-06T14:22:27+00:00"
+            "time": "2019-02-06T07:57:58+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "c79c051f5b3a46be09205c73b80b346e4153e494"
+                "reference": "fe5e94c604826c35a32fa832f35bd036b6799609"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/c79c051f5b3a46be09205c73b80b346e4153e494",
-                "reference": "c79c051f5b3a46be09205c73b80b346e4153e494",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/fe5e94c604826c35a32fa832f35bd036b6799609",
+                "reference": "fe5e94c604826c35a32fa832f35bd036b6799609",
                 "shasum": ""
             },
             "require": {
@@ -2620,7 +2620,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.9-dev"
+                    "dev-master": "1.11-dev"
                 }
             },
             "autoload": {
@@ -2654,7 +2654,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-09-21T13:07:52+00:00"
+            "time": "2019-02-06T07:57:58+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -2708,27 +2708,28 @@
         },
         {
             "name": "tracy/tracy",
-            "version": "v2.5.5",
+            "version": "v2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/tracy.git",
-                "reference": "35fa649b483b28e16f61de07110ea0585fc8d6ea"
+                "reference": "e179856e5dcc3ced99df1596cd299246fb1c3ac2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/tracy/zipball/35fa649b483b28e16f61de07110ea0585fc8d6ea",
-                "reference": "35fa649b483b28e16f61de07110ea0585fc8d6ea",
+                "url": "https://api.github.com/repos/nette/tracy/zipball/e179856e5dcc3ced99df1596cd299246fb1c3ac2",
+                "reference": "e179856e5dcc3ced99df1596cd299246fb1c3ac2",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-session": "*",
-                "php": ">=5.4.4"
+                "php": ">=7.1"
             },
             "require-dev": {
-                "nette/di": "~2.3",
-                "nette/tester": "~1.7",
-                "nette/utils": "~2.3"
+                "nette/di": "^2.4 || ~3.0.0",
+                "nette/tester": "^2.1",
+                "nette/utils": "^2.4 || ^3.0",
+                "psr/log": "^1.0"
             },
             "suggest": {
                 "https://nette.org/donate": "Please support Tracy via a donation"
@@ -2736,7 +2737,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -2744,7 +2745,7 @@
                     "src"
                 ],
                 "files": [
-                    "src/shortcuts.php"
+                    "src/Tracy/shortcuts.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2770,7 +2771,7 @@
                 "nette",
                 "profiler"
             ],
-            "time": "2018-11-05T15:10:59+00:00"
+            "time": "2019-03-01T02:12:13+00:00"
         }
     ],
     "aliases": [],
