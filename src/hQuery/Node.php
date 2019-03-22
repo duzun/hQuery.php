@@ -11,7 +11,7 @@ namespace duzun\hQuery;
  */
 abstract class Node implements \Iterator, \Countable {
     // ------------------------------------------------------------------------
-    const VERSION = '2.2.1';
+    const VERSION = '2.2.2';
     // ------------------------------------------------------------------------
     public static $last_http_result; // Response details of last request
 
@@ -96,7 +96,6 @@ abstract class Node implements \Iterator, \Countable {
      *
      *  @param string       $sel  - A valid CSS selector (some pseudo-selectors supported).
      *  @param array|string $attr - OPTIONAL attributes as string or key-value pairs.
-     *  @param hQuery_Node  $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
      *
      *  @return hQuery_Element collection of matched elements or NULL
      */
@@ -188,6 +187,95 @@ abstract class Node implements \Iterator, \Countable {
     */
     public function text($id=NULL) {
         return html_entity_decode(strip_tags($this->html($id)), ENT_QUOTES);/* ??? */
+    }
+
+    /**
+     * Parse .text as a definition list.
+     *
+     * @param  string         $sep key-value separator (default ":")
+     * @param  string|Closure $key search for one specific key
+     *
+     * @return array|mixed  the value for $key or list of key-value if no $key
+     */
+    public function text2dl($sep=':', $key=NULL) {
+        return self::text_parse_dl($this, $sep, $key);
+    }
+
+    /**
+     * Definition list parser
+     *
+     * @param  $ $dl    dl element
+     * @param  String|RegExp|Function $key search for one specific key
+     * @param  String $dt_sel dt selector (default "dt")
+     * @param  String $dd_sel dd selector (default "dd")
+     * @param  String $dw     definition term wrapper selector (default none)
+     *
+     * @return Object|mixed  the value for $key or list of key-value if no $key
+     */
+    public function dl($dt_sel='dt', $dd_sel='dd', $dw=NULL, $key=NULL) {
+        $oneKey = isset($key);
+        $dl = $oneKey ? NULL : array();
+
+        if ( $dw ) {
+            $l = $this->find($dw);
+            if ( $l ) foreach($l as $i => $w) {
+                if ( $dt_sel ) {
+                    $dte = $w->find($dt_sel)->first();
+                    $dt = $dte->text();
+                    if ( $dd_sel ) {
+                        $dd = $w->find($dd_sel)->first()->text();
+                    }
+                    // @TODO
+                    // else {
+                    //     $dd = $w.contents().not($dte).text();
+                    // }
+                }
+                else {
+                    if ( !$dd_sel ) {
+                        $dd = explode(':', $w->text(), 2);
+                        $dt = reset($dd);
+                        $dd = end($dd);
+                    }
+                    // @TODO
+                    // else {
+                    //     $dd_ = $w->find($dd_sel)->first();
+                    //     $dd = $dd_->text();
+                    //     $dt = $w.contents().not($dd_).text();
+                    // }
+                }
+                $dd = trim($dd);
+                $dt = trim($dt);
+                if ( $oneKey ) {
+                    if ( $key instanceof \Closure ? $key($dt, $dd) : $key == $dt ) {
+                        return $dd;
+                    }
+                }
+                else {
+                    $dl[$dt] = $dd;
+                }
+            }
+        }
+        else {
+            $dtl = $this->find($dt_sel);
+            $ddl = $this->find($dd_sel)->toArray();
+            $dd = reset($ddl);
+            foreach($dtl as $i => $e) {
+                $dt = trim($e->text());
+                $dd = trim($dd->text());
+                if ( $oneKey ) {
+                    if ( $key instanceof \Closure ? $key($dt, $dd) : $key == $dt ) {
+                        return $dd;
+                    }
+                }
+                else {
+                    $dl[$dt] = $dd;
+                }
+                $dd = next($ddl);
+                if ( !$dd ) break;
+            }
+        }
+
+        return $dl;
     }
 
     /**
@@ -636,9 +724,11 @@ abstract class Node implements \Iterator, \Countable {
     public function __unset($name) {
         unset($this->_prop[$name]);
     }
+
     // ------------------------------------------------------------------------
     // Countable:
     public function count() { return isset($this->ids) ? count($this->ids) : 0; }
+
     // ------------------------------------------------------------------------
     // Iterable:
     public function current() {
@@ -654,6 +744,57 @@ abstract class Node implements \Iterator, \Countable {
 
 // - Helpers ------------------------------------------------
 
+    // ------------------------------------------------------------------------
+    /**
+     * Textual definition list parser
+     *
+     * @param  $|string       $dl text or Element containing definition list text
+     * @param  string         $sep key-value separator (default ":")
+     * @param  string|Closure $key search for one specific key
+     *
+     * @return array|mixed  the value for $key or list of key-value if no $key
+     */
+    public static function text_parse_dl($dl, $sep = ':', $key = NULL) {
+        // Get the textContents of $dl
+        if ( $dl instanceof self ) {
+            if ( count($dl) > 1 ) {
+                $ln = array();
+                foreach($dl as $o) $ln[] = $o->text();
+                $dl = implode("\n", $ln);
+            }
+            else {
+                $dl = $dl->text();
+            }
+        }
+
+        $dl = trim($dl);
+
+        $oneKey = isset($key);
+        $o = $oneKey ? false : array();
+        if ( !$dl ) return $o;
+        $ln = explode("\n", $dl);
+        if ( !count($ln) ) return $o;
+
+        foreach($ln as $i => $l) {
+            $l = trim($l);
+            if ( !$l ) continue;
+            $l = explode($sep, $l, 2);
+            $i = rtrim(reset($l));
+            $l = ltrim(end($l));
+            if ( $oneKey ) {
+                if ( $key instanceof \Closure ? $key($i, $l) : $key == $i ) {
+                    return $l;
+                }
+            }
+            else {
+                $o[$i] = $l;
+            }
+        }
+
+        return $o;
+    }
+
+    // ------------------------------------------------------------------------
     /**
      * Normalize a CSS selector pseudo-class string.
      * ( int, string or array(name => value) )

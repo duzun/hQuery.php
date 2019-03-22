@@ -44,15 +44,40 @@ class TestHQuery extends PHPUnit_BaseClass {
 </head>
 <body class="test-class">
     <div id="test-div" class="test-class test-div">
-        This is some text
+        text: This is some text
         <a href="/path">
-            This is a link
+            link: This is a link
         </a>
-         between tags
-        <span id="aSpan" class="span">Span text</span>
+         in : between tags
+        span: <span id="aSpan" class="span">Span text</span>
     </div>
     <a id="outterLink" href="//not-my-site.com/next.html">Not My Site</a>
     <img id="outterImg" src="https://cdn.duzun.me/images/logo.png" />
+
+    <dl id="dict1">
+      <dt>Coffee</dt>
+      <dd>Black hot drink</dd>
+      <dt>Milk</dt>
+      <dd>White cold drink</dd>
+    </dl>
+
+    <table id="dict2">
+        <tr>
+            <th>Coffee</th>
+            <td>Black hot drink</td>
+        </tr>
+        <tr>
+            <th>Milk</th>
+            <td>White cold drink</td>
+        </tr>
+    </table>
+
+
+    <div id="dict3">
+      <span><b>Coffee:</b> Black hot drink</span>
+      <span><b>Milk:</b> White cold drink</span>
+    </div>
+
     Contents...
 </body>
 </html>
@@ -179,7 +204,7 @@ EOS
         $this->assertNotEmpty($a);
         $this->assertTrue($a instanceof Element);
         $this->assertEquals('a', $a->nodeName);
-        $this->assertEquals('This is a link', trim($a->text));
+        $this->assertEquals('link: This is a link', trim($a->text));
         $this->assertEquals('https://DUzun.Me/path', $a->attr('href'));
         $this->assertEquals('div', $a->parent->nodeName);
         $this->assertEquals('test-div', $a->parent->attr('id'));
@@ -355,8 +380,73 @@ EOS
         $div = self::$inst->find('#test-div');
         $text = $div->text();
 
-        $this->assertEquals("This is some text\n        \n            This is a link\n        \n         between tags\n        Span text", trim($text));
-        $this->assertEquals('This is some text This is a link between tags Span text', preg_replace('/\\s+/', ' ', trim($text)));
+        $this->assertEquals("text: This is some text\n        \n            link: This is a link\n        \n         in : between tags\n        span: Span text", trim($text));
+        $this->assertEquals('text: This is some text link: This is a link in : between tags span: Span text', preg_replace('/\\s+/', ' ', trim($text)));
+    }
+
+    public function test_text2dl() {
+        $div = self::$inst->find('#test-div');
+
+        // Fetch a definition list out of textContents
+        $dl = $div->text2dl();
+        $this->assertEquals(array(
+          'text' => 'This is some text',
+          'link' => 'This is a link',
+          'in'   => 'between tags',
+          'span' => 'Span text',
+        ), $dl);
+
+        // Fetch one value out of definition list as text
+        $this->assertEquals('This is a link', $div->text2dl(':', 'link'));
+
+        // Fetch one value out of definition list as text by filter function
+        if ( class_exists('Closure') ) {
+            $v = $div->text2dl(':', function ($key, $val) {
+                return stripos($key, 'SPAN') !== false;
+            });
+            $this->assertEquals('Span text', $v);
+        }
+    }
+
+    public function test_dl() {
+        $dl = self::$inst->find('#dict1');
+
+        // Fetch a definition list
+        $dict = $dl->dl('dt', 'dd');
+        $this->assertEquals(array(
+          'Coffee' => 'Black hot drink',
+          'Milk'   => 'White cold drink',
+        ), $dict);
+
+        // Fetch one value out of definition list
+        $this->assertEquals('White cold drink', $dl->dl('dt', 'dd', NULL, 'Milk'));
+
+
+        $dl = self::$inst->find('#dict2');
+
+        // Fetch a definition list
+        $dict = $dl->dl('th', 'td', 'tr');
+        $this->assertEquals(array(
+          'Coffee' => 'Black hot drink',
+          'Milk'   => 'White cold drink',
+        ), $dict);
+
+        // Fetch one value out of definition list
+        $this->assertEquals('White cold drink', $dl->dl('th', 'td', 'tr', 'Milk'));
+
+        // @TODO
+        // $dl = self::$inst->find('#dict3');
+
+        // // Fetch a definition list
+        // $dict = $dl->dl('b', NULL, 'span');
+        // $this->assertEquals(array(
+        //   'Coffee' => 'Black hot drink',
+        //   'Milk'   => 'White cold drink',
+        // ), $dict);
+
+        // // Fetch one value out of definition list
+        // $this->assertEquals('White cold drink', $dl->dl('th', 'td', 'tr', 'Milk'));
+
     }
 
     // -----------------------------------------------------
