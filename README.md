@@ -5,7 +5,7 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
 
 [API Documentation](https://duzun.github.io/hQuery.php/docs/class-hQuery.html)
 
-# Features
+# 💡 Features
 
   - Very fast parsing and lookup
   - Parses broken HTML
@@ -18,7 +18,7 @@ An extremely fast and efficient web scraper that parses megabytes of HTML in a b
   - PHP 5.3+
   - No dependencies
 
-# Install
+# 🛠 Install
 
 Just `include_once 'hquery.php';` in your project and start using `hQuery`.
 
@@ -27,7 +27,7 @@ Alternatively `composer require duzun/hquery`
 or using `npm install hquery.php`, `require_once 'node_modules/hquery.php/hquery.php';`.
 
 
-# Usage
+# ⚙ Usage
 
 ### Basic setup:
 ```php
@@ -184,7 +184,7 @@ $charset = $doc->charset;
 $size = $doc->size;
 ```
 
-# Live Demo
+# 🖧 Live Demo
     
 On [DUzun.Me](https://duzun.me/playground/hquery#sel=%20a%20%3E%20img%3Aparent&url=https%3A%2F%2Fgithub.com%2Fduzun)
 
@@ -192,7 +192,7 @@ A lot of people ask for sources of my **Live Demo** page. Here we go:
 
 [view-source:https://duzun.me/playground/hquery](https://github.com/duzun/hQuery.php/blob/master/examples/duzun.me_playground_hquery.php)
  
-#TODO
+# 🔧 TODO
 
   - Unit tests everything
   - Document everything
@@ -207,7 +207,7 @@ I love Open Source. Whenever possible I share cool things with the world (check 
 
 If you like what I'm doing and this project helps you reduce time to develop, please consider to:
 
-- Star and Share the projects you like (and use)
-- Give me a cup of coffee - [PayPal.me/duzuns](https://www.paypal.me/duzuns) (contact at duzun.me)
-- Send me some **Bitcoin** at this addres: `bitcoin:3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa` (or using the QR below)
+- ★ Star and Share the projects you like (and use)
+- ☕ Give me a cup of coffee - [PayPal.me/duzuns](https://www.paypal.me/duzuns) (contact at duzun.me)
+- ₿ Send me some **Bitcoin** at this addres: `bitcoin:3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa` (or using the QR below)
 ![bitcoin:3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa](https://cdn.duzun.me/files/qr_bitcoin-3MVaNQocuyRUzUNsTbmzQC8rPUQMC9qafa.png)
