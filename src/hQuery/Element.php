@@ -206,6 +206,22 @@ class Element extends Node implements \ArrayAccess {
     }
 
     /**
+     * Get the first node in the set
+     * @return hQuery_Element
+     */
+    public function first() {
+        return $this->eq(0);
+    }
+
+    /**
+     * Get the last node in the set
+     * @return hQuery_Element
+     */
+    public function last() {
+        return $this->eq(-1);
+    }
+
+    /**
      * Get a slice of current node collection.
      *
      * @param int $idx - start index of an element, starts with 0.
