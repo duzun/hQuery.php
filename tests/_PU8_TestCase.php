@@ -1,18 +1,21 @@
 <?php
 
-abstract class PU_TestCase extends PHPUnit\Framework\TestCase {
+abstract class PU_TestCase extends PHPUnit\Framework\TestCase
+{
     // Before any test
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setUpBeforeClass();
 
-        if ( method_exists(get_called_class(), 'mySetUpBeforeClass') ) {
+        if (method_exists(get_called_class(), 'mySetUpBeforeClass')) {
             static::mySetUpBeforeClass();
         }
     }
 
     // After all tests
-    public static function tearDownAfterClass(): void {
-        if ( method_exists(get_called_class(), 'myTearDownAfterClass') ) {
+    public static function tearDownAfterClass(): void
+    {
+        if (method_exists(get_called_class(), 'myTearDownAfterClass')) {
             static::myTearDownAfterClass();
         }
 
@@ -21,8 +24,9 @@ abstract class PU_TestCase extends PHPUnit\Framework\TestCase {
 
     // -----------------------------------------------------
     // Before every test
-    public function setUp(): void {
-        if ( method_exists($this, 'mySetUp') ) {
+    public function setUp(): void
+    {
+        if (method_exists($this, 'mySetUp')) {
             $this->mySetUp();
         }
 

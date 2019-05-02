@@ -1,38 +1,69 @@
 <?php
 use duzun\hQuery;
 use duzun\hQuery\Element;
-
-use Http\Mock\Client;
 use Http\Discovery\MessageFactoryDiscovery;
+use Http\Mock\Client;
 
 // -----------------------------------------------------
 /**
- *  @author DUzun.Me
- *
  *  @TODO: Test all methods
+ *  @author DUzun.Me
  */
 // -----------------------------------------------------
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
 
 // -----------------------------------------------------
 // Surogate class for testing, to access protected attributes of hQuery
-class TestHQueryTests extends hQuery {
+class TestHQueryTests extends hQuery
+{
+    /**
+     * @var mixed
+     */
     public $class_idx;
 
-    public static function html_findTagClose($str, $p) {
+    /**
+     * @param $str
+     * @param $p
+     */
+    public static function html_findTagClose($str, $p)
+    {
         return parent::html_findTagClose($str, $p);
     }
 }
 // -----------------------------------------------------
 
-class TestHQuery extends PHPUnit_BaseClass {
+class TestHQuery extends PHPUnit_BaseClass
+{
     // -----------------------------------------------------
+    /**
+     * @var TestHQueryTests
+     */
     public static $inst;
+
+    /**
+     * @var mixed
+     */
     public static $messageFactory;
-    public static $log       = true;
+
+    /**
+     * @var boolean
+     */
+    public static $log = true;
+
+    /**
+     * @var string
+     */
     public static $className = 'duzun\hQuery';
-    public static $baseUrl   = 'https://DUzun.Me/';
-    public static $bodyHTML  = <<<EOS
+
+    /**
+     * @var string
+     */
+    public static $baseUrl = 'https://DUzun.Me/';
+
+    /**
+     * @var string
+     */
+    public static $bodyHTML = <<<EOS
 <doctype html>
 <html>
 <head>
@@ -85,7 +116,8 @@ EOS
     ;
 
     // Before any test
-    public static function mySetUpBeforeClass() {
+    public static function mySetUpBeforeClass()
+    {
         hQuery::$_mockup_class = 'TestHQueryTests';
 
         self::$inst = TestHQueryTests::fromHTML(self::$bodyHTML, self::$baseUrl . 'index.html');
@@ -94,28 +126,30 @@ EOS
     }
 
     // After all tests
-    public static function myTearDownAfterClass() {
-        self::$inst = NULL;
+    public static function myTearDownAfterClass()
+    {
+        self::$inst = null;
     }
 
-
     // -----------------------------------------------------
     // -----------------------------------------------------
 
-    public function testClass() {
+    public function testClass()
+    {
         $this->assertMehodExists('fromHTML', self::$className);
         $this->assertMehodExists('fromFile', self::$className);
-        $this->assertMehodExists('fromURL' , self::$className);
+        $this->assertMehodExists('fromURL', self::$className);
 
         // $f = glob(PHPUNIT_DIR . 'data/*');
         // foreach($f as $k => $v) if(is_file($v) && substr($v, -3) != '.gz') {
-            // $g = gzencode(file_get_contents($v), 9);
-            // file_put_contents($v.'.gz', $g);
+        // $g = gzencode(file_get_contents($v), 9);
+        // file_put_contents($v.'.gz', $g);
         // }
     }
 
     // -----------------------------------------------------
-    public function test_fromHTML() {
+    public function test_fromHTML()
+    {
         $url = strtolower(self::$baseUrl . 'index.html');
 
         // self::$inst is initialized with ::fromHTML() method
@@ -124,14 +158,14 @@ EOS
         $this->assertEquals(self::$baseUrl . 'index.html', $doc->location());
 
         // Optional stuff
-        if ( class_exists('Http\Discovery\MessageFactoryDiscovery') ) {
+        if (class_exists('Http\Discovery\MessageFactoryDiscovery')) {
             empty(self::$messageFactory) and self::$messageFactory = MessageFactoryDiscovery::find();
 
             // $response = $this->createMock('Psr\Http\Message\ResponseInterface');
             $response = self::$messageFactory->createResponse(
                 '200',
                 'ok',
-                array('host' => parse_url(self::$baseUrl, PHP_URL_HOST), 'origin' => self::$baseUrl),
+                ['host' => parse_url(self::$baseUrl, PHP_URL_HOST), 'origin' => self::$baseUrl],
                 self::$bodyHTML
             );
 
@@ -143,7 +177,7 @@ EOS
             $request = self::$messageFactory->createRequest(
                 'GET',
                 $url,
-                array(),
+                [],
                 self::$bodyHTML
             );
 
@@ -151,12 +185,11 @@ EOS
             $doc = TestHQueryTests::fromHTML($request);
             $this->assertEquals(self::$bodyHTML, $doc->html());
             $this->assertEquals($url, $doc->location());
-        }
-        else {
+        } else {
             self::log('Http\Discovery\MessageFactoryDiscovery not found!');
         }
 
-        if ( class_exists('Http\Mock\Client') ) {
+        if (class_exists('Http\Mock\Client')) {
             // Document from hQuery::sendRequest($request, $client)
             $client = new Client();
             $client->addResponse($response);
@@ -164,8 +197,7 @@ EOS
             $doc = TestHQueryTests::sendRequest($request, $client);
             $this->assertEquals(self::$bodyHTML, $doc->html());
             $this->assertEquals($url, $doc->location());
-        }
-        else {
+        } else {
             self::log('Http\Mock\Client not found!');
         }
 
@@ -174,7 +206,8 @@ EOS
     }
 
     // -----------------------------------------------------
-    public function test_static_html_findTagClose() {
+    public function test_static_html_findTagClose()
+    {
         // A string with misplaced quotes inside a tag
         $str1 = '<img class="map>Img" "src"="https://cdn.duzun.lh/images/logo.png"">
                  <div class="overlayLowlightoverlayBottom">abra-kadabra</div>
@@ -197,7 +230,11 @@ EOS
     }
 
     // -----------------------------------------------------
-    public function test_find() {
+    /**
+     * @return mixed
+     */
+    public function test_find()
+    {
         // 1)
         $a = self::$inst->find('.test-class #test-div.test-div > a');
 
@@ -225,13 +262,12 @@ EOS
         $this->assertEquals(1, count($input));
         $this->assertEquals('the title', $input->value);
 
-        $input = $ff->find('input', array('type'=>'text'));
+        $input = $ff->find('input', ['type' => 'text']);
         $this->assertEquals(2, count($input));
 
-        $input = $ff->find('input', array('type'=>'text', 'name' => 'text'));
+        $input = $ff->find('input', ['type' => 'text', 'name' => 'text']);
         $this->assertEquals(1, count($input));
         $this->assertEquals('the text', $input->attr('value'));
-
 
         // @TODO
         // $input = $ff->find('input[name=title]');
@@ -242,19 +278,20 @@ EOS
     }
 
     // -----------------------------------------------------
-    public function test_hasClass() {
+    public function test_hasClass()
+    {
         $doc = self::$inst;
 
-        $a    = $doc->find('a:first');
-        $div  = $doc->find('div.test-div');
-        $body = $doc->find('body');
-        $head = $doc->find('head');
-        $all  = $doc->find('.test-class');
+        $a     = $doc->find('a:first');
+        $div   = $doc->find('div.test-div');
+        $body  = $doc->find('body');
+        $head  = $doc->find('head');
+        $all   = $doc->find('.test-class');
         $empty = $head->slice(0, 0);
 
         $this->assertNotEmpty($div->hasClass('test-class'), 'div.test-div should have .test-class class');
-        $this->assertNotEmpty($div->hasClass(array('test-class', 'test-div')), 'div.test-div should have .test-div and .test-class class');
-        $this->assertEmpty($div->hasClass(array('test-class', 'test-div', 'span')), 'div.test-div shouldn\'t have .no-class class');
+        $this->assertNotEmpty($div->hasClass(['test-class', 'test-div']), 'div.test-div should have .test-div and .test-class class');
+        $this->assertEmpty($div->hasClass(['test-class', 'test-div', 'span']), 'div.test-div shouldn\'t have .no-class class');
         $this->assertNotEmpty($all->hasClass('test-class test-div'), 'At least one div should have .test-div and .test-class classes');
 
         $this->assertEmpty($a->hasClass('test-class'), 'a should have no class');
@@ -264,9 +301,9 @@ EOS
         // Some edge cases
         $this->assertEmpty($a->hasClass('non-existent-class'), 'non existent classes should not throw');
         $this->assertEmpty($head->hasClass('non-existent-class'), 'non existent classes should not throw even on elements with non attributes at all');
-        $this->assertEmpty($div->hasClass(array('non-existent-class', 'span')), 'non existent classes should not throw even when in combination with existing classes');
+        $this->assertEmpty($div->hasClass(['non-existent-class', 'span']), 'non existent classes should not throw even when in combination with existing classes');
         $this->assertEmpty($a->hasClass(''), 'empty class doesn\'t exist');
-        $this->assertEmpty($a->hasClass(array()), 'empty class doesn\'t exist');
+        $this->assertEmpty($a->hasClass([]), 'empty class doesn\'t exist');
         $this->assertEmpty($empty->hasClass('test-class'), 'empty collection should not have any class');
         $this->assertEmpty($empty->hasClass('non-existent-class'), 'non existent classes should not throw even on empty collections');
 
@@ -280,7 +317,8 @@ EOS
     /**
      * @depends test_find
      */
-    public function test_hQuery_Element_ArrayAccess($doc) {
+    public function test_hQuery_Element_ArrayAccess($doc)
+    {
         $e = $doc->find('input');
 
         // Short forms of $e->get(0)->attr('name')
@@ -300,7 +338,8 @@ EOS
     /**
      * @depends test_hQuery_Element_ArrayAccess
      */
-    public function test_attr($doc) {
+    public function test_attr($doc)
+    {
         $e = $doc->find('#img1');
 
         // It's magic!
@@ -312,7 +351,6 @@ EOS
         $this->assertEquals('/path/to/img.png', $e->attr('src'));
         $this->assertEquals('other/img/here.jpg', $e->attr('src2'));
         $this->assertEquals('//example.com/full/path.gif', $e->attr('src3'));
-
 
         // Relative vs Absolute URL paths
 
@@ -329,11 +367,11 @@ EOS
         $this->assertEquals('https://cdn.duzun.me/images/logo.png', $a->src);
 
         // link[href] relative URL
-        $a = self::$inst->find('link', array('rel' => 'shortcut icon'));
+        $a = self::$inst->find('link', ['rel' => 'shortcut icon']);
         $this->assertEquals(self::$baseUrl . 'favicon.ico', $a->href);
 
         // meta[content] - not a URL
-        $m = self::$inst->find('meta', array('property' => 'og:image'));
+        $m = self::$inst->find('meta', ['property' => 'og:image']);
         $c = $m->attr('content');
 
         $this->assertEquals('/logo.png', $c);
@@ -343,64 +381,76 @@ EOS
 
         return $doc;
     }
+
     // -----------------------------------------------------
     /**
      * @depends test_attr
      */
-    public function test_prop_charset($doc) {
+    public function test_prop_charset($doc)
+    {
         $this->assertEquals('utf-8', strtolower($doc->charset));
         $this->assertEquals('iso-8859-2', strtolower(self::$inst->charset));
 
         return $doc;
     }
+
     // -----------------------------------------------------
-    public function test_prop_size() {
+    public function test_prop_size()
+    {
         $size = self::$inst->size;
         $this->assertGreaterThan(200, $size);
     }
+
     // -----------------------------------------------------
-    public function test_prop_baseURL() {
+    public function test_prop_baseURL()
+    {
         $baseURL = self::$inst->baseURL;
         $this->assertEquals(self::$baseUrl, $baseURL);
     }
+
     // -----------------------------------------------------
-    public function test_prop_baseURI() {
+    public function test_prop_baseURI()
+    {
         $baseURI = self::$inst->baseURI;
         $this->assertEquals(self::$baseUrl . 'index.html', $baseURI);
     }
+
     // -----------------------------------------------------
     // Alias of baseURI
-    public function test_prop_href() {
+    public function test_prop_href()
+    {
         $href = self::$inst->href;
         $this->assertEquals(self::$baseUrl . 'index.html', $href);
     }
 
     // -----------------------------------------------------
-    public function test_text() {
-        $div = self::$inst->find('#test-div');
+    public function test_text()
+    {
+        $div  = self::$inst->find('#test-div');
         $text = $div->text();
 
         $this->assertEquals("text: This is some text\n        \n            link: This is a link\n        \n         in : between tags\n        span: Span text", trim($text));
         $this->assertEquals('text: This is some text link: This is a link in : between tags span: Span text', preg_replace('/\\s+/', ' ', trim($text)));
     }
 
-    public function test_text2dl() {
+    public function test_text2dl()
+    {
         $div = self::$inst->find('#test-div');
 
         // Fetch a definition list out of textContents
         $dl = $div->text2dl();
-        $this->assertEquals(array(
-          'text' => 'This is some text',
-          'link' => 'This is a link',
-          'in'   => 'between tags',
-          'span' => 'Span text',
-        ), $dl);
+        $this->assertEquals([
+            'text' => 'This is some text',
+            'link' => 'This is a link',
+            'in'   => 'between tags',
+            'span' => 'Span text',
+        ], $dl);
 
         // Fetch one value out of definition list as text
         $this->assertEquals('This is a link', $div->text2dl(':', 'link'));
 
         // Fetch one value out of definition list as text by filter function
-        if ( class_exists('Closure') ) {
+        if (class_exists('Closure')) {
             $v = $div->text2dl(':', function ($key, $val) {
                 return stripos($key, 'SPAN') !== false;
             });
@@ -408,28 +458,28 @@ EOS
         }
     }
 
-    public function test_dl() {
+    public function test_dl()
+    {
         $dl = self::$inst->find('#dict1');
 
         // Fetch a definition list
         $dict = $dl->dl('dt', 'dd');
-        $this->assertEquals(array(
-          'Coffee' => 'Black hot drink',
-          'Milk'   => 'White cold drink',
-        ), $dict);
+        $this->assertEquals([
+            'Coffee' => 'Black hot drink',
+            'Milk'   => 'White cold drink',
+        ], $dict);
 
         // Fetch one value out of definition list
-        $this->assertEquals('White cold drink', $dl->dl('dt', 'dd', NULL, 'Milk'));
-
+        $this->assertEquals('White cold drink', $dl->dl('dt', 'dd', null, 'Milk'));
 
         $dl = self::$inst->find('#dict2');
 
         // Fetch a definition list
         $dict = $dl->dl('th', 'td', 'tr');
-        $this->assertEquals(array(
-          'Coffee' => 'Black hot drink',
-          'Milk'   => 'White cold drink',
-        ), $dict);
+        $this->assertEquals([
+            'Coffee' => 'Black hot drink',
+            'Milk'   => 'White cold drink',
+        ], $dict);
 
         // Fetch one value out of definition list
         $this->assertEquals('White cold drink', $dl->dl('th', 'td', 'tr', 'Milk'));
@@ -450,41 +500,42 @@ EOS
     }
 
     // -----------------------------------------------------
-//     public function test_extract_text_contents() {
-//         $div = self::$inst->find('#test-div');
-//         $div->exclude('*');
-//         $html = $div->html();
-//         $text = $div->text();
-//         $pos = $div->pos();
-//         $_pos = strpos(self::$inst->html(), $div->html());
-//         self::log(compact(/*'pos', '_pos', */'html', 'text'), self::$inst->html());
-//         $this->assertEquals('This is some text'.
-//                     '<a href="/path">'.
-//                         'This is a link'.
-//                     '</a>'.
-//                     ' between tags'.
-//                     '<span id="aSpan">Span text</span>', $html);
-//     }
+    //     public function test_extract_text_contents() {
+    //         $div = self::$inst->find('#test-div');
+    //         $div->exclude('*');
+    //         $html = $div->html();
+    //         $text = $div->text();
+    //         $pos = $div->pos();
+    //         $_pos = strpos(self::$inst->html(), $div->html());
+    //         self::log(compact(/*'pos', '_pos', */'html', 'text'), self::$inst->html());
+    //         $this->assertEquals('This is some text'.
+    //                     '<a href="/path">'.
+    //                         'This is a link'.
+    //                     '</a>'.
+    //                     ' between tags'.
+    //                     '<span id="aSpan">Span text</span>', $html);
+    //     }
 
     // -----------------------------------------------------
     // public function test_http_wr() {
-        // @TODO
-        // $doc = TestHQueryTests::fromURL('http://www.nameit.com', NULL, NULL, ['redirects' => 10, 'use_cookies' => true]);
-        // self::log(gettype($doc));
-        // self::log(TestHQueryTests::$last_http_result);
+    // @TODO
+    // $doc = TestHQueryTests::fromURL('http://www.nameit.com', NULL, NULL, ['redirects' => 10, 'use_cookies' => true]);
+    // self::log(gettype($doc));
+    // self::log(TestHQueryTests::$last_http_result);
     // }
 
     // -----------------------------------------------------
     // -----------------------------------------------------
-    public function test_unjsonize() {
+    public function test_unjsonize()
+    {
         $ser  = self::file_get_contents('data/jsonize.ser');
         $json = self::file_get_contents('data/jsonize.json');
 
         $ser_ = str_replace("\n", "\r\n", $ser);
 
-        $os = TestHQueryTests::unjsonize($ser);
+        $os  = TestHQueryTests::unjsonize($ser);
         $os_ = TestHQueryTests::unjsonize($ser_);
-        $oj = TestHQueryTests::unjsonize($json);
+        $oj  = TestHQueryTests::unjsonize($json);
 
         $this->assertNotEmpty($os);
         $this->assertNotEmpty($os_);
@@ -496,16 +547,16 @@ EOS
         $t = TestHQueryTests::unjsonize('[1,2,]');
         $this->assertNotEmpty($t, 'should handle trailing commas in arrays');
 
-
-        return array($os, $ser, $json);
+        return [$os, $ser, $json];
     }
 
     /**
      * @depends test_unjsonize
      */
-    public function test_jsonize($vars) {
+    public function test_jsonize($vars)
+    {
         list($o, $ser, $json) = $vars;
-        $b = TestHQueryTests::jsonize($o);
+        $b                    = TestHQueryTests::jsonize($o);
 
         $this->assertTrue(is_string($b));
         $this->assertNotEmpty($b);
@@ -516,4 +567,3 @@ EOS
     // -----------------------------------------------------
 
 }
-?>
