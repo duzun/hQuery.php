@@ -1,7 +1,7 @@
 {
   "name": "hquery.php",
   "description": "An extremely fast web scraper that parses megabytes of HTML in a blink of an eye. No dependencies. PHP5+",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "author": {
     "name": "Dumitru Uzun",
     "email": "contact@duzun.me",
@@ -65,7 +65,7 @@
     "test:7.0": "travis-local run --php=7.0",
     "test:5.6": "travis-local run --php=5.6",
     "test:5.3": "travis-local run --php=5.3",
-    "test:travis-local": "npm run test:7.3 && npm run test:7.2 && npm run test:7.1 && npm run test:7.1 && npm run test:5.6 && npm run test:5.3"
+    "test:travis-local": "npm run test:7.3 && npm run test:7.2 && npm run test:7.1 && npm run test:7.0 && npm run test:5.6 && npm run test:5.3"
   },
   "extra": {
     "verup": {

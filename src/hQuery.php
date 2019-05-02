@@ -23,7 +23,7 @@ class_exists('duzun\\hQuery\\HTML_Parser', false) or require_once __DIR__ . DIRE
  *
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
- *  @version 2.2.2
+ *  @version 2.2.3
  */
 class hQuery extends hQuery\HTML_Parser {
 
@@ -681,13 +681,13 @@ class hQuery extends hQuery\HTML_Parser {
         if(!is_string($cnt) || $cnt[0] == "\n") { $cnt = "\n" . self::jsonize($cnt); ++$n; }
         if($n) $cnt = $meta . $cnt;
         unset($meta);
-        @mkdir(dirname($fn), 0777, true);
         if($gzip) {
             $gl = is_int($gzip) ? $gzip : 1024;
             // Cache as gzip only if built-in gzdecode() defined (more CPU for less IO)
             strlen($cnt) > $gl && self::gz_supported() and
             $cnt = gzencode($cnt);
         }
+        file_exists($dn = dirname($fn)) or mkdir($dn, 0777, true);
         return self::flock_put_contents($fn, $cnt);
     }
 
