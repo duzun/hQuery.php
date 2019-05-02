@@ -699,7 +699,7 @@ class hQuery extends hQuery\HTML_Parser
     protected static function get_cache($fn, $expire = false, $meta_only = false)
     {
         $meta = $cnt = null;
-        if ($fm = @filemtime($fn) and (!$expire || $fm + $expire > time())) {
+        if (file_exists($fn) and $fm = filemtime($fn) and (!$expire || $fm + $expire > time())) {
             $cnt = self::flock_get_contents($fn);
         }
         $t = strlen($cnt);
@@ -939,7 +939,7 @@ class hQuery extends hQuery\HTML_Parser
                 throw new \Exception('Wrong host specified'); // error
             }
             $host = $p['host'];
-            $path = @$p['path'];
+            $path = isset($p['path']) ? $p['path'] : NULL;
             if (isset($p['query'])) {
                 $path .= '?' . $p['query'];
             }
