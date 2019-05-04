@@ -58,6 +58,7 @@
     "apigen": "php vendor/bin/apigen generate --source ./src --destination ./docs --base-url https://hquery.duzun.me/ --template-theme bootstrap",
     "doxygen": "doxygen Doxyfile",
     "test": "phpunit ./tests/",
+    "test:save": "{ echo; command -v lscpu > /dev/null && lscpu | grep -i 'model name' && echo; php -v && echo; npm run --silent test; } > ./tests/README.md",
     "test:watch": "node ./tools/test_watcher.js",
     "test:7.3": "travis-local run --php=7.3",
     "test:7.2": "travis-local run --php=7.2",

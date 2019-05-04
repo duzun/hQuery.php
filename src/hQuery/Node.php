@@ -402,7 +402,7 @@ abstract class Node implements \Iterator, \Countable
     public function nodeName($caseFolding = null, $id = null)
     {
         if (!isset($caseFolding)) {
-            $caseFolding = hQuery_HTML_Parser::$case_folding;
+            $caseFolding = HTML_Parser::$case_folding;
         }
 
         $dm = $this->isDoc() && !isset($id);
