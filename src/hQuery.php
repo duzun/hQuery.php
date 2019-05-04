@@ -22,7 +22,7 @@ class_exists('duzun\\hQuery\\HTML_Parser', false) or require_once __DIR__ . DIRE
  *
  *  Copyright (C) 2014-2018 Dumitru Uzun
  *
- *  @version 2.2.3
+ *  @version 2.2.4
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
  */

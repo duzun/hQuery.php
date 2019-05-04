@@ -2,7 +2,7 @@
   "name": "duzun/hquery",
   "type": "library",
   "description": "An extremely fast web scraper that parses megabytes of HTML in a blink of an eye. No dependencies. PHP5+",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "license": "MIT",
   "authors": [
     {
@@ -61,7 +61,9 @@
     "apigen/apigen": "~4.1",
     "php-http/mock-client": "^1.2",
     "guzzlehttp/psr7": "^1.5",
-    "php-http/discovery": "^1.6"
+    "php-http/discovery": "^1.6",
+    "symfony/dom-crawler": "^4.2",
+    "symfony/css-selector": "^4.2"
   },
   "suggest": {
     "php-http/message": "Might be required by hQuery::fromHTML($message) or hQuery::fromURL()",

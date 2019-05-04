@@ -122,7 +122,7 @@ EOS
 
         self::$inst = TestHQueryTests::fromHTML(self::$bodyHTML, self::$baseUrl . 'index.html');
 
-        self::log(get_class(self::$inst));
+        // self::log(get_class(self::$inst));
     }
 
     // After all tests

@@ -3,6 +3,12 @@ hQuery.php   [![Build Status](https://travis-ci.org/duzun/hQuery.php.svg?branch=
 
 An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye.
 
+In my unit tests, I demand it be at least 10 times faster than Symfony's DOMCrawler on a 3Mb HTML document.
+In reality, according to my humble tests, it is two-three orders of magnitude faster than DOMCrawler in some cases, especially when 
+selecting thousands of elements.
+
+See [tests/README.md](https://github.com/duzun/hQuery.php/blob/master/tests/README.md).
+
 [API Documentation](https://duzun.github.io/hQuery.php/docs/class-hQuery.html)
 
 # 💡 Features
