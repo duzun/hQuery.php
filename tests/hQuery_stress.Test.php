@@ -57,7 +57,7 @@ class TestHQueryStress extends PHPUnit_BaseClass
         krsort($counts);
 
         // self::log('Tag counts:', $counts);
-        return [$doc, $html];
+        return array($doc, $html);
     }
 
     /**
@@ -67,7 +67,7 @@ class TestHQueryStress extends PHPUnit_BaseClass
     {
         $doc = $return[0];
 
-        $selectors = [
+        $selectors = array(
             'span',
             '.ch-title',
             '.even',
@@ -81,25 +81,25 @@ class TestHQueryStress extends PHPUnit_BaseClass
             '.first:parent',
             '.first:next',
             'img.click',
-        ];
+        );
         $max_len = self::listMaxStrLen($selectors);
 
-        $contexts = [
+        $contexts = array(
             ' doc' => $doc,
             'body' => $doc->find('body'),
-        ];
+        );
 
         foreach ($selectors as $sel) {
-            $c = [];
-            $w = [];
+            $c = array();
+            $w = array();
             foreach ($contexts as $name => $ctx) {
-                $a   = null; // Free mem, call __destruct()
-                $tmr = self::timer();
-                $mmr = self::memer();
-                $a   = $ctx->find($sel);
-                $mem = self::memer($mmr);
-                $exe = self::timer($tmr);
-                $c[$name] = [$a, $exe, $mem];
+                $a        = null; // Free mem, call __destruct()
+                $tmr      = self::timer();
+                $mmr      = self::memer();
+                $a        = $ctx->find($sel);
+                $mem      = self::memer($mmr);
+                $exe      = self::timer($tmr);
+                $c[$name] = array($a, $exe, $mem);
                 // $pad = str_repeat(' ', $max_len - strlen($sel));
                 // self::log("{$name}.find('$sel')$pad\t-> " . str_pad(count($a), 5, ' ', STR_PAD_LEFT) . "  in {$exe}  with {$mem}");
                 $this->assertNotNull($a);

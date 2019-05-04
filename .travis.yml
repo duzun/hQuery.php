@@ -36,6 +36,10 @@ install:
     - flags="--prefer-dist --no-interaction --optimize-autoloader --no-suggest --no-progress"
     # install dependencies using system provided composer binary
     - if php -r "die(+(version_compare(PHP_VERSION,'5.5')!=1));"; then composer install $flags; else composer dump-autoload; fi
+    # Update some dependencies to this PHP version
+    - composer require --dev symfony/css-selector symfony/dom-crawler
+    # Remove some tools not required for testing
+    - composer remove --dev apigen/apigen
 
 script: phpunit tests/
 

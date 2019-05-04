@@ -130,14 +130,14 @@ class hQuery extends hQuery\HTML_Parser
      */
     public static function fromURL($url, $headers = null, $body = null, $options = null)
     {
-        $opt = [
+        $opt = array(
             'timeout'   => 7,
             'redirects' => 7,
             'close'     => false,
             'decode'    => 'gzip',
             'expires'   => self::$cache_expires,
-        ];
-        $hd = ['Accept-Charset' => 'UTF-8,*'];
+        );
+        $hd = array('Accept-Charset' => 'UTF-8,*');
 
         if ($options) {
             $opt = $options + $opt;
@@ -173,13 +173,13 @@ class hQuery extends hQuery\HTML_Parser
                 $code                   = $ret[1]['code'];
                 $url                    = $ret[1]['url'];
                 $cch_meta               = $ret[1];
-                self::$last_http_result = (object) [
+                self::$last_http_result = (object) array(
                     'body'    => $html,
                     'code'    => $code,
                     'url'     => $url,
                     'headers' => $hdrs,
                     'cached'  => true,
-                ];
+                );
             }
         } else {
             $ret = null;
@@ -201,7 +201,7 @@ class hQuery extends hQuery\HTML_Parser
             }
 
             if (!empty($cch_fn)) {
-                $save = self::set_cache($cch_fn, $html, ['hdr' => $hdrs, 'code' => $code, 'url' => $url]);
+                $save = self::set_cache($cch_fn, $html, array('hdr' => $hdrs, 'code' => $code, 'url' => $url));
             }
         }
         if (200 != $code) {
@@ -257,7 +257,7 @@ class hQuery extends hQuery\HTML_Parser
         $code = $response->getStatusCode();
         $url  = $request->getUri() . '';
 
-        self::$last_http_result = (object) [
+        self::$last_http_result = (object) array(
             'body'     => '', // to be set in fromHTML() - this avoids double call to __toString() on body
             'code'     => $code,
             'url'      => $url,
@@ -265,7 +265,7 @@ class hQuery extends hQuery\HTML_Parser
             // 'cached'  => false,
             'request'  => $request,
             'response' => $response,
-        ];
+        );
 
         if (200 != $code) {
             return false;
@@ -297,7 +297,7 @@ class hQuery extends hQuery\HTML_Parser
      */
     public function find($sel, $_attr = null, $ctx = null)
     {
-        $attr = [];
+        $attr = array();
         $c    = func_num_args();
         for ($i = 1; $i < $c; ++$i) {
             $a = func_get_arg($i);
@@ -738,7 +738,7 @@ class hQuery extends hQuery\HTML_Parser
 
             }
         }
-        return $cnt || $meta ? [$cnt, $meta] : false;
+        return $cnt || $meta ? array($cnt, $meta) : false;
     }
 
     /**
@@ -810,9 +810,9 @@ class hQuery extends hQuery\HTML_Parser
     }
 
     /**
-     * @param $fn
-     * @param $cnt
-     * @param $block
+     * @param  $fn
+     * @param  $cnt
+     * @param  $block
      * @return mixed
      */
     public static function flock_put_contents($fn, $cnt, $block = false)
@@ -842,8 +842,8 @@ class hQuery extends hQuery\HTML_Parser
     }
 
     /**
-     * @param $fn
-     * @param $block
+     * @param  $fn
+     * @param  $block
      * @return mixed
      */
     public static function flock_get_contents($fn, $block = false)
@@ -868,12 +868,12 @@ class hQuery extends hQuery\HTML_Parser
 
     // ------------------------------------------------------------------------
     /**
-     * @param $str
+     * @param  $str
      * @return mixed
      */
     public static function parse_cookie($str)
     {
-        $ret = [];
+        $ret = array();
         if (is_array($str)) {
             foreach ($str as $k => $v) {
                 $ret[$k] = self::parse_cookie($v);
@@ -929,7 +929,7 @@ class hQuery extends hQuery\HTML_Parser
     {
         self::$last_http_result      =
         $ret                         = new \stdClass();
-        empty($options) and $options = [];
+        empty($options) and $options = array();
 
         // If $host is a URL
         if ($p = strpos($host, '://') and $p < 7) {
@@ -939,7 +939,7 @@ class hQuery extends hQuery\HTML_Parser
                 throw new \Exception('Wrong host specified'); // error
             }
             $host = $p['host'];
-            $path = isset($p['path']) ? $p['path'] : NULL;
+            $path = isset($p['path']) ? $p['path'] : null;
             if (isset($p['query'])) {
                 $path .= '?' . $p['query'];
             }
@@ -981,10 +981,10 @@ class hQuery extends hQuery\HTML_Parser
 
         $ret->host =
         $conhost   = $host;
-        $_h        = [
+        $_h        = array(
             'host'   => isset($options['host']) ? $options['host'] : $host,
             'accept' => 'text/html,application/xhtml+xml,application/xml;q =0.9,*/*;q=0.8',
-        ];
+        );
         if (!empty($options['scheme'])) {
             switch ($p['scheme']) {
                 case 'http':
@@ -1053,7 +1053,7 @@ class hQuery extends hQuery\HTML_Parser
 
         $prot = empty($options['protocol']) ? 'HTTP/1.1' : $options['protocol'];
 
-        $head = ["$meth $path $prot"];
+        $head = array("$meth $path $prot");
         foreach ($_h as $i => $v) {
             $i = explode('-', $i);
             foreach ($i as &$j) {
@@ -1112,7 +1112,7 @@ class hQuery extends hQuery\HTML_Parser
                     if (is_array($_rh[$k])) {
                         $_rh[$k][] = $v;
                     } else {
-                        $_rh[$k] = [$_rh[$k], $v];
+                        $_rh[$k] = array($_rh[$k], $v);
                     }
                 }
             } else {
@@ -1134,7 +1134,7 @@ class hQuery extends hQuery\HTML_Parser
                         $host = $options['host'];
                     }
                     is_array($loc) and $loc = end($loc);
-                    $loc                    = self::abs_url($loc, compact('host', 'port', 'path') + ['scheme' => empty($options['scheme']) ? '' : $options['scheme']]);
+                    $loc                    = self::abs_url($loc, compact('host', 'port', 'path') + array('scheme' => empty($options['scheme']) ? '' : $options['scheme']));
                     unset($_h['host'], $options['host'], $options['port'], $options['scheme']);
                     if (isset($options['redirect_method'])) {
                         $redirect_method = $options['redirect_method'];
@@ -1221,7 +1221,7 @@ class hQuery extends hQuery\HTML_Parser
                                 if (is_array($_rh[$k])) {
                                     $_rh[$k][] = $v;
                                 } else {
-                                    $_rh[$k] = [$_rh[$k], $v];
+                                    $_rh[$k] = array($_rh[$k], $v);
                                 }
                             }
                         } else {

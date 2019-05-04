@@ -30,17 +30,17 @@ class Element extends Node implements \ArrayAccess
             return $this->_ich;
         }
 
-        $ret = [];
+        $ret = array();
         if ($cch) {
             foreach ($this->ids as $b => $e) {
                 $ret[$b] = isset($this->_ich[$b])
                     ? $this->_ich[$b]
-                    : ($this->_ich[$b] = new self($this->doc, [$b => $e]))
+                    : ($this->_ich[$b] = new self($this->doc, array($b => $e)))
                 ;
             }
         } else {
             foreach ($this->ids as $b => $e) {
-                $ret[$b] = new self($this->doc, [$b => $e]);
+                $ret[$b] = new self($this->doc, array($b => $e));
             }
         }
         return $ret;
@@ -172,7 +172,7 @@ class Element extends Node implements \ArrayAccess
         }
 
         if (!isset($this->_ich[$k])) {
-            $this->_ich[$k] = new self($this->doc, [$k => $this->ids[$k]]);
+            $this->_ich[$k] = new self($this->doc, array($k => $this->ids[$k]));
         }
 
         return $this->_ich[$k];
@@ -262,7 +262,7 @@ class Element extends Node implements \ArrayAccess
     public function eq($idx)
     {
         $i = array_slice($this->ids, $idx, 1, true) or
-        $i = [];
+        $i = array();
         // Create wraper instance for $i
         $o = new self($this->doc, $i);
         return $o;
@@ -297,7 +297,7 @@ class Element extends Node implements \ArrayAccess
     {
         $c = $this->count();
         if ($idx < $c) {
-            $ids = [];
+            $ids = array();
         } elseif (isset($len)) {
             if (0 == $idx && $len == $c) {
                 return $this; // ???

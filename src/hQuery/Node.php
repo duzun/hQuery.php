@@ -32,7 +32,7 @@ abstract class Node implements \Iterator, \Countable
      * Node properties
      * @var array
      */
-    protected $_prop = [];
+    protected $_prop = array();
 
     /**
      * Parent doc
@@ -69,7 +69,7 @@ abstract class Node implements \Iterator, \Countable
     /**
      * @var array
      */
-    static $_ar_ = [];
+    static $_ar_ = array();
     /**
      * @var int
      */
@@ -97,7 +97,7 @@ abstract class Node implements \Iterator, \Countable
     {
         $this->doc = $doc;
         if (is_int($ids)) {
-            $ids = [$ids => $doc->ids[$ids]];
+            $ids = array($ids => $doc->ids[$ids]);
         }
 
         $this->ids = $is_ctx ? $this->_ctx_ids($ids) : $ids;
@@ -330,7 +330,7 @@ abstract class Node implements \Iterator, \Countable
     public function dl($dt_sel = 'dt', $dd_sel = 'dd', $dw = null, $key = null)
     {
         $oneKey = isset($key);
-        $dl     = $oneKey ? null : [];
+        $dl     = $oneKey ? null : array();
 
         if ($dw) {
             $l = $this->find($dw);
@@ -485,7 +485,7 @@ abstract class Node implements \Iterator, \Countable
         if (!isset($ids)) {
             $ids = $this->ids;
         } elseif (is_int($ids)) {
-            $ids = isset($this->ids[$ids]) ? [$ids => $this->ids[$ids]] : self::$_fl_;
+            $ids = isset($this->ids[$ids]) ? array($ids => $this->ids[$ids]) : self::$_fl_;
         } else {
             foreach ($ids as $b => $e) {
                 if ($b <= $m || $b + 1 >= $e and empty($exc[$b])) {
@@ -506,7 +506,7 @@ abstract class Node implements \Iterator, \Countable
      */
     protected function _sub_ids($eq = false)
     {
-        $ret = [];
+        $ret = array();
         $ce  = reset($this->ids);
         $cb  = key($this->ids);
         $doc = $this->doc();
@@ -542,7 +542,7 @@ abstract class Node implements \Iterator, \Countable
 
         if ($force_array) {
             if (is_int($el)) {
-                $el = [$el => $this->doc()->ids[$el]];
+                $el = array($el => $this->doc()->ids[$el]);
             }
 
             if (!is_array($el)) {
@@ -571,7 +571,7 @@ abstract class Node implements \Iterator, \Countable
                 return $id;
             }
 
-            $id = [$id => $this->ids[$id]];
+            $id = array($id => $this->ids[$id]);
         } elseif (!$id) {
             return self::$_fl_;
         } else {
@@ -1129,7 +1129,7 @@ abstract class Node implements \Iterator, \Countable
             return false;
         }
 
-        return [$k => $this->ids[$k]];
+        return array($k => $this->ids[$k]);
     }
 
     public function valid()
@@ -1177,7 +1177,7 @@ abstract class Node implements \Iterator, \Countable
         // Get the textContents of $dl
         if ($dl instanceof self) {
             if (count($dl) > 1) {
-                $ln = [];
+                $ln = array();
                 foreach ($dl as $o) {
                     $ln[] = $o->text();
                 }
@@ -1191,7 +1191,7 @@ abstract class Node implements \Iterator, \Countable
         $dl = trim($dl);
 
         $oneKey = isset($key);
-        $o      = $oneKey ? false : [];
+        $o      = $oneKey ? false : array();
         if (!$dl) {
             return $o;
         }
@@ -1244,7 +1244,7 @@ abstract class Node implements \Iterator, \Countable
         /**
          * @var array
          */
-        static $map = [
+        static $map = array(
             'lt'       => '<',
             'gt'       => '>',
             'prev'     => '-',
@@ -1252,7 +1252,7 @@ abstract class Node implements \Iterator, \Countable
             'parent'   => '|',
             'children' => '*',
             '*'        => '*',
-        ];
+        );
         $p    = explode('(', $p, 2);
         $p[1] = isset($p[1]) ? trim(rtrim($p[1], ')')) : null;
         switch ($p[0]) {
@@ -1272,7 +1272,7 @@ abstract class Node implements \Iterator, \Countable
                     // ??? unknown ps
                 }
         }
-        return [$p[0] => $p[1]];
+        return array($p[0] => $p[1]);
     }
 
     // ------------------------------------------------------------------------
@@ -1304,8 +1304,8 @@ abstract class Node implements \Iterator, \Countable
     {
         $sc  = '#.:';
         $n   = null;
-        $a   = [];
-        $def = ['n' => $n, 'i' => $n, 'c' => $a, 'p' => $a];
+        $a   = array();
+        $def = array('n' => $n, 'i' => $n, 'c' => $a, 'p' => $a);
         $sel = rtrim(trim(preg_replace('/\\s*(>|,)\\s*/', '$1', $sel), " \t\n\r,>"), $sc);
         $sel = explode(',', $sel);
         foreach ($sel as &$a) {
@@ -1416,7 +1416,7 @@ abstract class Node implements \Iterator, \Countable
             $_attrName_firstLet = self::str_range('a-zA-Z_');
         }
 
-        $ret = [];
+        $ret = array();
         for ($i = strspn($str, " \t\n\r"), $len = strlen($str); $i < $len;) {
             $i += strcspn($str, $_attrName_firstLet, $i);
             if ($i >= $len) {
@@ -1496,7 +1496,7 @@ abstract class Node implements \Iterator, \Countable
         if (isset($attr['style']) && is_array($attr['style'])) {
             $attr['style'] = self::CSSArr2Str($attr['style']);
         }
-        $ret = [];
+        $ret = array();
         foreach ($attr as $n => $v) {
             $ret[] = $n . '=' . $quote . ($sq ? str_replace($quote, $sq, $v) : $v) . $quote;
         }
@@ -1511,7 +1511,7 @@ abstract class Node implements \Iterator, \Countable
      */
     public static function parseCSStr($str, $case_folding = true)
     {
-        $ret = [];
+        $ret = array();
         $a   = explode(';', $str); // ??? what if ; in "" ?
         foreach ($a as $v) {
             $v = explode(':', $v, 2);
@@ -1534,7 +1534,7 @@ abstract class Node implements \Iterator, \Countable
     {
         if (is_array($css)) {
             ksort($css);
-            $ret = [];
+            $ret = array();
             foreach ($css as $n => $v) {
                 $ret[] = $n . ':' . $v;
             }
@@ -1552,7 +1552,7 @@ abstract class Node implements \Iterator, \Countable
      */
     public static function str_range($comp, $pos = 0, $len = null)
     {
-        $ret = [];
+        $ret = array();
         $b   = strlen($comp);
         if (!isset($len) || $len > $b) {
             $len = $b;
@@ -1596,9 +1596,9 @@ abstract class Node implements \Iterator, \Countable
      */
     public static function array_select($arr, $keys, $force_null = false)
     {
-        $ret = [];
+        $ret = array();
 
-        is_array($keys) or is_object($keys) or $keys = [$keys];
+        is_array($keys) or is_object($keys) or $keys = array($keys);
         foreach ($keys as $k) {
             if (isset($arr[$k])) {
                 $ret[$k] = $arr[$k];
@@ -1654,7 +1654,7 @@ abstract class Node implements \Iterator, \Countable
         isset($from) or $from = $use_mb ? mb_internal_encoding() : iconv_get_encoding('internal_encoding');
 
         if (is_array($a)) {
-            $ret = [];
+            $ret = array();
             foreach ($a as $n => $v) {
                 $ret[is_string($n) ? self::convert_encoding($n, $to, $from, $use_mb) : $n] = is_string($v) || is_array($v) || $v instanceof stdClass
                     ? self::convert_encoding($v, $to, $from, $use_mb)
@@ -1662,7 +1662,7 @@ abstract class Node implements \Iterator, \Countable
             }
             return $ret;
         } elseif ($a instanceof stdClass) {
-            $ret = (object) [];
+            $ret = (object) array();
             foreach ($a as $n => $v) {
                 $ret->{is_string($n) ? self::convert_encoding($n, $to, $from, $use_mb) : $n} = is_string($v) || is_array($v) || $v instanceof stdClass
                     ? self::convert_encoding($v, $to, $from, $use_mb)

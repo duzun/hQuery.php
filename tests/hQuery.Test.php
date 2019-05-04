@@ -165,7 +165,7 @@ EOS
             $response = self::$messageFactory->createResponse(
                 '200',
                 'ok',
-                ['host' => parse_url(self::$baseUrl, PHP_URL_HOST), 'origin' => self::$baseUrl],
+                array('host' => parse_url(self::$baseUrl, PHP_URL_HOST), 'origin' => self::$baseUrl),
                 self::$bodyHTML
             );
 
@@ -177,7 +177,7 @@ EOS
             $request = self::$messageFactory->createRequest(
                 'GET',
                 $url,
-                [],
+                array(),
                 self::$bodyHTML
             );
 
@@ -262,10 +262,10 @@ EOS
         $this->assertEquals(1, count($input));
         $this->assertEquals('the title', $input->value);
 
-        $input = $ff->find('input', ['type' => 'text']);
+        $input = $ff->find('input', array('type' => 'text'));
         $this->assertEquals(2, count($input));
 
-        $input = $ff->find('input', ['type' => 'text', 'name' => 'text']);
+        $input = $ff->find('input', array('type' => 'text', 'name' => 'text'));
         $this->assertEquals(1, count($input));
         $this->assertEquals('the text', $input->attr('value'));
 
@@ -290,8 +290,8 @@ EOS
         $empty = $head->slice(0, 0);
 
         $this->assertNotEmpty($div->hasClass('test-class'), 'div.test-div should have .test-class class');
-        $this->assertNotEmpty($div->hasClass(['test-class', 'test-div']), 'div.test-div should have .test-div and .test-class class');
-        $this->assertEmpty($div->hasClass(['test-class', 'test-div', 'span']), 'div.test-div shouldn\'t have .no-class class');
+        $this->assertNotEmpty($div->hasClass(array('test-class', 'test-div')), 'div.test-div should have .test-div and .test-class class');
+        $this->assertEmpty($div->hasClass(array('test-class', 'test-div', 'span')), 'div.test-div shouldn\'t have .no-class class');
         $this->assertNotEmpty($all->hasClass('test-class test-div'), 'At least one div should have .test-div and .test-class classes');
 
         $this->assertEmpty($a->hasClass('test-class'), 'a should have no class');
@@ -301,9 +301,9 @@ EOS
         // Some edge cases
         $this->assertEmpty($a->hasClass('non-existent-class'), 'non existent classes should not throw');
         $this->assertEmpty($head->hasClass('non-existent-class'), 'non existent classes should not throw even on elements with non attributes at all');
-        $this->assertEmpty($div->hasClass(['non-existent-class', 'span']), 'non existent classes should not throw even when in combination with existing classes');
+        $this->assertEmpty($div->hasClass(array('non-existent-class', 'span')), 'non existent classes should not throw even when in combination with existing classes');
         $this->assertEmpty($a->hasClass(''), 'empty class doesn\'t exist');
-        $this->assertEmpty($a->hasClass([]), 'empty class doesn\'t exist');
+        $this->assertEmpty($a->hasClass(array()), 'empty class doesn\'t exist');
         $this->assertEmpty($empty->hasClass('test-class'), 'empty collection should not have any class');
         $this->assertEmpty($empty->hasClass('non-existent-class'), 'non existent classes should not throw even on empty collections');
 
@@ -367,11 +367,11 @@ EOS
         $this->assertEquals('https://cdn.duzun.me/images/logo.png', $a->src);
 
         // link[href] relative URL
-        $a = self::$inst->find('link', ['rel' => 'shortcut icon']);
+        $a = self::$inst->find('link', array('rel' => 'shortcut icon'));
         $this->assertEquals(self::$baseUrl . 'favicon.ico', $a->href);
 
         // meta[content] - not a URL
-        $m = self::$inst->find('meta', ['property' => 'og:image']);
+        $m = self::$inst->find('meta', array('property' => 'og:image'));
         $c = $m->attr('content');
 
         $this->assertEquals('/logo.png', $c);
@@ -439,12 +439,12 @@ EOS
 
         // Fetch a definition list out of textContents
         $dl = $div->text2dl();
-        $this->assertEquals([
+        $this->assertEquals(array(
             'text' => 'This is some text',
             'link' => 'This is a link',
             'in'   => 'between tags',
             'span' => 'Span text',
-        ], $dl);
+        ), $dl);
 
         // Fetch one value out of definition list as text
         $this->assertEquals('This is a link', $div->text2dl(':', 'link'));
@@ -464,10 +464,10 @@ EOS
 
         // Fetch a definition list
         $dict = $dl->dl('dt', 'dd');
-        $this->assertEquals([
+        $this->assertEquals(array(
             'Coffee' => 'Black hot drink',
             'Milk'   => 'White cold drink',
-        ], $dict);
+        ), $dict);
 
         // Fetch one value out of definition list
         $this->assertEquals('White cold drink', $dl->dl('dt', 'dd', null, 'Milk'));
@@ -476,10 +476,10 @@ EOS
 
         // Fetch a definition list
         $dict = $dl->dl('th', 'td', 'tr');
-        $this->assertEquals([
+        $this->assertEquals(array(
             'Coffee' => 'Black hot drink',
             'Milk'   => 'White cold drink',
-        ], $dict);
+        ), $dict);
 
         // Fetch one value out of definition list
         $this->assertEquals('White cold drink', $dl->dl('th', 'td', 'tr', 'Milk'));
@@ -547,7 +547,7 @@ EOS
         $t = TestHQueryTests::unjsonize('[1,2,]');
         $this->assertNotEmpty($t, 'should handle trailing commas in arrays');
 
-        return [$os, $ser, $json];
+        return array($os, $ser, $json);
     }
 
     /**

@@ -62,8 +62,8 @@
     "php-http/mock-client": "^1.2",
     "guzzlehttp/psr7": "^1.5",
     "php-http/discovery": "^1.6",
-    "symfony/dom-crawler": "^4.2",
-    "symfony/css-selector": "^4.2"
+    "symfony/dom-crawler": "*",
+    "symfony/css-selector": "*"
   },
   "suggest": {
     "php-http/message": "Might be required by hQuery::fromHTML($message) or hQuery::fromURL()",

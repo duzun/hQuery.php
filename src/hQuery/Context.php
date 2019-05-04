@@ -46,7 +46,7 @@ class Context extends Node
                 if ($eq) {
                     return $this;
                 } else {
-                    $el = [];
+                    $el = array();
                 }
 
             } else {

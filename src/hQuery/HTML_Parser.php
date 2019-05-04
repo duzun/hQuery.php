@@ -32,27 +32,27 @@ class HTML_Parser extends Node
     /**
      * @var array
      */
-    public static $_emptyTags = ['base', 'meta', 'link', 'hr', 'br', 'basefont', 'param', 'img', 'area', 'input', 'isindex', 'col'];
+    public static $_emptyTags = array('base', 'meta', 'link', 'hr', 'br', 'basefont', 'param', 'img', 'area', 'input', 'isindex', 'col');
 
     /**
      * @var array
      */
-    public static $_specialTags = ['--' => '--', '[CDATA[' => ']]'];
+    public static $_specialTags = array('--' => '--', '[CDATA[' => ']]');
 
     /**
      * @var array
      */
-    public static $_unparsedTags = ['style', 'script'];
+    public static $_unparsedTags = array('style', 'script');
 
     /**
      * @var array
      */
-    public static $_index_attribs = ['href', 'src'];
+    public static $_index_attribs = array('href', 'src');
 
     /**
      * @var array
      */
-    public static $_url_attribs = ['href' => 'href', 'src' => 'src'];
+    public static $_url_attribs = array('href' => 'href', 'src' => 'src');
 
     /**
      * @var string
@@ -290,7 +290,7 @@ class HTML_Parser extends Node
             $q  = strpos($up, '/', strpos($up, '//') + 2);
             $ub = substr($up, 0, $q + 1);
         }
-        return $array && $ub ? [$ub, $up] : $ub;
+        return $array && $ub ? array($ub, $up) : $ub;
     }
 
     /**
@@ -357,7 +357,7 @@ class HTML_Parser extends Node
      */
     public static function is_abs_path($path)
     {
-        $ds = ['\\' => 1, '/' => 2];
+        $ds = array('\\' => 1, '/' => 2);
         if (isset($ds[substr($path, 0, 1)]) ||
             substr($path, 1, 1) == ':' && isset($ds[substr($path, 2, 1)])
         ) {
@@ -401,7 +401,7 @@ class HTML_Parser extends Node
             }
         } else {
             $p = strpos($url, ':');
-            if (substr($url, $p + 3, 1) === '/' && in_array(substr($url, 0, $p), ['http', 'https'])) {
+            if (substr($url, $p + 3, 1) === '/' && in_array(substr($url, 0, $p), array('http', 'https'))) {
                 $url = substr($url, 0, $p + 3) . ltrim(substr($url, $p + 3), '/');
             }
         }
@@ -476,8 +476,8 @@ class HTML_Parser extends Node
      */
     public function _info()
     {
-        $inf = [];
-        $ar  = [];
+        $inf = array();
+        $ar  = array();
         foreach ($this->attribs as $i => $a) {
             $ar[$i] = self::html_attr2str($a);
         }
@@ -489,16 +489,16 @@ class HTML_Parser extends Node
         $inf['attr_idx']  = $this->attr_idx;
         $inf['class_idx'] = $this->class_idx;
 
-        $lev = [];
-        $nm  = [];
-        $st  = [];
+        $lev = array();
+        $nm  = array();
+        $st  = array();
         $pb  = -1;
         $pe  = PHP_INT_MAX;
         $l   = 0;
         foreach ($this->ids as $b => $e) {
             if ($pb < $b && $b < $pe) {
-                $st[]          = [$pb, $pe];
-                list($pb, $pe) = [$b, $e];
+                $st[]          = array($pb, $pe);
+                list($pb, $pe) = array($b, $e);
             } else {
                 while ($pe < $b && $st) {
                     list($pb, $pe) = array_pop($st);
@@ -634,7 +634,7 @@ class HTML_Parser extends Node
             if (isset($six[$str])) {
                 $aid = $six[$str];
                 if (!is_array($iix[$aid])) {
-                    $iix[$aid] = [$iix[$aid]];
+                    $iix[$aid] = array($iix[$aid]);
                 }
 
                 if (is_array($v)) {
@@ -659,7 +659,7 @@ class HTML_Parser extends Node
                 if (count($v) == 1) {
                     $v = reset($v);
                 } elseif ($v) {
-                    $u = [];
+                    $u = array();
                     foreach ($v as $e) {
                         $u[$e]           = $this->ids[$e];
                         $this->attrs[$e] = $aid;
@@ -692,7 +692,7 @@ class HTML_Parser extends Node
      */
     private function _index_classes()
     {
-        $ix  = [];
+        $ix  = array();
         $aix = $this->attr_idx;
         foreach ($this->attribs as $aid => &$a) {
             if (!empty($a['class'])) {
@@ -703,7 +703,7 @@ class HTML_Parser extends Node
                 foreach ($cl as $cl) {
                     if (isset($ix[$cl])) {
                         if (!is_array($ix[$cl])) {
-                            $ix[$cl] = [$ix[$cl] => $this->attr_idx[$ix[$cl]]];
+                            $ix[$cl] = array($ix[$cl] => $this->attr_idx[$ix[$cl]]);
                         }
 
                         $ix[$cl][$aid] = $this->attr_idx[$aid];
@@ -738,7 +738,7 @@ class HTML_Parser extends Node
 
         $firstLetterChars = self::str_range(self::$_tagID_first_letter); // first letter chars
         $tagLettersChars  = self::str_range(self::$_tagID_letters);      // tag name chars
-        $specialTags      = ['!' => 1, '?' => 2];                        // special tags
+        $specialTags      = array('!' => 1, '?' => 2);                        // special tags
         $unparsedTags     = array_flip(self::$_unparsedTags);
 
         $utn   = null; // current unparsed tag name
@@ -792,7 +792,7 @@ class HTML_Parser extends Node
                             if (!isset($a[$at])) {
                                 $a[$at] = $e;
                             } elseif (!is_array($a[$at])) {
-                                $a[$at] = [$a[$at], $e];
+                                $a[$at] = array($a[$at], $e);
                             } else {
                                 $a[$at][] = $e;
                             }
@@ -1171,8 +1171,7 @@ class HTML_Parser extends Node
      * @param  array|string $cl
      * @param  boolean      $as_keys
      * @param  array        $actx
-     *
-     * @return array $as_keys ? [aid => id | [ids]] : [aids]
+     * @return array        $as_keys ? [aid => id | [ids]] : [aids]
      */
     protected function get_aids_byClass($cl, $as_keys = false, $actx = null)
     {
@@ -1274,7 +1273,7 @@ class HTML_Parser extends Node
 
         foreach ($aid as $aid => $aix) {
             if (!is_array($aix)) {
-                $aix = [$aix => $this->ids[$aix]];
+                $aix = array($aix => $this->ids[$aix]);
             }
 
             if (empty($ret)) {
@@ -1328,7 +1327,7 @@ class HTML_Parser extends Node
 
             foreach ($aids as $aid => $aix) {
                 if (!is_array($aix)) {
-                    $aix = [$aix => $this->ids[$aix]];
+                    $aix = array($aix => $this->ids[$aix]);
                 }
 
                 foreach ($aix as $id => $e) {

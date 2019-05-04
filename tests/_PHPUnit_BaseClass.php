@@ -86,7 +86,7 @@ abstract class PHPUnit_BaseClass extends PU_TestCase
     public function assertClassHasMethod()
     {
         $args = func_get_args();
-        return call_user_func_array([$this, 'assertMehodExists'], $args);
+        return call_user_func_array(array($this, 'assertMehodExists'), $args);
     }
 
     // -----------------------------------------------------
