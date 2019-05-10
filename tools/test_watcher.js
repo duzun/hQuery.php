@@ -17,6 +17,7 @@ var _test_dir = path.join(_dir, 'tests');
 var _phpunit_url = 'https://phar.phpunit.de/phpunit.phar';
 var _phpunit_path = path.join(__dirname, '..', 'vendor/bin/phpunit');
 var _test_file = _test_dir;
+var _test_args    = [];
 
 
 function run_test() {
@@ -37,6 +38,7 @@ function run_test() {
         args.push('-c');
         args.push(phpunit_xml);
     }
+    if ( _test_args ) args = args.concat(_test_args);
     args.push(_test_file);
 
     _running = spawn( 'php', args, { cwd: _dir, env: process.env } );
@@ -151,6 +153,7 @@ check_phpunit_phar(function () {
         console.error("Can't find TestCase `" + testcase + "`");
         process.exit(1);
     }
+    _test_args = process.argv.slice(3);
     if ( _test_dir != _test_file ) {
         console.log("Using '%s'", _test_file.slice(_test_dir.length+1));
     }
@@ -158,14 +161,14 @@ check_phpunit_phar(function () {
     run_test_async();
 
     watch.createMonitor(
-      _dir
-      , {
-        interval: (_delay >>> 1) / 1e3
-        , ignoreDotFiles: true
-        , ignoreDirectoryPattern: /(node_modules|scripts|tools)/
-        , filter: function (f, stat) { return stat.isDirectory() || path.extname(f) === '.php'; }
-      }
-      , function (monitor) {
+      _dir,
+      {
+        interval: (_delay >>> 1) / 1e3,
+        ignoreDotFiles: true,
+        ignoreDirectoryPattern: /(node_modules|scripts|tools)/,
+        filter: function (f, stat) { return stat.isDirectory() || path.extname(f) === '.php'; }
+      },
+      function (monitor) {
         // monitor.files['/home/mikeal/.zshrc'] // Stat object for my zshrc.
         monitor.on("created", function (f, stat) {
             run_test_async();
@@ -180,5 +183,3 @@ check_phpunit_phar(function () {
       }
     );
 });
-
-

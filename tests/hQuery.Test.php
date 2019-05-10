@@ -13,23 +13,17 @@ use Http\Mock\Client;
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
 
 // -----------------------------------------------------
-// Surogate class for testing, to access protected attributes of hQuery
-class TestHQueryTests extends hQuery
-{
-    /**
-     * @var mixed
-     */
-    public $class_idx;
+class_alias(hQuery::class, 'TestHQueryTests');
 
-    /**
-     * @param $str
-     * @param $p
-     */
-    public static function html_findTagClose($str, $p)
-    {
-        return parent::html_findTagClose($str, $p);
-    }
-}
+// // Surogate class for testing, to access protected attributes of hQuery
+// class TestHQueryTests extends hQuery
+// {
+//     /**
+//      * @var mixed
+//      */
+//     public $class_idx;
+// }
+
 // -----------------------------------------------------
 
 class TestHQuery extends PHPUnit_BaseClass
@@ -71,16 +65,17 @@ class TestHQuery extends PHPUnit_BaseClass
     <!-- <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" /> -->
     <meta content="/logo.png" property="og:image" />
     <title>Sample HTML Doc</title>
-    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="shortcut icon" href="/favicon.ico" class="pjax" />
 </head>
 <body class="test-class">
     <div id="test-div" class="test-class test-div">
         text: This is some text
-        <a href="/path">
+        <a href="/path" class="path">
             link: This is a link
         </a>
          in : between tags
         span: <span id="aSpan" class="span">Span text</span>
+        notSpan: <div id="aDiv" class="span">notSpan text</div>
     </div>
     <a id="outterLink" href="//not-my-site.com/next.html">Not My Site</a>
     <img id="outterImg" src="https://cdn.duzun.me/images/logo.png" />
@@ -206,37 +201,15 @@ EOS
     }
 
     // -----------------------------------------------------
-    public function test_static_html_findTagClose()
-    {
-        // A string with misplaced quotes inside a tag
-        $str1 = '<img class="map>Img" "src"="https://cdn.duzun.lh/images/logo.png"">
-                 <div class="overlayLowlightoverlayBottom">abra-kadabra</div>
-               ';
-        $str2 = '<img "class"="mapImg" title="What <br>a nice day for testing!!!" ">
-                 <div class="overlayLowlightoverlayBottom">abra-kadabra</div>
-               ';
-        $str3 = "<img 'class 4 mapImg' title='What <br>a nice day for testing!!' ''>
-                 <div class='overlayLowlightoverlayBottom'>abra-kadabra</div>
-               ";
-
-        $r = TestHQueryTests::html_findTagClose($str1, 1);
-        $this->assertEquals(66, $r);
-
-        $r = TestHQueryTests::html_findTagClose($str2, 1);
-        $this->assertEquals(66, $r);
-
-        $r = TestHQueryTests::html_findTagClose($str3, 1);
-        $this->assertEquals(66, $r);
-    }
-
-    // -----------------------------------------------------
     /**
      * @return mixed
      */
     public function test_find()
     {
+        $doc = self::$inst;
+
         // 1)
-        $a = self::$inst->find('.test-class #test-div.test-div > a');
+        $a = $doc->find('.test-class #test-div.test-div > a[href]');
 
         $this->assertNotEmpty($a);
         $this->assertTrue($a instanceof Element);
@@ -246,8 +219,30 @@ EOS
         $this->assertEquals('div', $a->parent->nodeName);
         $this->assertEquals('test-div', $a->parent->attr('id'));
 
-        // 2)
+        $a = $doc->find('#outterImg');
+        $this->assertNotEmpty($a);
+        $this->assertEquals('img', $a->nodeName);
 
+        $a = $doc->find('dl>dt+dd');
+        $this->assertNotEmpty($a);
+        $this->assertEquals(2, count($a));
+
+        $a = $doc->find('div + a');
+        $this->assertNotEmpty($a);
+        $this->assertEquals(1, count($a));
+
+        $a = $doc->find('div + img');
+        $this->assertEmpty($a);
+
+        $a = $doc->find('div ~ img');
+        $this->assertNotEmpty($a);
+        $this->assertEquals(1, count($a));
+
+        $a = $doc->find('a ~ .span');
+        $this->assertNotEmpty($a);
+        $this->assertEquals(2, count($a));
+
+        // 2)
         $ff = TestHQueryTests::fromFile(self::file_exists('data/attr.html'));
         $aa = $ff->find('a.aa');
         $this->assertEquals(3, count($aa));
@@ -258,21 +253,29 @@ EOS
         $input = $ff->find('input');
         $this->assertEquals(3, count($input));
 
-        $input = $ff->find('input', 'name=title');
+        $input = $ff->find('input[name=title]');
         $this->assertEquals(1, count($input));
         $this->assertEquals('the title', $input->value);
 
-        $input = $ff->find('input', array('type' => 'text'));
+        $input = $ff->find('input[type=text]');
         $this->assertEquals(2, count($input));
 
-        $input = $ff->find('input', array('type' => 'text', 'name' => 'text'));
+        $input = $ff->find('input[type=text][name=text]');
         $this->assertEquals(1, count($input));
         $this->assertEquals('the text', $input->attr('value'));
 
-        // @TODO
-        // $input = $ff->find('input[name=title]');
-        // $this->assertEquals(1, count($input));
-        // $this->assertEquals('the title', $input->value);
+        // 4)
+        $a = $doc->find('[href]');
+        $this->assertEquals(3, count($a));
+
+        $a = self::$inst->find('[href][class]');
+        $this->assertEquals(2, count($a));
+
+        $a = self::$inst->find('[href][class=pjax]');
+        $b = self::$inst->find('[href].pjax');
+        $this->assertEquals(1, count($a));
+        $this->assertEquals(1, count($a));
+        $this->assertEquals($a->key(), $b->key());
 
         return $ff;
     }
@@ -429,8 +432,8 @@ EOS
         $div  = self::$inst->find('#test-div');
         $text = $div->text();
 
-        $this->assertEquals("text: This is some text\n        \n            link: This is a link\n        \n         in : between tags\n        span: Span text", trim($text));
-        $this->assertEquals('text: This is some text link: This is a link in : between tags span: Span text', preg_replace('/\\s+/', ' ', trim($text)));
+        $this->assertEquals("text: This is some text\n        \n            link: This is a link\n        \n         in : between tags\n        span: Span text\n        notSpan: notSpan text", trim($text));
+        $this->assertEquals('text: This is some text link: This is a link in : between tags span: Span text notSpan: notSpan text', preg_replace('/\\s+/', ' ', trim($text)));
     }
 
     public function test_text2dl()
@@ -440,10 +443,11 @@ EOS
         // Fetch a definition list out of textContents
         $dl = $div->text2dl();
         $this->assertEquals(array(
-            'text' => 'This is some text',
-            'link' => 'This is a link',
-            'in'   => 'between tags',
-            'span' => 'Span text',
+            'text'    => 'This is some text',
+            'link'    => 'This is a link',
+            'in'      => 'between tags',
+            'span'    => 'Span text',
+            'notSpan' => 'notSpan text',
         ), $dl);
 
         // Fetch one value out of definition list as text
@@ -556,7 +560,8 @@ EOS
     public function test_jsonize($vars)
     {
         list($o, $ser, $json) = $vars;
-        $b                    = TestHQueryTests::jsonize($o);
+
+        $b = TestHQueryTests::jsonize($o);
 
         $this->assertTrue(is_string($b));
         $this->assertNotEmpty($b);

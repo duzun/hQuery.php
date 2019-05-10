@@ -103,8 +103,8 @@ use GuzzleHttp\Client;
 <body>
     <header class="selector">
         <form name="hquery" action="" method="post">
-            <p><label>URL: <input type="url" name="url" value="<?=htmlspecialchars(@$url, ENT_QUOTES);?>" placeholder="ex. https://mariauzun.com" autofocus class="form-control" /></label></p>
-            <p><label>Selector: <input type="text" name="sel" value="<?=htmlspecialchars(@$sel, ENT_QUOTES);?>" placeholder="ex. 'a &gt; img:parent'" class="form-control" /></label></p>
+            <p><label>URL: <input type="url" name="url" value="<?=htmlspecialchars(@$url, ENT_QUOTES);?>" placeholder="ex. https://mariauzun.com/portfolio" autofocus class="form-control" /></label></p>
+            <p><label>Selector: <input type="text" name="sel" value="<?=htmlspecialchars(@$sel, ENT_QUOTES);?>" placeholder="ex. 'a[href] &gt; img[src]:parent'" class="form-control" /></label></p>
 
             <p>
                 <button type="submit" name="go" value="elements" class="btn btn-success">Fetch elements</button>

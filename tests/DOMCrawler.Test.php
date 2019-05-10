@@ -64,16 +64,16 @@ class TestDOMCrawler extends TestHQueryStress
             'table tr',
             'table>tr',
             'tr td',
-            'tr>td',
+            'tr>td', // @TODO: improve performance
             '.ch-title',
             '.even',
             '.row',
             'a',
             'img',
             'a img',
-            'a>img',
+            'a>img', // @TODO: improve performance
             '.first',
-            '.first:next',
+            '.first:next', // @TODO: improve performance
             'img.click',
             '#current_page',
             'div#current_page',

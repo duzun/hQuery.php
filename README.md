@@ -149,7 +149,7 @@ to create a `$context`, then call `hQuery::fromFile($url, false, $context)`.
 ###### [hQuery::find](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_find)( string `$sel`, array|string `$attr` = NULL, hQuery_Node `$ctx` = NULL )
 ```php
 // Find all banners (images inside anchors)
-$banners = $doc->find('a > img:parent');
+$banners = $doc->find('a[href] > img[src]:parent');
 
 // Extract links and images
 $links  = array();
@@ -203,7 +203,7 @@ A lot of people ask for sources of my **Live Demo** page. Here we go:
   - Unit tests everything
   - Document everything
   - ~~Cookie support~~ (implemented in mem for redirects)
-  - Improve selectors to be able to select by attributes
+  - ~~Improve selectors to be able to select by attributes~~
   - Add more selectors
   - Use [HTTPlug](http://httplug.io/) internally
 

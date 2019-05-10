@@ -1,6 +1,9 @@
 <?php
 namespace duzun\hQuery;
 
+use duzun\hQuery\Parser\Selector as SelectorParser;
+use duzun\hQuery\Parser\HTML as HTMLParser;
+
 // ------------------------------------------------------------------------
 /**
  *  Base class for HTML Elements and Documents.
@@ -13,7 +16,7 @@ namespace duzun\hQuery;
 abstract class Node implements \Iterator, \Countable
 {
     // ------------------------------------------------------------------------
-    const VERSION = '2.2.4';
+    const VERSION = '3.0.0';
     // ------------------------------------------------------------------------
     /**
      * Response details of last request
@@ -280,7 +283,6 @@ abstract class Node implements \Iterator, \Countable
         if (false === $id) {
             return self::$_fl_;
         }
-
         $doc = $this->doc();
         $ret = self::$_nl_;
         $map = isset($this->tag_map) ? $this->tag_map : (isset($doc->tag_map) ? $doc->tag_map : null);
@@ -290,7 +292,6 @@ abstract class Node implements \Iterator, \Countable
             if ($map && isset($map[$_n = strtolower($n)])) {
                 $n = $map[$_n];
             }
-
             $h = $p++ == $q ? false : ($p < $q ? substr($doc->html, $p, $q - $p) : '');
             $ret .= '<' . $n . ($a ? ' ' . $a : '') . (false === $h ? ' />' : '>' . $h . '</' . $n . '>');
         }
@@ -402,7 +403,7 @@ abstract class Node implements \Iterator, \Countable
     public function nodeName($caseFolding = null, $id = null)
     {
         if (!isset($caseFolding)) {
-            $caseFolding = HTML_Parser::$case_folding;
+            $caseFolding = HTML_Index::$case_folding;
         }
 
         $dm = $this->isDoc() && !isset($id);
@@ -493,7 +494,6 @@ abstract class Node implements \Iterator, \Countable
                 } else {
                     $m = $e;
                 }
-
             }
         }
         return $ids;
@@ -520,9 +520,9 @@ abstract class Node implements \Iterator, \Countable
             } else {
                 $ce = next($this->ids);
                 if (!$ce) {
+                    // end of context
                     break;
                 }
-                // end of context
                 $cb = key($this->ids);
             }
         }
@@ -584,10 +584,9 @@ abstract class Node implements \Iterator, \Countable
     // ------------------------------------------------------------------------
     /**
      * @param  array|int $ids
-     * @param  int       $n
      * @return array
      */
-    protected function _parent($ids = null, $n = 0)
+    protected function _parent($ids = null)
     {
         $ret = self::$_ar_;
         $ids = $this->_my_ids($ids);
@@ -598,7 +597,7 @@ abstract class Node implements \Iterator, \Countable
         $lb   = $le   = -1;  // last parent
         $ie   = reset($ids); // current child
         $ib   = key($ids);
-        $dids = &$this->doc()->ids;
+        $dids = $this->doc()->ids;
         foreach ($dids as $b => $e) {
             // $b < $ib < $e
             // if current element is past current child and last parent is parent for current child
@@ -650,10 +649,10 @@ abstract class Node implements \Iterator, \Countable
 
         $ib = key($dids);
         foreach ($ids as $b => $e) {
+            // empty tag; min 3 chars are required for a tag - eg. <b>
             if ($b + 4 >= $e) {
                 continue;
             }
-            // empty tag; min 3 chars are required for a tag - eg. <b>
 
             // child of prev element
             if ($b <= $le) {
@@ -662,7 +661,8 @@ abstract class Node implements \Iterator, \Countable
                         $ib = key($dids);
                     } else {
                         reset($dids);
-                        break;}
+                        break;
+                    }
                 }
 
             } else {
@@ -678,27 +678,31 @@ abstract class Node implements \Iterator, \Countable
                     $ib = key($dids);
                 } else {
                     end($dids);
-                    break;}
+                    break;
+                }
             }
 
             if ($b < $ib) {
                 $i = 0;
                 while ($ib < $e) {
-                    if (!isset($n)) {
-                        $ret[$ib] = $ie;
-                    } elseif ($n == $i) {
-                        $ret[$ib] = $ie;
-                        break;} else {
+                    if (isset($n)) {
+                        if ($n == $i) {
+                            $ret[$ib] = $ie;
+                            break;
+                        }
                         ++$i;
+                    } else {
+                        $ret[$ib] = $ie;
                     }
 
-                    $lie = $ie < $e ? $ie : $e;
+                    $lie = $ie < $e ? $ie : $e; // min($ie, $e)
                     while ($ib <= $lie) {
                         if ($ie = next($dids)) {
                             $ib = key($dids);
                         } else {
                             end($dids);
-                            continue 3;}
+                            continue 3;
+                        }
                     }
                 }
             }
@@ -708,10 +712,11 @@ abstract class Node implements \Iterator, \Countable
 
     /**
      * @param  array|int $ids
-     * @param  int       $n
+     * @param  int       $idx
+     * @param  int       $count
      * @return array
      */
-    public function _next($ids = null, $n = 0)
+    public function _next($ids = null, $idx = 0, $count = 1)
     {
         $ret = self::$_ar_;          // array()
         $ids = $this->_my_ids($ids); // ids to search siblings for
@@ -738,7 +743,9 @@ abstract class Node implements \Iterator, \Countable
 
         while ($e) {
             $b = key($dids);
-/* 4) */if ($ib <= $b) {
+
+            /* 4) */
+            if ($ib <= $b) {
                 // if current element is past our child, then its siblings context is found
                 if ($kb < $ke) {
                     $st[$kb] = $ke;
@@ -761,7 +768,8 @@ abstract class Node implements \Iterator, \Countable
                 }
             }
 
-/* 3) */if ($b < $ib && $ib < $e) {
+            /* 3) */
+            if ($b < $ib && $ib < $e) {
                 // push the parents to their stack
                 $pt[$lb] = $le;
                 $lb      = $b;
@@ -789,16 +797,24 @@ abstract class Node implements \Iterator, \Countable
             // current element
             do {
                 $b = key($dids);
+
+                // Found a child of $kb
                 if ($kb < $b) {
                     // iterate next siblings
                     $i = 0;
+                    $c = $count;
                     while ($b < $ke) {
-                        if ($n == $i) {
+                        if ($idx <= $i) {
                             $ret[$b] = $e;
-                            break;} else {
+                            if (!--$c) {
+                                break;
+                            }
+
+                        } else {
                             ++$i;
                         }
 
+                        // Skip all inner elements of $b (until past $e)
                         $lie = $e < $ke ? $e : $ke;
                         while ($b <= $lie && ($e = next($dids))) {
                             $b = key($dids);
@@ -806,7 +822,8 @@ abstract class Node implements \Iterator, \Countable
 
                         if (!$e) {
                             $e = end($dids);
-                            break;}
+                            break;
+                        }
                     }
                     break;
                 }
@@ -917,7 +934,8 @@ abstract class Node implements \Iterator, \Countable
 
                     if (!$e) {
                         $e = end($dids);
-                        break;}
+                        break;
+                    }
                 }
 
                 if ($pt) {
@@ -1010,7 +1028,8 @@ abstract class Node implements \Iterator, \Countable
                 return self::$_fl_;
             }
 
-            $el = $el->ids;} else {
+            $el = $el->ids;
+        } else {
             $el = $this->_ctx_ids($this->_doc_ids($el, true));
         }
 
@@ -1048,7 +1067,8 @@ abstract class Node implements \Iterator, \Countable
                 $ie = next($el);
                 if (false === $ie) {
                     $ib = -1;
-                    break 2;}
+                    break 2;
+                }
                 $ib = key($el);
             }
             // $b < $ib
@@ -1057,7 +1077,8 @@ abstract class Node implements \Iterator, \Countable
                 $ie       = next($el);
                 if (false === $ie) {
                     $ib = -1;
-                    break 2;}
+                    break 2;
+                }
                 $ib = key($el);
             }
         }
@@ -1224,183 +1245,8 @@ abstract class Node implements \Iterator, \Countable
 
     // ------------------------------------------------------------------------
     /**
-     * Normalize a CSS selector pseudo-class string.
-     * ( int, string or array(name => value) )
+     * @deprecated
      *
-     * @internal
-     * @return int|array
-     */
-    public static function html_normal_pseudoClass($p)
-    {
-        if (is_int($p)) {
-            return $p;
-        }
-
-        $i = (int) $p;
-        if ((string) $i === $p) {
-            return $i;
-        }
-
-        /**
-         * @var array
-         */
-        static $map = array(
-            'lt'       => '<',
-            'gt'       => '>',
-            'prev'     => '-',
-            'next'     => '+',
-            'parent'   => '|',
-            'children' => '*',
-            '*'        => '*',
-        );
-        $p    = explode('(', $p, 2);
-        $p[1] = isset($p[1]) ? trim(rtrim($p[1], ')')) : null;
-        switch ($p[0]) {
-            case 'first':
-            case 'first-child':return 0;
-            case 'last':
-            case 'last-child':return -1;
-            case 'eq':return (int) $p[1];
-            default:
-                if (isset($map[$p[0]])) {
-                    $p[0] = $map[$p[0]];
-                    if (isset($p[1])) {
-                        $p[1] = (int) $p[1];
-                    }
-
-                } else {
-                    // ??? unknown ps
-                }
-        }
-        return array($p[0] => $p[1]);
-    }
-
-    // ------------------------------------------------------------------------
-    /**
-     * Parse a selector string into an array structure.
-     *
-     * tn1#id1 .cl1.cl2:first tn2:5 , tn3.cl3 tn4#id2:eq(-1) > tn5:last-child > tn6:lt(3)
-     *  -->
-     *   [
-     *      [
-     *          [{ n: "tn1", i: "id1", c: [],            p: []  }],
-     *          [{ n: NULL,  i: NULL,  c: ["cl1","cl2"], p: [0] }],
-     *          [{ n: "tn2", i: NULL,  c: [],            p: [5] }]
-     *      ]
-     *    , [
-     *          [{ n: "tn3", i: NULL, c: ["cl3"], p: [] }],
-     *          [
-     *              { n: "tn4", i: "id2", c: [], p: [-1]   },
-     *              { n: "tn5", i: NULL , c: [], p: [-1]   },
-     *              { n: "tn6", i: NULL , c: [], p: ["<3"] }
-     *          ]
-     *      ]
-     *   ]
-     *
-     * @internal
-     * @return array
-     */
-    public static function html_selector2struc($sel)
-    {
-        $sc  = '#.:';
-        $n   = null;
-        $a   = array();
-        $def = array('n' => $n, 'i' => $n, 'c' => $a, 'p' => $a);
-        $sel = rtrim(trim(preg_replace('/\\s*(>|,)\\s*/', '$1', $sel), " \t\n\r,>"), $sc);
-        $sel = explode(',', $sel);
-        foreach ($sel as &$a) {
-            $a = preg_split('|\\s+|', $a);
-            foreach ($a as &$b) {
-                $b = explode('>', $b);
-                foreach ($b as &$c) {
-                    $d = $def;
-                    $l = strlen($c);
-                    $j = strcspn($c, $sc, 0, $l);
-                    if ($j) {
-                        $d['n'] = substr($c, 0, $j);
-                    }
-
-                    $i = $j;
-                    while ($i < $l) {
-                        $k = $c[$i++];
-                        $j = strcspn($c, $sc, $i, $l);
-                        if ($j) {
-                            $e = substr($c, $i, $j);
-                            switch ($k) {
-                                case '.':$d['c'][] = $e;
-                                    break;
-                                case '#':$d['i'] = $e;
-                                    break;
-                                case ':':$d['p'][] = self::html_normal_pseudoClass($e);
-                                    break;
-                            }
-                            $i += $j;
-                        }
-                    }
-                    if (empty($d['c'])) {
-                        $d['c'] = $n;
-                    }
-
-                    if (empty($d['p'])) {
-                        $d['p'] = $n;
-                    }
-
-                    $c = $d;
-                }
-            }
-        }
-        return $sel;
-    }
-
-    // ------------------------------------------------------------------------
-    /**
-     * @param  string $str
-     * @param  int    $p         position
-     * @return int    position
-     */
-    protected static function html_findTagClose($str, $p)
-    {
-        $l = strlen($str);
-        while ($i = $p < $l ? strpos($str, '>', $p) : $l) {
-            $e = $p; // save pos
-            $p += strcspn($str, '"\'', $p, $i);
-
-            // If closest quote is after '>', return pos of '>'
-            if ($p >= $i) {
-                return $i;
-            }
-
-                           // If there is any quote before '>', make sure '>' is outside an attribute string
-            $q = $str[$p]; // " | ' ?
-
-            // next char after the quote
-            ++$p;
-
-            // is there a '=' before first quote?
-            $e += strcspn($str, '=', $e, $p);
-
-            // is this the attr_name (like in "attr_name"="attr_value") ?
-            if ($e >= $p) {
-                // Attribute name should not have '>'
-                $p += strcspn($str, '>' . $q, $p, $l);
-                // but if it has '>', it is the tag closing char
-                if ('>' == $str[$p]) {
-                    return $p;
-                }
-
-            }
-            // else, its attr_value
-            else {
-                $p += strcspn($str, $q, $p, $l);
-            }
-
-            ++$p; // next char after the quote
-        }
-        return $i;
-    }
-
-    // ------------------------------------------------------------------------
-    /**
      * @param  $str
      * @param  $case_folding
      * @param  true            $extended
@@ -1408,183 +1254,58 @@ abstract class Node implements \Iterator, \Countable
      */
     public static function html_parseAttrStr($str, $case_folding = true, $extended = false)
     {
-        /**
-         * @var mixed
-         */
-        static $_attrName_firstLet = null;
-        if (!$_attrName_firstLet) {
-            $_attrName_firstLet = self::str_range('a-zA-Z_');
-        }
-
-        $ret = array();
-        for ($i = strspn($str, " \t\n\r"), $len = strlen($str); $i < $len;) {
-            $i += strcspn($str, $_attrName_firstLet, $i);
-            if ($i >= $len) {
-                break;
-            }
-
-            $b = $i;
-            $i += strcspn($str, " \t\n\r=\"\'", $i);
-            $attrName = rtrim(substr($str, $b, $i - $b));
-            if ($case_folding) {
-                $attrName = strtolower($attrName);
-            }
-
-            $i += strspn($str, " \t\n\r", $i);
-            $attrValue = null;
-            if ($i < $len && '=' == $str[$i]) {
-                ++$i;
-                $i += strspn($str, " \t\n\r", $i);
-                if ($i < $len) {
-                    $q = substr($str, $i, 1);
-                    if ('"' == $q || "'" == $q) {
-                        $b = ++$i;
-                        $e = strpos($str, $q, $i);
-                        if (false !== $e) {
-                            $attrValue = substr($str, $b, $e - $b);
-                            $i         = $e + 1;
-                        } else {
-                            /*??? no closing quote */
-                        }
-                    } else {
-                        $b = $i;
-                        $i += strcspn($str, " \t\n\r\"\'", $i);
-                        $attrValue = substr($str, $b, $i - $b);
-                    }
-                }
-            }
-            if ($extended && $attrValue) {
-                switch ($case_folding ? $attrName : strtolower($attrName)) {
-                    case 'class':
-                        $attrValue = preg_split('|\\s+|', trim($attrValue));
-                        if (count($attrValue) == 1) {
-                            $attrValue = reset($attrValue);
-                        } else {
-                            sort($attrValue);
-                        }
-
-                        break;
-
-                    case 'style':
-                        $attrValue = self::parseCSStr($attrValue, $case_folding);
-                        break;
-                }
-            }
-
-            $ret[$attrName] = $attrValue;
-        }
-        return $ret;
+        return HTMLParser::parseAttrStr($str, $case_folding, $extended);
     }
 
     // ------------------------------------------------------------------------
     /**
+     * @deprecated
+     *
      * @param $attr
      * @param $quote
      */
     public static function html_attr2str($attr, $quote = '"')
     {
-        $sq = htmlspecialchars($quote);
-        if ($sq == $quote) {
-            $sq = false;
-        }
-
-        ksort($attr);
-        if (isset($attr['class']) && is_array($attr['class'])) {
-            sort($attr['class']);
-            $attr['class'] = implode(' ', $attr['class']);
-        }
-        if (isset($attr['style']) && is_array($attr['style'])) {
-            $attr['style'] = self::CSSArr2Str($attr['style']);
-        }
-        $ret = array();
-        foreach ($attr as $n => $v) {
-            $ret[] = $n . '=' . $quote . ($sq ? str_replace($quote, $sq, $v) : $v) . $quote;
-        }
-        return implode(' ', $ret);
+        return HTMLParser::attr2str($attr, $quote);
     }
 
     // ------------------------------------------------------------------------
     /**
+     * @deprecated
+     *
      * @param  $str
      * @param  $case_folding
      * @return array
      */
     public static function parseCSStr($str, $case_folding = true)
     {
-        $ret = array();
-        $a   = explode(';', $str); // ??? what if ; in "" ?
-        foreach ($a as $v) {
-            $v = explode(':', $v, 2);
-            $n = trim(reset($v));
-            if ($case_folding) {
-                $n = strtolower($n);
-            }
-
-            $ret[$n] = count($v) == 2 ? trim(end($v)) : null;
-        }
-        unset($ret['']);
-        return $ret;
+        return HTMLParser::parseCssStr($str, $case_folding);
     }
 
     /**
+     * @deprecated
+     *
      * @param  $css
      * @return string
      */
     public static function CSSArr2Str($css)
     {
-        if (is_array($css)) {
-            ksort($css);
-            $ret = array();
-            foreach ($css as $n => $v) {
-                $ret[] = $n . ':' . $v;
-            }
-
-            return implode(';', $ret);
-        }
-        return $css;
+        return HTMLParser::css2str($css);
     }
 
     // ------------------------------------------------------------------------
     /**
+     * Use duzun\hQuery\Parser::str_range() instead
+     *
+     * @deprecated
+     *
      * @param $comp
      * @param $pos
      * @param $len
      */
     public static function str_range($comp, $pos = 0, $len = null)
     {
-        $ret = array();
-        $b   = strlen($comp);
-        if (!isset($len) || $len > $b) {
-            $len = $b;
-        }
-
-        $b = "\x0";
-        while ($pos < $len) {
-            switch ($c = $comp[$pos++]) {
-                case '\\':{
-                        $b       = substr($comp, $pos, 1);
-                        $ret[$b] = $pos++;
-                    }break;
-
-                case '-':{
-                        $c_ = ord($c = substr($comp, $pos, 1));
-                        $b  = ord($b);
-                        while ($b++ < $c_) {
-                            $ret[chr($b)] = $pos;
-                        }
-
-                        while ($b-- > $c_) {
-                            $ret[chr($b)] = $pos;
-                        }
-
-                    }break;
-
-                default:{
-                        $ret[$b = $c] = $pos;
-                    }
-            }
-        }
-        return implode('', array_keys($ret));
+        return Parser::str_range($comp, $pos, $len);
     }
 
     // ------------------------------------------------------------------------

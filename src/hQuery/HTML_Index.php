@@ -2,6 +2,9 @@
 namespace duzun\hQuery;
 
 // ------------------------------------------------------------------------
+use duzun\hQuery\Parser\HTML as HTMLParser;
+
+// ------------------------------------------------------------------------
 class_exists('duzun\\hQuery\\Node', false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'Node.php';
 
 // ------------------------------------------------------------------------
@@ -10,7 +13,7 @@ class_exists('duzun\\hQuery\\Node', false) or require_once __DIR__ . DIRECTORY_S
  *
  *  @internal
  */
-class HTML_Parser extends Node
+class HTML_Index extends Node
 {
     /**
      * @var boolean
@@ -21,13 +24,6 @@ class HTML_Parser extends Node
      * @var boolean
      */
     public static $case_folding = true;
-
-    /**
-     * 1 - auto-close non-empty tags,
-     * 2 - auto-close all tags
-     * @var boolean
-     */
-    public static $autoclose_tags = false;
 
     /**
      * @var array
@@ -42,11 +38,6 @@ class HTML_Parser extends Node
     /**
      * @var array
      */
-    public static $_unparsedTags = array('style', 'script');
-
-    /**
-     * @var array
-     */
     public static $_index_attribs = array('href', 'src');
 
     /**
@@ -57,12 +48,12 @@ class HTML_Parser extends Node
     /**
      * @var string
      */
-    protected static $_tagID_first_letter = 'a-zA-Z_';
+    protected static $_tagID_first_letter = "a-zA-Z_\x80-\xFF";
 
     /**
      * @var string
      */
-    protected static $_tagID_letters = 'a-zA-Z_0-9:\-';
+    protected static $_tagID_letters = "a-zA-Z_0-9:\-\x80-\xFF";
 
     /**
      * @var string
@@ -110,11 +101,6 @@ class HTML_Parser extends Node
      * @var array [class => aid | [aids=>[ids]]]
      */
     protected $class_idx;
-
-    /**
-     * @var stdClass
-     */
-    protected $o = null;
 
     /**
      * completely indexed?
@@ -434,7 +420,7 @@ class HTML_Parser extends Node
 
             $a = substr($str, $p, $q - $p);
             $p = $q + 2;
-            $a = self::html_parseAttrStr($a, true);
+            $a = HTMLParser::parseAttrStr($a, true);
             if (!empty($a['charset'])) {
                 return strtoupper($a['charset']);
             }
@@ -479,7 +465,7 @@ class HTML_Parser extends Node
         $inf = array();
         $ar  = array();
         foreach ($this->attribs as $i => $a) {
-            $ar[$i] = self::html_attr2str($a);
+            $ar[$i] = HTMLParser::attr2str($a);
         }
 
         $inf['attribs']   = $ar;
@@ -515,40 +501,6 @@ class HTML_Parser extends Node
         $inf['struc'] = $nm;
         unset($lev, $st, $nm);
         return $inf;
-    }
-
-    /**
-     * Index comment tags position in source HTML
-     *
-     * @param  stdClass $o
-     * @return stdClass $o
-     */
-    protected function _index_comments_html($o)
-    {
-        if (!isset($o->l)) {
-            $o->l = strlen($o->h);
-        }
-
-        $o->tg = self::$_ar_;
-        $i     = $o->i;
-        while ($i < $o->l) {
-            $i = strpos($o->h, '<!--', $i);
-            if (false === $i) {
-                break;
-            }
-
-            $p = $i;
-            $i += 4;
-            $i = strpos($o->h, '-->', $i);
-            if (false === $i) {
-                $i = $o->l;
-            } else {
-                $i += 3;
-            }
-
-            $o->tg[$p] = $i;
-        }
-        return $o;
     }
 
     /**
@@ -609,7 +561,7 @@ class HTML_Parser extends Node
         }
 
         foreach ($attrs as $str => $v) {
-            $a = self::html_parseAttrStr($str, true, false);
+            $a = HTMLParser::parseAttrStr($str, true, false);
             unset($attrs[$str]); // free mem
             foreach ($ian as $atn) {
                 if (isset($a[$atn])) {
@@ -629,7 +581,7 @@ class HTML_Parser extends Node
                 continue;
             }
 
-            $str = self::html_attr2str($a);
+            $str = HTMLParser::attr2str($a);
             $aid = $i;
             if (isset($six[$str])) {
                 $aid = $six[$str];
@@ -729,139 +681,13 @@ class HTML_Parser extends Node
         $this->indexed = true;
 
         // Parser state object
-        $this->o = $o = new \stdClass();
-        $o->h    = $this->html;
-        $o->l    = strlen($o->h);
-        $o->i    = 0;
-        $o->tg   = self::$_ar_;
-        $this->_index_comments_html($o);
-
-        $firstLetterChars = self::str_range(self::$_tagID_first_letter); // first letter chars
-        $tagLettersChars  = self::str_range(self::$_tagID_letters);      // tag name chars
-        $specialTags      = array('!' => 1, '?' => 2);                        // special tags
-        $unparsedTags     = array_flip(self::$_unparsedTags);
-
-        $utn   = null; // current unparsed tag name
-        $i     = $o->i;
-        $stack = $a = self::$_ar_;
-
-        while ($i < $o->l) {
-            $i = strpos($o->h, '<', $i);
-            if (false === $i) {
-                break;
-            }
-
-            ++$i;
-            $b = $i;
-            $c = $o->h[$i];
-
-            // if close tags
-            if ($isCloseTag = '/' === $c) {
-                ++$i;
-                $c = $o->h[$i];
-            }
-
-            // usual tags
-            if (false !== strpos($firstLetterChars, $c)) {
-                ++$i; // posibly second letter of tagName
-                $j = strspn($o->h, $tagLettersChars, $i);
-                $n = substr($o->h, $i - 1, $j + 1);
-                $i += $j;
-                if ($utn) {
-                    $n = strtolower($n);
-                    if ($utn !== $n || !$isCloseTag) {
-                        continue;
-                    }
-                    $utn = null;
-                }
-                $i = self::html_findTagClose($o->h, $i);
-                if (false === $i) {
-                    break;
-                }
-
-                $e = $i++;
-                // open tag
-                if (!$isCloseTag) {
-                    $this->ids[$e]  = $e; // the end of the tag contents (>)
-                    $this->tags[$e] = $n;
-                    $b += $j + 1;
-                    $b += strspn($o->h, " \n\r\t", $b);
-                    if ($b < $e) {
-                        $at = trim(substr($o->h, $b, $e - $b));
-                        if ($at) {
-                            if (!isset($a[$at])) {
-                                $a[$at] = $e;
-                            } elseif (!is_array($a[$at])) {
-                                $a[$at] = array($a[$at], $e);
-                            } else {
-                                $a[$at][] = $e;
-                            }
-
-                        }
-                    }
-                    if ('/' != $o->h[$e - 1]) {
-                        $n = strtolower($n);
-                        if (isset($unparsedTags[$n])) {
-                            $utn = $n;
-                        }
-                        $stack[$n][$b] = $e; // put in stack
-                    }
-                }
-                // close tag
-                else {
-                    $n = strtolower($n);
-                    $s = &$stack[$n];
-                    if (empty($s)); // error - tag not opened, but closed - ???
-                    else{
-                        $q = end($s);
-                        $p = key($s);
-                        unset($s[$p], $s);
-                        $this->ids[$q] = $b - 1; // the end of the tag contents (<)
-                    }
-                }
-            } elseif (!$isCloseTag) {
-                // special tags
-                if (isset($specialTags[$c])) {
-                    --$b;
-                    if (isset($o->tg[$b])) {
-                        $i = $o->tg[$b];
-                        continue;
-                    }
-                    // ???
-                } else {
-                    continue;
-                }
-                // not a tag
-                $i = strpos($o->h, '>', $i);
-                if (false === $i) {
-                    break;
-                }
-
-                $e = $i++;
-            }
-        }
-
-        foreach ($stack as $n => $st) {
-            if (empty($st)) {
-                unset($stack[$n]);
-            }
-        }
-
-        // if(self::$autoclose_tags) {
-        // foreach($stack as $n => $st) { // ???
-        // }
-        // } else {
-        // foreach($stack as $n => $st) { // ???
-        // }
-        // }
+        list($this->ids, $this->tags, $attr) = HTMLParser::exec($this->html);
 
         $this->_index_tags();
-        $this->_index_attribs($a);unset($a);
+        $this->_index_attribs($attr);unset($attr);
         $this->_index_classes();
 
         // debug($stack); // unclosed tags
-
-        $this->o = self::$_nl_; // Free mem
 
         // Read <base href="..." /> tag
         if (!empty($this->tag_idx['base'])) {
@@ -906,34 +732,80 @@ class HTML_Parser extends Node
     {
         // if(!in_array($name, array('meta', 'head'))) debug(compact('name', 'class', 'attr','ctx', 'rec'));
 
+        if (is_string($name) && '' !== $name && '*' != $name) {
+            $name = strtolower(trim($name));
+            if (empty($this->tag_idx[$name])) {
+                // no such tag-name
+                return self::$_ar_;
+            }
+            $hasSelectors = true;
+        } else {
+            $name         = null;
+            $hasSelectors = $attr || $class;
+        }
+
+        $iattr = self::$_ar_;
+        if ($attr) {
+            foreach (self::$_index_attribs as $atn) {
+                if (array_key_exists($atn, $attr)) {
+                    if (empty($this->idx_attr[$atn])) {
+                        return self::$_ar_;
+                    }
+
+                    $iattr[$atn] = $attr[$atn];
+                    unset($attr[$atn]);
+                }
+            }
+        }
+
         $aids = null;
+
         if ($class) {
-            if ($attr) {
-                $aids = $this->get_aids_byClassAttr($class, $attr, true);
-            } else {
-                $aids = $this->get_aids_byClass($class, true);
-            }
+            $aids = $this->get_aids_byClass($class, true);
 
             if (!$aids) {
-                return self::$_nl_;
-            }
-
-        } elseif ($attr) {
-            $aids = $this->get_aids_byAttr($attr, true);
-            if (!$aids) {
-                return self::$_nl_;
+                return self::$_ar_;
             }
 
         }
 
-        if (is_string($name) && '' !== $name && '*' != $name) {
-            $name = strtolower(trim($name));
-            if (empty($this->tag_idx[$name])) {
-                return self::$_nl_;
+        if ($attr) {
+            $aids = $this->get_aids_byAttr($attr, true, $aids);
+
+            if (!$aids) {
+                return self::$_ar_;
             }
-            // no such tag-name
+        }
+
+        unset($class, $attr); // free mem
+
+        if (isset($aids)) {
+            $ids = $this->get_ids_byAid($aids, true, true);
+            unset($aids); // free mem
         } else {
-            $name = null;
+            $ids = null;
+        }
+
+        if ($name) {
+            $ids = isset($ids) ? array_intersect_key($ids, $this->tag_idx[$name]) : $this->tag_idx[$name];
+        }
+
+        if ($iattr) {
+            foreach ($iattr as $n => $v) {
+                $ids = array_intersect_key(isset($ids) ? $ids : $this->ids, $this->idx_attr[$n]);
+
+                if (isset($v)) {
+                    foreach (array_intersect_key($this->idx_attr[$n], $ids) as $id => $t) {
+                        if ($t !== $v) {
+                            unset($ids[$id]);
+                        }
+                    }
+                }
+
+                if (!$ids) {
+                    return $ids;
+                }
+            }
         }
 
         if (isset($ctx)) {
@@ -941,49 +813,30 @@ class HTML_Parser extends Node
             if (!$ctx) {
                 throw new \Exception(__CLASS__ . '->' . __FUNCTION__ . ': Invalid context!');
             }
-
         }
 
-        if (isset($aids)) {
-            $ni = $this->get_ids_byAid($aids, true, true);
-            if ($ni && $ctx) {
-                $ni = $ctx->_filter_contains($ni);
+        if ($hasSelectors) {
+            if ($ids && $ctx) {
+                $ids = $ctx->_filter_contains($ids);
             }
-
-            if (!$ni) {
-                return self::$_nl_;
-            }
-
-            if ($name) {
-                $ni = array_intersect_key($ni, $this->tag_idx[$name]);
-            }
-
         } else {
-            if ($name) {
-                $ni = $this->tag_idx[$name];
-                if ($ni && $ctx) {
-                    $ni = $ctx->_filter_contains($ni);
-                }
-
+            if ($ctx) {
+                $ids = $ctx->_sub_ids(false);
             } else {
-                if ($ctx) {
-                    $ni = $ctx->_sub_ids(false);
-                } else {
-                    $ni = $this->ids;
-                }
                 // all tags
+                $ids = $this->ids;
             }
         }
 
-        return $ni ? $ni : self::$_nl_;
+        return $ids;
     }
 
     /**
      * Checks whether $this element/collection has a(ll) class(es).
      *
-     * @param  int|array|string|Node $id - The context to check
-     * @param  string|array          $cl - class(es) to check
-     * @return false                 - no class, - doesn't have any class, true - has class, [id => true]
+     * @param  int|array|string|Node $id   - The context to check
+     * @param  string|array          $cl   - class(es) to check
+     * @return boolean               false - no class, - doesn't have any class, true - has class, [id => true]
      */
     public function hasClass($id, $cl)
     {
@@ -1010,13 +863,18 @@ class HTML_Parser extends Node
                 } elseif (false === $c) {
                     return $c;
                 }
-
             }
             return $ret;
         }
+
         if (!isset($this->attrs[$id])) {
             return 0;
         }
+
+        if (!$cl) {
+            return 0;
+        }
+
         // $id has no attributes at all (but indexed)
         foreach ($cl as $cl) {
             if (!isset($this->class_idx[$cl])) {
@@ -1044,39 +902,6 @@ class HTML_Parser extends Node
      */
     protected function _filter($ids, $name = null, $class = null, $attr = null, $ctx = null)
     {
-        $aids = null;
-        if ($class) {
-            if ($attr) {
-                $aids = $this->get_aids_byClassAttr($class, $attr, true);
-            } else {
-                $aids = $this->get_aids_byClass($class, true);
-            }
-
-            if (!$aids) {
-                return self::$_nl_;
-            }
-
-        } elseif ($attr) {
-            $aids = $this->get_aids_byAttr($attr, true);
-            if (!$aids) {
-                return self::$_nl_;
-            }
-
-        }
-        unset($class, $attr);
-        if ($aids) {
-            foreach ($ids as $b => $e) {
-                if (!isset($this->attrs[$b], $aids[$this->attrs[$b]])) {
-                    unset($ids[$b]);
-                }
-            }
-
-            if (!$ids) {
-                return self::$_nl_;
-            }
-
-        }
-        unset($aids);
 
         if (is_string($name) && '' !== $name && '*' != $name) {
             $name = strtolower(trim($name));
@@ -1084,18 +909,79 @@ class HTML_Parser extends Node
                 return self::$_nl_;
             }
             // no such tag-name
+            $ids = array_intersect_key($ids, $this->tag_idx[$name]);
+
+            if (!$ids) {
+                return $ids;
+            }
+
+        }
+        unset($name); // free mem
+
+        $iattr = self::$_ar_;
+        if ($attr) {
+            foreach (self::$_index_attribs as $atn) {
+                if (array_key_exists($atn, $attr)) {
+                    if (empty($this->idx_attr[$atn])) {
+                        return self::$_ar_;
+                    }
+
+                    $iattr[$atn] = $attr[$atn];
+                    unset($attr[$atn]);
+                }
+            }
+        }
+
+        if ($iattr) {
+            foreach ($iattr as $n => $v) {
+                $ids = array_intersect_key($ids, $this->idx_attr[$n]);
+
+                if (isset($v)) {
+                    foreach (array_intersect_key($this->idx_attr[$n], $ids) as $id => $t) {
+                        if ($t !== $v) {
+                            unset($ids[$id]);
+                        }
+                    }
+                }
+
+                if (!$ids) {
+                    return $ids;
+                }
+            }
+        }
+
+        $aids = null;
+        if ($class) {
+            $aids = $this->get_aids_byClass($class, true);
+
+            if (!$aids) {
+                return self::$_ar_;
+            }
+
+        }
+        if ($attr) {
+            $aids = $this->get_aids_byAttr($attr, true, $aids);
+
+            if (!$aids) {
+                return self::$_ar_;
+            }
+        }
+
+        unset($class, $attr); // free mem
+
+        if ($aids) {
+            $ids = array_intersect_key($ids, $this->attrs);
             foreach ($ids as $b => $e) {
-                if (!isset($this->tag_idx[$name][$b])) {
+                if (!isset( /*$this->attrs[$b], */$aids[$this->attrs[$b]])) {
                     unset($ids[$b]);
                 }
             }
 
             if (!$ids) {
-                return self::$_nl_;
+                return $ids;
             }
-
         }
-        unset($name);
+        unset($aids); // free mem
 
         if (isset($ctx)) {
             $ctx = $this->_get_ctx($ctx);
@@ -1104,12 +990,8 @@ class HTML_Parser extends Node
             }
 
             $ids = $ctx->_filter_contains($ids);
-            if (!$ids) {
-                return $ids;
-            }
-
         }
-        unset($ctx);
+
         return $ids;
     }
 
@@ -1126,42 +1008,26 @@ class HTML_Parser extends Node
         }
 
         if (is_string($attr)) {
-            $attr = self::html_parseAttrStr($attr);
+            $attr = HTMLParser::parseAttrStr($attr);
         }
 
+        $attribs = $this->attribs;
+
         if ($actx) {
-            foreach ($actx as $aid => $a) {
-                if (!isset($this->attribs[$aid])) {
-                    continue;
-                }
+            $attribs = array_intersect_key($attribs, $actx);
+        }
 
-                $a    = $this->attribs[$aid];
-                $good = true;
-                foreach ($attr as $n => $v) {
-                    if (!isset($a[$n]) || $a[$n] !== $v) {
-                        $good = false;
-                        break;}
+        foreach ($attribs as $aid => $a) {
+            foreach ($attr as $n => $v) {
+                if (!array_key_exists($n, $a)) {
+                    continue 2;
                 }
-
-                if ($good) {
-                    $aids[$aid] = $this->attr_idx[$aid];
+                if (isset($v) && $a[$n] !== $v) {
+                    continue 2;
                 }
-
             }
-        } else {
-            foreach ($this->attribs as $aid => $a) {
-                $good = true;
-                foreach ($attr as $n => $v) {
-                    if (!isset($a[$n]) || $a[$n] !== $v) {
-                        $good = false;
-                        break;}
-                }
 
-                if ($good) {
-                    $aids[$aid] = $this->attr_idx[$aid];
-                }
-
-            }
+            $aids[$aid] = $this->attr_idx[$aid];
         }
 
         return $as_keys ? $aids : array_keys($aids);
@@ -1232,7 +1098,7 @@ class HTML_Parser extends Node
     {
         $aids = $this->get_aids_byClass($cl, true, $actx);
         if (is_string($attr)) {
-            $attr = self::html_parseAttrStr($attr);
+            $attr = HTMLParser::parseAttrStr($attr);
         }
 
         if ($attr) {
@@ -1241,7 +1107,7 @@ class HTML_Parser extends Node
                 $good = count($a) > 1; // has only 'class' attribute
                 if ($good) {
                     foreach ($attr as $n => $v) {
-                        if (!isset($a[$n]) || $a[$n] !== $v) {
+                        if (isset($v) ? !isset($a[$n]) || $a[$n] !== $v : !array_key_exists($n, $a)) {
                             $good = false;
                             break;
                         }
@@ -1279,12 +1145,10 @@ class HTML_Parser extends Node
             if (empty($ret)) {
                 $ret = $aix;
             } else {
-                foreach ($aix as $id => $e) {
-                    $ret[$id] = $e;
-                }
+                $ret += $aix;
             }
-
         }
+
         if ($sort && $ret) {
             ksort($ret);
         }
@@ -1301,21 +1165,21 @@ class HTML_Parser extends Node
     {
         $ret = self::$_ar_;
         if (is_string($attr)) {
-            $attr = self::html_parseAttrStr($attr);
+            $attr = HTMLParser::parseAttrStr($attr);
         }
 
         if (!$attr) {
             return $ret;
         }
 
-        $sat = $ret;
+        $iattr = $ret;
         foreach (self::$_index_attribs as $atn) {
-            if (isset($attr[$atn])) {
+            if (array_key_exists($atn, $attr)) {
                 if (empty($this->idx_attr[$atn])) {
                     return $ret;
                 }
 
-                $sat[$atn] = $attr[$atn];
+                $iattr[$atn] = $attr[$atn];
                 unset($attr[$atn]);
             }
         }
@@ -1330,51 +1194,38 @@ class HTML_Parser extends Node
                     $aix = array($aix => $this->ids[$aix]);
                 }
 
-                foreach ($aix as $id => $e) {
-                    if ($sat) {
-                        $good = true;
-                        foreach ($sat as $n => $v) {
-                            if (!isset($this->idx_attr[$n][$id]) || $this->idx_attr[$n][$id] !== $v) {
-                                $good = false;
-                                break;
+                if ($iattr) {
+                    foreach ($aix as $id => $e) {
+                        foreach ($iattr as $n => $v) {
+                            if (isset($v) ? !isset($this->idx_attr[$n][$id]) || $this->idx_attr[$n][$id] !== $v : !array_key_exists($id, $this->idx_attr[$n])) {
+                                continue 2;
                             }
                         }
-                        if ($good) {
-                            $ret[$id] = $e;
-                        }
-
-                    } else {
                         $ret[$id] = $e;
                     }
-
+                } else {
+                    $ret += $aix;
                 }
+
             }
         } else {
-            // !$attr && $sat
-            $av  = reset($sat);
-            $an  = key($sat);unset($sat[$an]);
+            // !$attr && $iattr
+            $av  = reset($iattr);
+            $an  = key($iattr);unset($iattr[$an]);
             $aix = $this->idx_attr[$an];
             foreach ($aix as $id => $v) {
-                if ($v !== $av) {
+                if (isset($av) && $v !== $av) {
                     continue;
                 }
 
-                $e = $this->ids[$id];
-                if ($sat) {
-                    $good = true;
-                    foreach ($sat as $n => $v) {
-                        if (!isset($this->idx_attr[$n][$id]) || $this->idx_attr[$n][$id] !== $v) {
-                            $good = false;
-                            break;
+                if ($iattr) {
+                    foreach ($iattr as $n => $v) {
+                        if (isset($v) ? !isset($this->idx_attr[$n][$id]) || $this->idx_attr[$n][$id] !== $v : !array_key_exists($id, $this->idx_attr[$n])) {
+                            continue 2;
                         }
                     }
-                    if ($good) {
-                        $ret[$id] = $e;
-                    }
-
-                } else {
-                    $ret[$id] = $e;
                 }
+                $ret[$id] = $this->ids[$id];
             }
         }
         if ($sort) {
@@ -1392,18 +1243,6 @@ class HTML_Parser extends Node
     protected function get_ids_byClass($cl, $sort = true)
     {
         $aids = $this->get_aids_byClass($cl, true);
-        return $this->get_ids_byAid($aids, $sort, true);
-    }
-
-    /**
-     * @param  array|string $cl
-     * @param  array|string $attr
-     * @param  boolean      $sort
-     * @return array
-     */
-    protected function get_ids_byClassAttr($cl, $attr, $sort = true)
-    {
-        $aids = $this->get_aids_byClassAttr($cl, $attr, true);
         return $this->get_ids_byAid($aids, $sort, true);
     }
 
@@ -1427,7 +1266,7 @@ class HTML_Parser extends Node
 
             $ret = $this->attribs[$aid];
             if ($to_str) {
-                $ret = self::html_attr2str($ret);
+                $ret = HTMLParser::attr2str($ret);
             }
 
         }
@@ -1473,7 +1312,6 @@ class HTML_Parser extends Node
                     if (isset($this->idx_attr[$atn][$id])) {
                         $ret[$atn] = $this->idx_attr[$atn][$id];
                     }
-
                 }
 
                 if (!empty($bu)) {
@@ -1485,7 +1323,7 @@ class HTML_Parser extends Node
                     }
                 }
                 if ($to_str) {
-                    $ret = self::html_attr2str($ret);
+                    $ret = HTMLParser::attr2str($ret);
                 }
 
             }
@@ -1496,4 +1334,4 @@ class HTML_Parser extends Node
 
 // ------------------------------------------------------------------------
 // PSR-0 alias
-class_exists('hQuery_HTML_Parser', false) or class_alias('duzun\\hQuery\\HTML_Parser', 'hQuery_HTML_Parser', false);
+class_exists('hQuery_HTML_Index', false) or class_alias('duzun\\hQuery\\HTML_Index', 'hQuery_HTML_Index', false);

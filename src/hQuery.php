@@ -2,6 +2,10 @@
 namespace duzun;
 
 // ------------------------------------------------------------------------
+use duzun\hQuery\Parser\HTML as HTMLParser;
+use duzun\hQuery\Parser\Selector as SelectorParser;
+
+// ------------------------------------------------------------------------
 use Http\Discovery\HttpClientDiscovery;
 // use Psr\Http\Message\ResponseInterface;
 
@@ -9,7 +13,7 @@ use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 
 // ------------------------------------------------------------------------
-class_exists('duzun\\hQuery\\HTML_Parser', false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'HTML_Parser.php';
+class_exists('duzun\\hQuery\\HTML_Index', false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'HTML_Index.php';
 
 // ------------------------------------------------------------------------
 /**
@@ -22,11 +26,11 @@ class_exists('duzun\\hQuery\\HTML_Parser', false) or require_once __DIR__ . DIRE
  *
  *  Copyright (C) 2014-2018 Dumitru Uzun
  *
- *  @version 2.2.4
+ *  @version 3.0.0
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
  */
-class hQuery extends hQuery\HTML_Parser
+class hQuery extends hQuery\HTML_Index
 {
     // ------------------------------------------------------------------------
     // Response headers when using self::fromURL()
@@ -311,7 +315,7 @@ class hQuery extends hQuery\HTML_Parser
             } elseif (is_array($a)) {
                 $attr = array_merge($attr, $a);
             } elseif (is_string($a)) {
-                $attr = array_merge($attr, self::html_parseAttrStr($a));
+                $attr = array_merge($attr, HTMLParser::parseAttrStr($a));
             }
 
         }
@@ -319,92 +323,111 @@ class hQuery extends hQuery\HTML_Parser
             $ctx = $this->_get_ctx($ctx);
         }
 
-        $sel = self::html_selector2struc($sel);
+        $sel = SelectorParser::exec(trim($sel));
 
         $ra = null;
         // , //
         foreach ($sel as $a) {
             $rb = null;
             $cx = $ctx;
-            //   //
             foreach ($a as $b) {
-                $rc = null;
-                if ($rb) {
-                    $cx = $this->_get_ctx($rb);
-                    if (!$cx); // ??? error
-                }
-                // > //
-                foreach ($b as $c) {
+                if (empty($b['a'])) {
                     $at = $attr;
-                    if (isset($c['i'])) {
-                        $at['id'] = $c['i'];
-                    }
-
-                    // x of x > y > ...
-                    if (!$rc) {
-                        $rc = $this->_find($c['n'], $c['c'], $at, $cx);
-                    }
-                    // y of x > y > ...
-                    else {
-                        $ch = $this->_children($rc);
-                        $rc = $this->_filter($ch, $c['n'], $c['c'], $at);
-                    }
-                    unset($ch);
-                    if (!$rc) {
-                        break;
-                    }
-
-                    if (isset($c['p'])) {
-                        foreach ($c['p'] as $p) {
-                            if (is_int($p)) {
-                                if ($p < 0) {
-                                    $p += count($rc);
-                                }
-
-                                if (count($rc) >= 1 || $p) {
-                                    $rc = $p < 0 ? null : array_slice($rc, $p, 1, true);
-                                }
-                            } elseif (is_array($p)) {
-                                $ch = reset($p);
-                                switch (key($p)) {
-                                    case '<':$rc = array_slice($rc, 0, $ch, true);
-                                        break;
-                                    case '>':$rc = array_slice($rc, $ch, count($rc), true);
-                                        break;
-                                    case '-':$rc = $this->_prev($rc, $ch);
-                                        break;
-                                    case '+':$rc = $this->_next($rc, $ch);
-                                        break;
-                                    case '|':do$rc = $this->_parent($rc);while ($ch-- > 0);
-                                        break;
-                                    case '*':do$rc = $this->_children($rc);while ($ch-- > 0);
-                                        break;
-                                }
-                            }
-                            if (!$rc) {
-                                break 2;
-                            }
-
-                        }
+                } else {
+                    $at = $b['a'];
+                    if ($attr) {
+                        $at += $attr;
                     }
                 }
-                $rb = $rc;
+                if (isset($b['i'])) {
+                    $at['id'] = $b['i'];
+                }
+                $n = isset($b['n']) ? $b['n'] : null;
+                $c = isset($b['c']) ? $b['c'] : null;
+
+                if (!$rb) {
+                    $rb = $this->_find($n, $c, $at, $cx);
+                } else {
+                    $x = isset($b['x']) ? $b['x'] : ' ';
+                    switch ($x) {
+                        case ' ':
+                            $cx = $this->_get_ctx($rb);
+                            if (!$cx); // ??? error
+                            $rb = $this->_find($n, $c, $at, $cx);
+                            break;
+
+                        case '>':
+                            $ch = $this->_children($rb);
+
+                            $rb = $this->_filter($ch, $n, $c, $at);
+                            // $rb = $this->_find($n, $c, $at, $cx);
+                            // $rb = array_intersect_key($rb, $ch);
+
+                            break;
+
+                        case '+':
+                            $ch = $this->_next($rb);
+                            $rb = $this->_filter($ch, $n, $c, $at);
+                            break;
+
+                        case '~':
+                            $ch = $this->_next($rb, 0, -1);
+                            $rb = $this->_filter($ch, $n, $c, $at);
+                            break;
+                    }
+                }
+
                 if (!$rb) {
                     break;
                 }
 
-            }
-            if ($rc) {
-                if (!$ra) {
-                    $ra = $rc;
-                } else {
-                    foreach ($rc as $rb => $rc) {
-                        $ra[$rb] = $rc;
+                if (isset($b['p'])) {
+                    foreach ($b['p'] as $p) {
+                        if (is_int($p)) {
+                            if ($p < 0) {
+                                $p += count($rb);
+                            }
+
+                            if (count($rb) >= 1 || $p) {
+                                $rb = $p < 0 ? null : array_slice($rb, $p, 1, true);
+                            }
+                        } elseif (is_array($p)) {
+                            $ch = reset($p);
+                            switch (key($p)) {
+                                case '<':$rb = array_slice($rb, 0, $ch, true);
+                                    break;
+                                case '>':$rb = array_slice($rb, $ch, count($rb), true);
+                                    break;
+                                case '-':$rb = $this->_prev($rb, $ch);
+                                    break;
+                                case '+':$rb = $this->_next($rb, $ch);
+                                    break;
+                                case '|':do$rb = $this->_parent($rb);while ($ch-- > 0);
+                                    break;
+                                case '*':do$rb = $this->_children($rb);while ($ch-- > 0);
+                                    break;
+                            }
+                        }
+                        if (!$rb) {
+                            break 2;
+                        }
+
                     }
+                }
+            }
+            if ($rb) {
+                if (!$ra) {
+                    $ra = $rb;
+                } else {
+                    $ra += $rb;
+                    // foreach ($rb as $rb => $rc) {
+                    //     $ra[$rb] = $rc;
+                    // }
                 }
             }
 
         }
+
         if ($ra) {
             ksort($ra);
             return new hQuery\Element($this, $ra);

@@ -208,8 +208,8 @@ class Element extends Node implements \ArrayAccess
     /**
      * Checks whether $this element/collection has a(ll) class(es).
      *
-     * @param  string|array $cl - class(es) to check
-     * @return true         - has class, false - no class, - doesn't have any class,
+     * @param  string|array $cl  - class(es) to check
+     * @return boolean      true - has class, false - no class, - doesn't have any class,
      */
     public function hasClass($className)
     {
