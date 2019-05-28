@@ -167,6 +167,9 @@ if ( $banners ) {
 
         // Filter the result
         if ( !$a->hasClass('logo') ) {
+            // $a->style property is the parsed $a->attr('style')
+            if ( strtolower($a->style['position']) == 'fixed' ) continue;
+
             $img = $a->find('img')[0]; // ArrayAccess
             if ( $img ) $images[$pos] = $img->src; // short for $img->attr('src')
         }
