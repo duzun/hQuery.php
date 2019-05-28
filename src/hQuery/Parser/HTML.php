@@ -249,20 +249,15 @@ class HTML extends Parser
 
     // ------------------------------------------------------------------------
     /**
-     * @param  $str
-     * @param  $case_folding
-     * @param  true            $extended
-     * @return mixed
+     * @param  string  $str
+     * @param  boolean $case_folding If TRUE, use lowercase of attribute names
+     * @param  boolean $extended     If TRUE, class attribute with more than one class becomes array and style attribute is also parsed
+     * @return array
      */
     public static function parseAttrStr($str, $case_folding = true, $extended = false)
     {
-        /**
-         * @var mixed
-         */
-        static $_attrName_firstLet = null;
-        if (!$_attrName_firstLet) {
-            $_attrName_firstLet = self::str_range('a-zA-Z_');
-        }
+        isset(self::$nameStartRange) or self::_init_class();
+        $_attrName_firstLet = self::$nameStartRange;
 
         $ret = array();
         for ($i = strspn($str, " \t\n\r"), $len = strlen($str); $i < $len;) {

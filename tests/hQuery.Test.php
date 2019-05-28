@@ -58,7 +58,7 @@ class TestHQuery extends PHPUnit_BaseClass
      * @var string
      */
     public static $bodyHTML = <<<EOS
-<doctype html>
+<!doctype html>
 <html>
 <head>
     <meta charset="ISO-8859-2" />
@@ -77,7 +77,10 @@ class TestHQuery extends PHPUnit_BaseClass
         span: <span id="aSpan" class="span">Span text</span>
         notSpan: <div id="aDiv" class="span">notSpan text</div>
     </div>
-    <a id="outterLink" href="//not-my-site.com/next.html">Not My Site</a>
+    <a id="outterLink"
+        href="//not-my-site.com/next.html"
+        style="Color:blue;padding: 1px 2pt 3em 0; background-image:url(/path/to/img.jpg?url=param&and=another&one);"
+    >Not My Site</a>
     <img id="outterImg" src="https://cdn.duzun.me/images/logo.png" />
 
     <dl id="dict1">
@@ -364,6 +367,15 @@ EOS
         // a[href] absolute URL
         $a = self::$inst->find('a#outterLink');
         $this->assertEquals('https://not-my-site.com/next.html', $a->href);
+
+        // $a->style is the parset $a->attr('style'):
+        $this->assertNotEmpty($a->style);
+        $this->assertNotEquals($a->attr('style'), $a->style);
+        $this->assertTrue(is_array($a->style));
+        $this->assertTrue(is_string($a->attr('style')));
+        $this->assertEquals(array('color', 'padding', 'background-image'), array_keys($a->style));
+        $this->assertEquals('blue', $a->style['color']);
+
 
         // img[src] absolute URL
         $a = self::$inst->find('img#outterImg');

@@ -1,5 +1,6 @@
 <?php
 namespace duzun\hQuery\Parser;
+
 use duzun\hQuery\Parser;
 
 // ------------------------------------------------------------------------
@@ -25,7 +26,7 @@ class Selector extends Parser
     /**
      * @var string
      */
-    public static $combinatorsRange = ">+~";
+    public static $combinatorsRange = '>+~';
 
     /**
      * @var array
@@ -73,8 +74,6 @@ class Selector extends Parser
 
     /**
      * Parse $this->s as a CSS selector
-     * @return array internal structure to be used by _find() and other methods
-     *
      *  tn1#id1[href] .cl1.cl2:first[x=y] tn2:5 , tn3.cl3 tn4#id2:eq(-1) > tn5:last-child > tn6:lt(3)
      *    -->
      *  [
@@ -90,14 +89,14 @@ class Selector extends Parser
      *       { n: "tn6", p: [{"<":3}] },
      *     ]
      *  ]
-     *
+     * @return array internal structure to be used by _find() and other methods
      */
     public function parse()
     {
         $ret = array();
 
-        $desc  = 0;
-        $and   = 0;
+        $desc = 0;
+        $and  = 0;
 
         $this->skipWhitespace(); // we have trimmed $sel
         $sel = $this->s;
@@ -207,26 +206,25 @@ class Selector extends Parser
     {
         $this->skipWhitespace();
         $n = rtrim($this->readUntil('=]'));
-        if ( $this->c == ']' || $this->c == '' ) {
+        if (']' == $this->c || '' == $this->c) {
             $this->inc(); // ]
-            return [$n => null];
+            return array($n => null);
         }
 
         $this->inc(); // =
         $this->skipWhitespace();
 
-        if ( $this->inRange('"\'') ) {
+        if ($this->inRange('"\'')) {
             $q = $this->c;
             ++$this->i;
             $v = $this->readTo($q);
             ++$this->i;
             $this->skipWhitespace();
-        }
-        else {
+        } else {
             $v = rtrim($this->readTo(']'));
         }
         $this->inc();
-        return [$n => $v];
+        return array($n => $v);
 
         // $a = $this->readTo(']');
         // $this->inc();
@@ -258,17 +256,16 @@ class Selector extends Parser
             $this->inc();
             $this->skipWhitespace();
 
-            if ( $this->inRange('"\'') ) {
+            if ($this->inRange('"\'')) {
                 $q = $this->c;
                 ++$this->i;
                 $t = $this->readTo($q);
                 $this->inc();
                 $this->skipWhitespace();
-                if( $this->c != ')' ) {
+                if (')' != $this->c) {
                     $this->throwException("Unexpected {$this->c}", 2);
                 }
-            }
-            else {
+            } else {
                 $t = rtrim($this->readTo(')'));
             }
 

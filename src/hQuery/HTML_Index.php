@@ -418,7 +418,7 @@ class HTML_Index extends Node
                 $q = strlen($str_);
             }
 
-            $a = substr($str, $p, $q - $p);
+            $a = substr($str, $p, $q - $p - ('/' == $str_[$q - 1]));
             $p = $q + 2;
             $a = HTMLParser::parseAttrStr($a, true);
             if (!empty($a['charset'])) {
