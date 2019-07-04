@@ -13,16 +13,16 @@ use Http\Mock\Client;
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
 
 // -----------------------------------------------------
-class_alias(hQuery::class, 'TestHQueryTests');
+// class_alias(hQuery::class, 'TestHQueryTests');
 
-// // Surogate class for testing, to access protected attributes of hQuery
-// class TestHQueryTests extends hQuery
-// {
-//     /**
-//      * @var mixed
-//      */
-//     public $class_idx;
-// }
+// Surogate class for testing, to access protected attributes of hQuery
+class TestHQueryTests extends hQuery
+{
+    /**
+     * @var mixed
+     */
+    public $class_idx;
+}
 
 // -----------------------------------------------------
 

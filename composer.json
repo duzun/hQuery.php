@@ -58,12 +58,14 @@
     "php": ">=5.3"
   },
   "require-dev": {
-    "apigen/apigen": "~4.1",
-    "php-http/mock-client": "^1.2",
-    "guzzlehttp/psr7": "^1.5",
-    "php-http/discovery": "^1.6",
     "symfony/dom-crawler": "*",
     "symfony/css-selector": "*"
+  },
+  "extra": {
+    "apigen/apigen": "*",
+    "php-http/mock-client": "*",
+    "php-http/discovery": "*",
+    "guzzlehttp/psr7": "*"
   },
   "suggest": {
     "php-http/message": "Might be required by hQuery::fromHTML($message) or hQuery::fromURL()",

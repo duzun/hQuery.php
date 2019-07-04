@@ -155,7 +155,7 @@ class TestHQueryStress extends PHPUnit_BaseClass
             $a    = $doc->find($sel);
             $amem = self::memer($mmr, false);
             $aexe = self::timer($tmr, false);
-            $this->assertNotNull($a);
+            $this->assertNotNull($a, $sel);
 
             $b    = null; // Free mem, call __destruct()
             $tmr  = self::timer();
@@ -163,7 +163,7 @@ class TestHQueryStress extends PHPUnit_BaseClass
             $b    = $body->find($sel);
             $bmem = self::memer($mmr, false);
             $bexe = self::timer($tmr, false);
-            $this->assertNotNull($b);
+            $this->assertNotNull($b, $sel);
 
             $this->assertEquals(count($a), count($b), $sel);
 
