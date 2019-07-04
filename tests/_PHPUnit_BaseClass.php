@@ -59,6 +59,95 @@ abstract class PHPUnit_BaseClass extends PU_TestCase
      */
     public static $thausandsSeparator = "'";
 
+    /**
+     * @var array
+     */
+    public static $table_header = array();
+
+    /**
+     * @var array
+     */
+    public static $table_cols = array();
+
+    /**
+     * @var array
+     */
+    public static $table_align = array();
+
+    /**
+     * @var string
+     */
+    public static $CEL_SEP = ' | ';
+
+    /**
+     * @var string
+     */
+    public static $ROW_SEP = '---------------------';
+
+    // -----------------------------------------------------
+    /**
+     * @param $header
+     * @param NULL      $cols
+     * @param NULL      $align
+     */
+    public static function print_table_header($header = null, $cols = null, $align = null)
+    {
+        if (isset($header)) {
+            static::$table_header = $header;
+        }
+
+        if (!empty($cols)) {
+            static::$table_cols = $cols+static::$table_cols;
+        }
+        if (!empty($align)) {
+            static::$table_align = $align+static::$table_align;
+        }
+
+        $a = array('');
+        foreach (static::$table_header as $i => $h) {
+            $a[] = self::pad($h,
+                isset(static::$table_cols[$i]) ? static::$table_cols[$i] : 6,
+                STR_PAD_BOTH
+            );
+        }
+        $a[] = '';
+
+        $sep = array();
+        foreach ($a as $b) {
+            $sep[] = str_repeat('-', strlen($b) + substr_count($b, "\t") * 3);
+        }
+        $a   = rtrim(implode(static::$CEL_SEP, $a));
+        $sep = rtrim(implode(static::$CEL_SEP, $sep));
+
+        static::$ROW_SEP = $sep;
+
+        echo PHP_EOL;
+        echo $a, PHP_EOL;
+        echo $sep, PHP_EOL;
+    }
+
+    /**
+     * @param $row
+     */
+    public static function print_table_row($row, $align = null)
+    {
+        $a = array('');
+        foreach ($row as $i => $c) {
+            $a[] = self::pad(
+                $c,
+                isset(static::$table_cols[$i]) ? static::$table_cols[$i] : 6,
+                !isset($align[$i])
+                    ? !isset(static::$table_align[$i])
+                    ? STR_PAD_LEFT
+                    : static::$table_align[$i]
+                    : $align[$i]
+            );
+        }
+        $a[] = '';
+
+        echo implode(static::$CEL_SEP, $a), PHP_EOL;
+    }
+
     // -----------------------------------------------------
     // Before every test
     public function mySetUp()
@@ -254,7 +343,7 @@ abstract class PHPUnit_BaseClass extends PU_TestCase
      * @param  int      $pad_type
      * @return string
      */
-    public static function pad($input, $pad_length, $pad_string = ' ', $pad_type = STR_PAD_RIGHT)
+    public static function pad($input, $pad_length, $pad_type = STR_PAD_RIGHT, $pad_string = ' ')
     {
         $diff = strlen($input) - mb_strlen($input);
         return str_pad($input, $pad_length + $diff, $pad_string, $pad_type);

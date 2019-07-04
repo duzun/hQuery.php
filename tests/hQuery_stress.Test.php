@@ -18,6 +18,46 @@ class TestHQueryStress extends PHPUnit_BaseClass
     public static $log = true;
 
     // -----------------------------------------------------
+    /**
+     * @var array
+     */
+    public static $table_header = array(
+        'Selector',
+        'found',
+        'doc exe',
+        'body exe',
+        'doc mem',
+        'body mem',
+    );
+
+    /**
+     * @var array
+     */
+    public static $table_cols = array(
+        16,
+        6,
+        10, // TIME_LENGTH
+        10, // TIME_LENGTH
+            // 6,
+        9,  // MEM_LENGTH
+        9,  // MEM_LENGTH
+            // 7,
+    );
+
+    /**
+     * @var array
+     */
+    public static $table_align = array(
+        STR_PAD_RIGHT,
+        STR_PAD_LEFT,
+        STR_PAD_LEFT,
+        STR_PAD_LEFT,
+        // STR_PAD_RIGHT,
+        STR_PAD_LEFT,
+        STR_PAD_LEFT,
+        // STR_PAD_RIGHT,
+    );
+    // -----------------------------------------------------
     // -----------------------------------------------------
     public function test_construct_and_index()
     {
@@ -69,51 +109,109 @@ class TestHQueryStress extends PHPUnit_BaseClass
 
         $selectors = array(
             'span',
+            'span.glyphicon',
+            'div',
+            'p',
+            'form',
+            'td',
+            'tr',
+            'table',
+            'table tr',
+            'table>tr',
+            'tr td',
+            'tr>td', // @TODO: improve performance
             '.ch-title',
             '.even',
             '.row',
             'a',
+            'a[href]',
             'img',
+            'img[src]',
             'a img',
             'a>img',
             'a>img:parent',
+            'a[href]>img[src]:parent',
             '.first',
             '.first:parent',
             '.first:next',
             'img.click',
+            'script',
         );
-        $max_len = self::listMaxStrLen($selectors);
+        self::$table_cols[0] = self::listMaxStrLen($selectors);
+        $max_len             = self::listMaxStrLen($selectors);
 
-        $contexts = array(
-            ' doc' => $doc,
-            'body' => $doc->find('body'),
-        );
+        self::print_table_header();
+        $total = array(0, 0, 0, 0, 0);
+
+        $body = $doc->find('body');
 
         foreach ($selectors as $sel) {
             $c = array();
             $w = array();
-            foreach ($contexts as $name => $ctx) {
-                $a        = null; // Free mem, call __destruct()
-                $tmr      = self::timer();
-                $mmr      = self::memer();
-                $a        = $ctx->find($sel);
-                $mem      = self::memer($mmr);
-                $exe      = self::timer($tmr);
-                $c[$name] = array($a, $exe, $mem);
-                // $pad = str_repeat(' ', $max_len - strlen($sel));
-                // self::log("{$name}.find('$sel')$pad\t-> " . str_pad(count($a), 5, ' ', STR_PAD_LEFT) . "  in {$exe}  with {$mem}");
-                $this->assertNotNull($a);
-            }
-            $a  = reset($c);
-            $ak = trim(key($c));
-            $b  = next($c);
-            $bk = trim(key($c));
 
-            $pad = str_repeat(' ', $max_len - strlen($sel));
-            self::log("count(\$c.find('$sel'))$pad\t= " . str_pad(count($a[0]), 5, ' ', STR_PAD_LEFT) . " in {$a[1]} (\$c={$ak}), {$b[1]} (\$c={$bk})  mem: {$a[2]}");
+            $a    = null; // Free mem, call __destruct()
+            $tmr  = self::timer();
+            $mmr  = self::memer();
+            $a    = $doc->find($sel);
+            $amem = self::memer($mmr, false);
+            $aexe = self::timer($tmr, false);
+            $this->assertNotNull($a);
 
-            $this->assertEquals(count($a[0]), count($b[0]), $sel);
+            $b    = null; // Free mem, call __destruct()
+            $tmr  = self::timer();
+            $mmr  = self::memer();
+            $b    = $body->find($sel);
+            $bmem = self::memer($mmr, false);
+            $bexe = self::timer($tmr, false);
+            $this->assertNotNull($b);
+
+            $this->assertEquals(count($a), count($b), $sel);
+
+            $total[0] += count($a);
+            $total[1] += $aexe;
+            $total[2] += $bexe;
+            $total[3] += $amem;
+            $total[4] += $bmem;
+
+            self::print_table_row(array(
+                $sel,
+                count($a),
+                self::fmtMicroTime($aexe / 1e6),
+                self::fmtMicroTime($bexe / 1e6),
+                // 'x' . round($bexe / $aexe),
+                self::fmtMem($amem),
+                self::fmtMem($bmem),
+                // 'x' . round($bmem / $amem, 1),
+            ));
         }
+
+        $count = count($selectors);
+
+        echo self::$ROW_SEP, PHP_EOL;
+
+        self::print_table_row(array(
+            'Average:',
+            round($total[0] / $count),
+            self::fmtMicroTime($total[1] / $count / 1e6),
+            self::fmtMicroTime($total[2] / $count / 1e6),
+            // 'x' . round($total[2] / $total[1]),
+            self::fmtMem($total[3] / $count),
+            self::fmtMem($total[4] / $count),
+            // 'x' . round($total[4] / $total[3]),
+        ), array(STR_PAD_LEFT));
+
+        self::print_table_row(array(
+            'Total:',
+            $total[0],
+            self::fmtNumber($total[1] / 1e3) . 'ms',
+            self::fmtNumber($total[2] / 1e3) . 'ms',
+            // '-',
+            self::fmtMem($total[3]),
+            self::fmtMem($total[4]),
+            // '-',
+        ), array(STR_PAD_LEFT));
+
+        echo PHP_EOL;
 
         return $return;
     }
