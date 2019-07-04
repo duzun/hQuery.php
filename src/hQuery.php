@@ -26,7 +26,7 @@ class_exists('duzun\\hQuery\\HTML_Index', false) or require_once __DIR__ . DIREC
  *
  *  Copyright (C) 2014-2018 Dumitru Uzun
  *
- *  @version 3.0.1
+ *  @version 3.0.2
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
  */

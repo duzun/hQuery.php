@@ -1,5 +1,6 @@
 <?php
 namespace duzun\hQuery\Parser;
+
 use duzun\hQuery\Parser;
 
 // ------------------------------------------------------------------------
@@ -44,6 +45,7 @@ class HTML extends Parser
      */
     public function parse()
     {
+        // Index comments first, so than we can safely ignore them
         $this->_index_comments();
 
         $firstLetterChars = self::$nameStartRange;  // first letter chars
@@ -62,6 +64,7 @@ class HTML extends Parser
         while ($i < $l) {
             $i = strpos($html, '<', $i);
             if (false === $i) {
+                // no more tags in $html
                 break;
             }
 
@@ -69,13 +72,13 @@ class HTML extends Parser
             $b = $i;
             $c = $html[$i];
 
-            // if close tags
+            // if close tag
             if ($isCloseTag = '/' === $c) {
                 ++$i;
                 $c = $html[$i];
             }
 
-            // usual tags
+            // regular tag
             if (false !== strpos($firstLetterChars, $c)) {
                 ++$i; // possibly second letter of tagName
                 $j = strspn($html, $tagLettersChars, $i);
@@ -90,13 +93,14 @@ class HTML extends Parser
                 }
                 $i = self::_findTagClose($html, $i);
                 if (false === $i) {
+                    // this tag never closes - malformed HTML?
                     break;
                 }
 
                 $e = $i++;
                 // open tag
                 if (!$isCloseTag) {
-                    $ids[$e]  = $e; // the end of the tag contents (>)
+                    $ids[$e]  = $e; // the end of tag attributs (>) and start of tag contents
                     $tags[$e] = $n;
                     $b += $j + 1;
                     $b += strspn($html, " \n\r\t", $b);
@@ -113,6 +117,7 @@ class HTML extends Parser
 
                         }
                     }
+                    // Not an empty tag
                     if ('/' != $html[$e - 1]) {
                         $n = strtolower($n);
                         if (isset($unparsedTags[$n])) {

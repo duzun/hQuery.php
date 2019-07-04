@@ -766,7 +766,6 @@ class HTML_Index extends Node
             if (!$aids) {
                 return self::$_ar_;
             }
-
         }
 
         if ($attr) {
@@ -1042,7 +1041,30 @@ class HTML_Index extends Node
     protected function get_aids_byClass($cl, $as_keys = false, $actx = null)
     {
         $aids = self::$_ar_;
+
+        // Empty context yields empty result
         if (isset($actx) && !$actx) {
+            return $aids;
+        }
+
+        // Get aids for all attributes with classes
+        if($cl === true) {
+            $cl = $this->class_idx;
+            if(!$cl) {
+                return $aids;
+            }
+            foreach($cl as $c) {
+                if(is_array($c)) {
+                    $aids += $c;
+                }
+                else {
+                    $aids[$c] = $this->attr_idx[$c];
+                }
+            }
+
+            if($actx) {
+                $aids = array_intersect_key($aids, $actx);
+            }
             return $aids;
         }
 
@@ -1050,36 +1072,42 @@ class HTML_Index extends Node
             $cl = preg_split('|\\s+|', trim($cl));
         }
 
+        // Not sure how we've got here
         if (!$cl) {
-            $cl = array_keys($this->class_idx);
+            return $aids;
         }
-        // the empty set effect
-        foreach ($cl as $cl) {
-            if (isset($this->class_idx[$cl])) {
-                $aid = $this->class_idx[$cl];
-                if (!$actx) {
-                    if (is_array($aid)) {
-                        foreach ($aid as $aid => $cl) {
-                            $aids[$aid] = $cl;
-                        }
-                    } else {
-                        $aids[$aid] = $this->attr_idx[$aid];
-                    }
 
-                } else {
-                    if (is_array($aid)) {
-                        foreach ($aid as $aid => $cl) {
-                            if (isset($actx[$aids])) {
-                                $aids[$aid] = $cl;
-                            } elseif (isset($actx[$aids])) {
-                                $aids[$aid] = $this->attr_idx[$aid];
-                            }
-                        }
-                    }
+        $cl = array_flip($cl);
+        $count = count($cl);
+        $cl = array_intersect_key($this->class_idx, $cl);
 
+        // At least one class not found in the document
+        if(count($cl) < $count) {
+            return $aids;
+        }
+
+        foreach ($cl as $aid) {
+            if (!is_array($aid)) {
+                $aid = array($aid => $this->attr_idx[$aid]);
+            }
+
+            if(!$aids) {
+                $aids = $aid;
+                if($actx) {
+                    $aids = array_intersect_key($aids, $actx);
+                    // Class not found in the context
+                    if(!$aids) {
+                        return $aids;
+                    }
                 }
-            } else {
-                return self::$_ar_;
+            }
+            else {
+                $aids = array_intersect_key($aids, $aid);
+
+                // Some class combination not found
+                if (!$aids) {
+                    return $aids;
+                }
             }
         }
 

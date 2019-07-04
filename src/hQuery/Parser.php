@@ -16,11 +16,13 @@ class Parser
     public static $spaceRange = " \t\n\r\0\x0B\f";
 
     /**
+     * Call ::_init_class() to init
      * @var string
      */
     public static $nameStartRange;
 
     /**
+     * Call ::_init_class() to init
      * @var string
      */
     public static $nameRange;

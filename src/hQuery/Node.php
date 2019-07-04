@@ -16,7 +16,7 @@ use duzun\hQuery\Parser\HTML as HTMLParser;
 abstract class Node implements \Iterator, \Countable
 {
     // ------------------------------------------------------------------------
-    const VERSION = '3.0.1';
+    const VERSION = '3.0.2';
     // ------------------------------------------------------------------------
     /**
      * Response details of last request
@@ -640,8 +640,9 @@ abstract class Node implements \Iterator, \Countable
         if (!$ids) {
             return $ret;
         }
+        $doc = $this->doc();
 
-        $dids = &$this->doc()->ids;
+        $dids = &$doc->ids;
         $le   = end($ids);
         if (current($dids) === false) {
             $ie = reset($dids);

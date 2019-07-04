@@ -68,20 +68,20 @@ class TestHQuery extends PHPUnit_BaseClass
     <link rel="shortcut icon" href="/favicon.ico" class="pjax" />
 </head>
 <body class="test-class">
-    <div id="test-div" class="test-class test-div">
+    <div id="test-div" class="test-class test-div span-div">
         text: This is some text
-        <a href="/path" class="path">
+        <a href="/path" class="path span span-a">
             link: This is a link
         </a>
          in : between tags
-        span: <span id="aSpan" class="span">Span text</span>
-        notSpan: <div id="aDiv" class="span">notSpan text</div>
+        span: <span id="aSpan" class="span span-span">Span text</span>
+        notSpan: <div id="aDiv" class="span span-div">notSpan text</div>
     </div>
-    <a id="outterLink"
+    <a id="outerLink"
         href="//not-my-site.com/next.html"
         style="Color:blue;padding: 1px 2pt 3em 0; background-image:url(/path/to/img.jpg?url=param&and=another&one);"
     >Not My Site</a>
-    <img id="outterImg" src="https://cdn.duzun.me/images/logo.png" />
+    <img id="outerImg" src="https://cdn.duzun.me/images/logo.png" />
 
     <dl id="dict1">
       <dt>Coffee</dt>
@@ -215,6 +215,7 @@ EOS
         $a = $doc->find('.test-class #test-div.test-div > a[href]');
 
         $this->assertNotEmpty($a);
+        $this->assertEquals(1, count($a));
         $this->assertTrue($a instanceof Element);
         $this->assertEquals('a', $a->nodeName);
         $this->assertEquals('link: This is a link', trim($a->text));
@@ -222,7 +223,23 @@ EOS
         $this->assertEquals('div', $a->parent->nodeName);
         $this->assertEquals('test-div', $a->parent->attr('id'));
 
-        $a = $doc->find('#outterImg');
+        $a = $doc->find('.test-class [id=test-div].test-div.span-div > a[href].path.span-a');
+        $this->assertEquals(1, count($a));
+        $this->assertEquals('a', $a->nodeName);
+
+        $a = $doc->find('.test-class a[href][class="path span span-a"]');
+        $this->assertEquals(1, count($a));
+        $this->assertEquals('a', $a->nodeName);
+
+        $a = $doc->find('.test-class [class="path span span-a"]');
+        $this->assertEquals(1, count($a));
+        $this->assertEquals('a', $a->nodeName);
+
+        $a = $doc->find('[class="path span span-a"]');
+        $this->assertEquals(1, count($a));
+        $this->assertEquals('a', $a->nodeName);
+
+        $a = $doc->find('#outerImg');
         $this->assertNotEmpty($a);
         $this->assertEquals('img', $a->nodeName);
 
@@ -240,6 +257,15 @@ EOS
         $a = $doc->find('div ~ img');
         $this->assertNotEmpty($a);
         $this->assertEquals(1, count($a));
+
+        $a = $doc->find('.span');
+        $this->assertEquals(3, count($a));
+
+        $a = $doc->find('.span.span-div');
+        $this->assertEquals(1, count($a));
+
+        $a = $doc->find('.span-a.span-div');
+        $this->assertEmpty($a);
 
         $a = $doc->find('a ~ .span');
         $this->assertNotEmpty($a);
@@ -365,7 +391,7 @@ EOS
         $this->assertEquals(self::$baseUrl . 'path', $a->href);
 
         // a[href] absolute URL
-        $a = self::$inst->find('a#outterLink');
+        $a = self::$inst->find('a#outerLink');
         $this->assertEquals('https://not-my-site.com/next.html', $a->href);
 
         // $a->style is the parset $a->attr('style'):
@@ -378,7 +404,7 @@ EOS
 
 
         // img[src] absolute URL
-        $a = self::$inst->find('img#outterImg');
+        $a = self::$inst->find('img#outerImg');
         $this->assertEquals('https://cdn.duzun.me/images/logo.png', $a->src);
 
         // link[href] relative URL
@@ -582,5 +608,4 @@ EOS
     }
 
     // -----------------------------------------------------
-
 }
