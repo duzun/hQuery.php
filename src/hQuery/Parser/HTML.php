@@ -54,13 +54,17 @@ class HTML extends Parser
         $specialTags  = array('!' => 1, '?' => 2); // special tags
         $unparsedTags = array_flip(self::$_unparsedTags);
 
-        $utn  = null; // current unparsed tag name
         $html = $this->s;
         $i    = $this->i;
         $l    = $this->l;
 
-        $stack = $tags = $ids = $attr = array();
+        $stack   = $pStack   =
+        $parents =
+        $tags    = $ids    = $attr    = array();
 
+        $pid = null;
+
+        $utn = null; // current unparsed tag name
         while ($i < $l) {
             $i = strpos($html, '<', $i);
             if (false === $i) {
@@ -102,6 +106,9 @@ class HTML extends Parser
                 if (!$isCloseTag) {
                     $ids[$e]  = $e; // the end of tag attributs (>) and start of tag contents
                     $tags[$e] = $n;
+
+                    isset($pid) and $parents[$e] = $pid;
+
                     $b += $j + 1;
                     $b += strspn($html, " \n\r\t", $b);
                     if ($b < $e) {
@@ -119,23 +126,32 @@ class HTML extends Parser
                     }
                     // Not an empty tag
                     if ('/' != $html[$e - 1]) {
+                        if (isset($pid)) {
+                            $pStack[$pid] = $pid;
+                        }
+                        $pid = $e;
+
                         $n = strtolower($n);
                         if (isset($unparsedTags[$n])) {
                             $utn = $n;
                         }
-                        $stack[$n][$b] = $e; // put in stack
+                        $stack[$n][$e] = $e; // put in stack
                     }
                 }
                 // close tag
                 else {
                     $n = strtolower($n);
-                    $s = &$stack[$n];
-                    if (empty($s)); // error - tag not opened, but closed - ???
-                    else{
-                        $q = end($s);
-                        $p = key($s);
-                        unset($s[$p], $s);
+
+                    if (!empty($stack[$n])) {
+                        $q       = array_pop($stack[$n]);
                         $ids[$q] = $b - 1; // the end of the tag contents (<)
+                        if ($q == $pid) {
+                            $pid = array_pop($pStack);
+                        } else {
+                            unset($pStack[$q]);
+                        }
+                    } else {
+                        // error - tag not opened, but closed - ???
                     }
                 }
             } elseif (!$isCloseTag) {
@@ -160,14 +176,14 @@ class HTML extends Parser
             }
         }
 
-        foreach ($stack as $n => $st) {
-            if (empty($st)) {
-                unset($stack[$n]);
-            }
-        }
+        return array($ids, $tags, $attr, $parents);
 
-        return array($ids, $tags, $attr);
-
+        // foreach ($stack as $n => $st) {
+        //     if (empty($st)) {
+        //         unset($stack[$n]);
+        //     }
+        // }
+        //
         // if(self::$autoclose_tags) {
         // foreach($stack as $n => $st) { // ???
         // }

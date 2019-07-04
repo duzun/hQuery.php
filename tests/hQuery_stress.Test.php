@@ -87,6 +87,23 @@ class TestHQueryStress extends PHPUnit_BaseClass
         $count = self::fmtNumber(self::listSumCounts($tags));
         self::log("    hQuery->index( {$count} tags )\tin\t{$exe}\t{$mem} RAM");
 
+        $tmr   = self::timer();
+        $mmr   = self::memer();
+        $p1    = $doc->calcParentIds();
+        $mem   = self::memer($mmr);
+        $exe   = self::timer($tmr);
+        $count = self::fmtNumber(count(array_flip($p1)));
+        self::log(" hQuery->calcParentIds(): {$count}\tin\t{$exe}\t{$mem} RAM");
+
+        $tmr   = self::timer();
+        $mmr   = self::memer();
+        $p2    = $doc->getChildrenIds();
+        $mem   = self::memer($mmr);
+        $exe   = self::timer($tmr);
+        $count = self::fmtNumber(count($p2));
+        self::log(" hQuery->getChildrenIds(): {$count}\tin\t{$exe}\t{$mem} RAM");
+
+
         self::log("   Original Charset: {$doc->charset}");
 
         $tags   = array_map('count', $tags);

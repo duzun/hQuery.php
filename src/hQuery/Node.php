@@ -641,6 +641,12 @@ abstract class Node implements \Iterator, \Countable
             return $ret;
         }
         $doc = $this->doc();
+        // if ( $doc->pids ) {
+        //     // $this->getParentsIds()
+        //     // $this->getChildrenIds()
+        //     $ret = array_intersect($doc->pids, array_keys($ids));
+        //     return array_intersect_key($doc->ids, $ret);
+        // }
 
         $dids = &$doc->ids;
         $le   = end($ids);

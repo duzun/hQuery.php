@@ -16,6 +16,11 @@ class_exists('duzun\\hQuery\\Node', false) or require_once __DIR__ . DIRECTORY_S
 class HTML_Index extends Node
 {
     /**
+     * @var array
+     */
+    public $pids;
+
+    /**
      * @var boolean
      */
     public static $del_spaces = false;
@@ -681,7 +686,7 @@ class HTML_Index extends Node
         $this->indexed = true;
 
         // Parser state object
-        list($this->ids, $this->tags, $attr) = HTMLParser::exec($this->html);
+        list($this->ids, $this->tags, $attr, $this->pids) = HTMLParser::exec($this->html);
 
         $this->_index_tags();
         $this->_index_attribs($attr);unset($attr);
@@ -700,6 +705,149 @@ class HTML_Index extends Node
         }
 
         return $this->tag_idx;
+    }
+
+    // ------------------------------------------------------------------------
+    /**
+     * @param  $ids
+     * @return mixed
+     */
+    public function calcParentIds($ids = null)
+    {
+        isset($ids) or $ids = $this->ids;
+        $pStack             = $parents             = array();
+        $pb                 = $pe                 = null;
+        foreach ($ids as $b => $e) {
+            if (!isset($pb)) {
+                $pb = $b;
+                $pe = $e;
+            } else {
+                while ($b >= $pe && $pStack) {
+                    list($pb, $pe) = array_pop($pStack);
+                }
+                if ($b < $pe) {
+                    $parents[$b] = $pb;
+                }
+                if ($b + 4 < $e) {
+                    $pStack[] = array($pb, $pe);
+
+                    $pb = $b;
+                    $pe = $e;
+                }
+            }
+        }
+
+        return $parents;
+    }
+
+    /**
+     * Calculates parents element IDs for given/all categories.
+     *
+     * @param  array $ids  - list of element IDs. If NULL, get parents for all elements in the document
+     * @param  array &$lev - Used to return level for each element in $ids (sorted). Level starts at 0
+     * @return array [<id> => <parent_id>]
+     */
+    public function getParentsIds($ids = null, &$lev = null)
+    {
+
+        // No ids - no parents
+        if (empty($this->ids)) {
+            return self::$_ar_;
+        }
+
+        if (empty($this->pids)) {
+            $this->pids = $this->calcParentIds();
+        }
+
+        $pids = $this->pids;
+
+        if (isset($ids)) {
+            $ret = array();
+            $p   = array_intersect_key($ids, $pids);
+
+            foreach ($p as $i => $v) {
+                $v = array($i => $n = 0);
+                $l = 0;
+                while ($i = $pids[$i]) {
+                    if (isset($ret[$i])) {
+                        $l = $lev[$i] + 1;
+                        break;
+                    }
+                    if (isset($v[$i])) {
+                        throw new \Exception('Infinit recursion in array chain! ' . implode(' >> ', array_reverse(array_slice(array_keys($v), $v[$i]))));
+                    }
+
+                    $v[$i] = ++$n;
+                }
+                $l += $n;
+                // count($v) > 1 and $v = array_reverse($v, true);
+                foreach ($v as $c => $i) {
+                    $ret[$c] = $pids[$c];
+                    $lev[$c] = $l - $i;
+                }
+            }
+            // $lev and asort($lev);
+            return $ret;
+        }
+
+        return $pids;
+    }
+
+    // ------------------------------------------------------------------------
+    /**
+     * @param $cids
+     * @param NULL $lev
+     * @return mixed
+     */
+    public function getChildrenIds($cids = null, $lev = -1)
+    {
+        if (isset($this->cids)) {
+            $cc = $this->cids;
+        } else {
+            $cp = $this->getParentsIds(null, $l);
+            if (!$cp) {
+                return false;
+            }
+            $cc = $this->cids = \duzun\ArrayClass::flip_grouped($cp, true);
+        }
+
+        $ret = array();
+        if (isset($cids)) {
+
+            $p = is_array($cids) ? array_flip($cids) : array($cids => $cids);
+
+            // $stack = [];
+            // foreach($p as $c => $t) if(isset($cc[$c])) $stack += is_array($cc[$c]) ? $cc[$c] : array($cc[$c] => $cc[$c]);
+            // // $stack = $p;
+            // while($stack) {
+            // reset($stack);
+            // $c = key($stack);
+            // unset($stack[$c]);
+            // $ret[$c] = $c;
+            // if(isset($cc[$c])) {
+            // is_array($s = $cc[$c]) or $s = array($s=>$s);
+            // $stack = $s + $stack;
+            // }
+            // }
+
+            while ($t = array_intersect_key($cc, $p) and $lev--) {
+                $p = array();
+                foreach ($t as $t) {
+                    if (is_array($t)) {
+                        $p += $t;
+                    } else {
+                        $p[$t] = $t;
+                    }
+
+                }
+                $ret += $p;
+            }
+        }
+        else {
+            $ret = $cc;
+        }
+
+        return $ret;
     }
 
     // ------------------------------------------------------------------------

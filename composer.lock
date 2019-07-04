@@ -4,8 +4,54 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "39f1124a6c5bc57be147aba03ebe7b4a",
-    "packages": [],
+    "content-hash": "30f7bdf73be814644c0ad13978af74b5",
+    "packages": [
+        {
+            "name": "duzun/array",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/duzun/array.php.git",
+                "reference": "f22e7d0773d16a578a9ba7a86e37eac9ab852fae"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/duzun/array.php/zipball/f22e7d0773d16a578a9ba7a86e37eac9ab852fae",
+                "reference": "f22e7d0773d16a578a9ba7a86e37eac9ab852fae",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "duzun\\": "./"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dumitru Uzun",
+                    "email": "contact@duzun.me",
+                    "homepage": "https://DUzun.Me",
+                    "role": "Author"
+                }
+            ],
+            "description": "Useful array methods in PHP",
+            "homepage": "https://github.com/duzun/array.php",
+            "keywords": [
+                "array",
+                "list",
+                "php",
+                "tools"
+            ],
+            "time": "2019-04-11T21:03:40+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "andrewsville/php-token-reflection",

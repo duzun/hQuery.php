@@ -55,7 +55,8 @@
     ]
   },
   "require": {
-    "php": ">=5.3"
+    "php": ">=5.3",
+    "duzun/array": "^0.0.1"
   },
   "require-dev": {
     "apigen/apigen": "~4.1",

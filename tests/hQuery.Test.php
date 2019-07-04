@@ -13,16 +13,26 @@ use Http\Mock\Client;
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
 
 // -----------------------------------------------------
-class_alias(hQuery::class, 'TestHQueryTests');
+// class_alias(hQuery::class, 'TestHQueryTests');
 
 // // Surogate class for testing, to access protected attributes of hQuery
-// class TestHQueryTests extends hQuery
-// {
-//     /**
-//      * @var mixed
-//      */
-//     public $class_idx;
-// }
+class TestHQueryTests extends hQuery
+{
+    /**
+     * @var mixed
+     */
+    public $class_idx;
+
+    public function t_get($n, $i=NULL) {
+        return ($i?:$this)->{$n};
+    }
+
+    public function t_elems($ra) {
+        $ra = array_flip($ra);
+        $ra = array_intersect_key($this->ids, $ra);
+        return new Element($this, $ra);
+    }
+}
 
 // -----------------------------------------------------
 
@@ -210,6 +220,25 @@ EOS
     public function test_find()
     {
         $doc = self::$inst;
+
+        $p1 = $doc->calcParentIds();
+        $p = $doc->t_get('pids');
+        // self::log(array_diff_assoc($p, $p1));
+        // self::log(array_diff_assoc($p1, $p));
+
+        // 21 - <html>, 28 - <head>, 338 - <body>
+        // $l = $doc->t_elems([62,203,304,813]);
+        // foreach($l as $k => $v) {
+        //     self::log($k, $v->outerHtml());
+        // }
+        $this->assertEquals($p, $p1);
+
+        // $t = $doc->find('#dict2');
+        // $tr = $t->children();
+        // // $this->assertEquals($p, $p1);
+        // $p = array_intersect_key($p, $doc->t_get('ids', $tr));
+        // self::log($doc->t_get('ids', $t), $doc->t_get('ids', $tr));
+        // self::log($p);
 
         // 1)
         $a = $doc->find('.test-class #test-div.test-div > a[href]');
