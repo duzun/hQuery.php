@@ -4,13 +4,13 @@
     $sel = @$_POST['sel'] ?: @$_GET['sel'];
     $go  = @$_POST['go']  ?: @$_GET['go'];
     $rm = strtoupper(getenv('REQUEST_METHOD') ?: $_SERVER['REQUEST_METHOD']);
-// var_export(compact('url', 'sel', 'go')+[$rm]+$_SERVER);
+    // var_export(compact('url', 'sel', 'go')+[$rm]+$_SERVER);
     if ( $rm == 'POST' ) {
         require_once __DIR__ . '/../hquery.php';
 
         $config = [
-            'user_agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
-            'accept_html' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'user_agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+            'accept_html' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
         ];
 
         // Enable cache
@@ -27,9 +27,13 @@
                   , [
                         'Accept'     => $config['accept_html'],
                         'User-Agent' => $config['user_agent'],
+                        'Upgrade-Insecure-Requests' => 1,
                     ]
                 );
                 if($doc) {
+                    // Follow redirects
+                    $t = $doc->href and $url = $t;
+
                     // Read some meta info from $doc
                     $t = $doc->find('head title') and $t = trim($t->text()) and $meta['title'] = $t;
                     $t = $doc->find('head meta');
