@@ -11,7 +11,7 @@ See [tests/README.md](https://github.com/duzun/hQuery.php/blob/master/tests/READ
 
 [API Documentation](https://duzun.github.io/hQuery.php/docs/class-hQuery.html)
 
-# 💡 Features
+## 💡 Features
 
   - Very fast parsing and lookup
   - Parses broken HTML
@@ -24,7 +24,7 @@ See [tests/README.md](https://github.com/duzun/hQuery.php/blob/master/tests/READ
   - PHP 5.3+
   - No dependencies
 
-# 🛠 Install
+## 🛠 Install
 
 Just `include_once 'hquery.php';` in your project and start using `hQuery`.
 
@@ -32,8 +32,7 @@ Alternatively `composer require duzun/hquery`
 
 or using `npm install hquery.php`, `require_once 'node_modules/hquery.php/hquery.php';`.
 
-
-# ⚙ Usage
+## ⚙ Usage
 
 ### Basic setup:
 ```php
@@ -54,7 +53,6 @@ hQuery::$cache_expires = 3600; // default one hour
 
 I would recomend using [php-http/cache-plugin](http://docs.php-http.org/en/latest/plugins/cache.html)
 with a [PSR-7 client](http://docs.php-http.org/en/latest/clients.html) for better flexibility.
-
 
 ### Load HTML from a file
 ###### [hQuery::fromFile](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromFile)( string `$filename`, boolean `$use_include_path` = false, resource `$context` = NULL )
@@ -119,7 +117,6 @@ composer require php-http/message php-http/discovery php-http/curl-client
 If you don't have [cURL PHP extension](https://secure.php.net/curl),
 just replace `php-http/curl-client` with `php-http/socket-client` in the above command.
 
-
 ```php
 use duzun\hQuery;
 
@@ -144,7 +141,6 @@ $doc = hQuery::fromHTML($response, $request->getUri());
 Another option is to use [stream_context_create()](https://secure.php.net/manual/en/function.stream-context-create.php)
 to create a `$context`, then call `hQuery::fromFile($url, false, $context)`.
 
-
 ### Processing the results
 ###### [hQuery::find](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_find)( string `$sel`, array|string `$attr` = NULL, hQuery_Node `$ctx` = NULL )
 ```php
@@ -159,7 +155,7 @@ $titles = array();
 // If the result of find() is not empty
 // $banners is a collection of elements (hQuery_Element)
 if ( $banners ) {
-    
+
     // Iterate over the result
     foreach($banners as $pos => $a) {
         $links[$pos] = $a->attr('href'); // get absolute URL from href property
@@ -193,15 +189,46 @@ $charset = $doc->charset;
 $size = $doc->size;
 ```
 
-# 🖧 Live Demo
-    
+## 🖧 Live Demo
+
 On [DUzun.Me](https://duzun.me/playground/hquery#sel=%20a%20%3E%20img%3Aparent&url=https%3A%2F%2Fgithub.com%2Fduzun)
 
-A lot of people ask for sources of my **Live Demo** page. Here we go: 
+A lot of people ask for sources of my **Live Demo** page. Here we go:
 
 [view-source:https://duzun.me/playground/hquery](https://github.com/duzun/hQuery.php/blob/master/examples/duzun.me_playground_hquery.php)
- 
-# 🔧 TODO
+
+### 🏃 Run the playground
+
+You can easily run any of the `examples/` on your local machine. 
+All you need is PHP installed in your system.
+After you clone the repo with `git clone https://github.com/duzun/hQuery.php.git`,
+you have several options to start a web-server.
+
+###### Option 1:
+
+```sh
+cd hQuery.php/examples
+php -S localhost:8000
+
+# open browser http://localhost:8000/
+```
+
+###### Option 2 (browser-sync):
+
+This option starts a live-reload server and is good for playing with the code.
+
+```sh
+npm install
+gulp
+
+# open browser http://localhost:8080/
+```
+
+###### Option 3 (VSCode):
+
+If you are using VSCode, simply open the project and run debugger (`F5`).
+
+## 🔧 TODO
 
   - Unit tests everything
   - Document everything
@@ -210,7 +237,7 @@ A lot of people ask for sources of my **Live Demo** page. Here we go:
   - Add more selectors
   - Use [HTTPlug](http://httplug.io/) internally
 
-# 💖 Support my projects
+## 💖 Support my projects
 
 I love Open Source. Whenever possible I share cool things with the world (check out [NPM](https://duzun.me/npm) and [GitHub](https://github.com/duzun/)).
 

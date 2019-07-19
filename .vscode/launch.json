@@ -7,16 +7,6 @@
     {
       "type": "php",
       "request": "launch",
-      "name": "test hQuery",
-      "cwd": "${workspaceFolder}",
-      "program": "${workspaceFolder}/vendor/bin/phpunit",
-      "args": [
-        "./tests/hQuery.Test.php"
-      ],
-    },
-    {
-      "type": "php",
-      "request": "launch",
       "name": "Start examples on localhost:8000",
       "cwd": "${workspaceFolder}/examples/",
       "program": "${workspaceFolder}/examples/",
@@ -26,6 +16,16 @@
         "-t"
       ],
       "port": 9000
+    },
+    {
+      "type": "php",
+      "request": "launch",
+      "name": "test hQuery",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/vendor/bin/phpunit",
+      "args": [
+        "./tests/hQuery.Test.php"
+      ],
     },
     {
       "name": "Listen for XDebug",
