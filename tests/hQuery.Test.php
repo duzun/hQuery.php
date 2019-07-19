@@ -1,4 +1,5 @@
 <?php
+
 use duzun\hQuery;
 use duzun\hQuery\Element;
 use Http\Discovery\MessageFactoryDiscovery;
@@ -110,8 +111,16 @@ class TestHQuery extends PHPUnit_BaseClass
     Contents...
 </body>
 </html>
-EOS
-    ;
+EOS;
+
+    public static $emptyBodyHTML = <<<EOS
+    <html>
+    <head>
+    <meta name="robots" content="noindex,nofollow">
+    <script src="xxx"></script>
+    <body>
+    </body></html>
+EOS;
 
     // Before any test
     public static function mySetUpBeforeClass()
@@ -303,8 +312,20 @@ EOS
         $a = self::$inst->find('[href][class=pjax]');
         $b = self::$inst->find('[href].pjax');
         $this->assertEquals(1, count($a));
-        $this->assertEquals(1, count($a));
+        $this->assertEquals(1, count($b));
         $this->assertEquals($a->key(), $b->key());
+
+        // 5)
+        $edoc = TestHQueryTests::fromHTML(self::$emptyBodyHTML, self::$baseUrl . 'index.html');
+        $a = $edoc->find('a');
+        $this->assertEmpty($a);
+
+        // there is no </head> closing tag, thus meta is not inside of <head>
+        $a = $edoc->find('head meta');
+        $this->assertEmpty($a);
+
+        $b = $edoc->find('body');
+        $this->assertEquals(1, count($b));
 
         return $ff;
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace duzun;
 
 // ------------------------------------------------------------------------
@@ -26,7 +27,7 @@ class_exists('duzun\\hQuery\\HTML_Index', false) or require_once __DIR__ . DIREC
  *
  *  Copyright (C) 2014-2018 Dumitru Uzun
  *
- *  @version 3.0.2
+ *  @version 3.0.3
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
  */
@@ -220,7 +221,6 @@ class hQuery extends hQuery\HTML_Index
             if (!empty($cch_meta)) {
                 $doc->cch_meta = $cch_meta;
             }
-
         }
 
         return $doc;
@@ -311,16 +311,20 @@ class hQuery extends hQuery\HTML_Index
                 } else {
                     throw new \Exception('Wrong context in ' . __METHOD__);
                 }
-
             } elseif (is_array($a)) {
                 $attr = array_merge($attr, $a);
             } elseif (is_string($a)) {
                 $attr = array_merge($attr, HTMLParser::parseAttrStr($a));
             }
-
         }
+
         if (isset($ctx)) {
             $ctx = $this->_get_ctx($ctx);
+
+            // Empty context yields empty result
+            if (!$ctx) {
+                return null;
+            }
         }
 
         $sel = SelectorParser::exec(trim($sel));
@@ -352,8 +356,13 @@ class hQuery extends hQuery\HTML_Index
                     switch ($x) {
                         case ' ':
                             $cx = $this->_get_ctx($rb);
-                            if (!$cx); // ??? error
-                            $rb = $this->_find($n, $c, $at, $cx);
+                            if ($cx) {
+                                $rb = $this->_find($n, $c, $at, $cx);
+                            }
+                            // Empty context -> empty result
+                            else {
+                                $rb = null;
+                            }
                             break;
 
                         case '>':
@@ -394,24 +403,31 @@ class hQuery extends hQuery\HTML_Index
                         } elseif (is_array($p)) {
                             $ch = reset($p);
                             switch (key($p)) {
-                                case '<':$rb = array_slice($rb, 0, $ch, true);
+                                case '<':
+                                    $rb = array_slice($rb, 0, $ch, true);
                                     break;
-                                case '>':$rb = array_slice($rb, $ch, count($rb), true);
+                                case '>':
+                                    $rb = array_slice($rb, $ch, count($rb), true);
                                     break;
-                                case '-':$rb = $this->_prev($rb, $ch);
+                                case '-':
+                                    $rb = $this->_prev($rb, $ch);
                                     break;
-                                case '+':$rb = $this->_next($rb, $ch);
+                                case '+':
+                                    $rb = $this->_next($rb, $ch);
                                     break;
-                                case '|':do$rb = $this->_parent($rb);while ($ch-- > 0);
+                                case '|':
+                                    do $rb = $this->_parent($rb);
+                                    while ($ch-- > 0);
                                     break;
-                                case '*':do$rb = $this->_children($rb);while ($ch-- > 0);
+                                case '*':
+                                    do $rb = $this->_children($rb);
+                                    while ($ch-- > 0);
                                     break;
                             }
                         }
                         if (!$rb) {
                             break 2;
                         }
-
                     }
                 }
             }
@@ -425,7 +441,6 @@ class hQuery extends hQuery\HTML_Index
                     // }
                 }
             }
-
         }
 
         if ($ra) {
@@ -481,7 +496,9 @@ class hQuery extends hQuery\HTML_Index
      * Index elements of the source HTML. (Called automatically)
      */
     public function index()
-    {return $this->_index_all();}
+    {
+        return $this->_index_all();
+    }
 
     // - Helpers ------------------------------------------------
 
@@ -537,7 +554,7 @@ class hQuery extends hQuery\HTML_Index
             }
         }
         switch ($type) {
-            case 'ser':{
+            case 'ser': {
                     $data = @unserialize($str);
                     if (false === $data) {
                         if (strpos($str, "\n") !== false) {
@@ -549,16 +566,17 @@ class hQuery extends hQuery\HTML_Index
                             $retry and $data = unserialize($str);
                         }
                     }
-                }break;
+                }
+                break;
 
-            case 'json':{
+            case 'json': {
                     $data = json_decode($str, true);
                     // Check for errors only if $data is NULL
                     if (is_null($data)) {
                         // If can't decode JSON, try to remove trailing commans in arrays and objects:
                         if (0 == $_json_support ? 'null' !== $str : json_last_error() != JSON_ERROR_NONE) {
                             $t    = preg_replace('/,\s*([\]\}])/m', '$1', $str) and
-                            $data = json_decode($t, true);
+                                $data = json_decode($t, true);
                         }
                         if (is_null($data)) {
                             // PHP 5 >= 5.3.0
@@ -581,9 +599,10 @@ class hQuery extends hQuery\HTML_Index
                             }
                         }
                     }
-                }break;
+                }
+                break;
 
-            default:{
+            default: {
                     // at least try!
                     $data = json_decode($str, true);
                     if (is_null($data) && (0 == $_json_support ? 'null' !== $str : json_last_error() != JSON_ERROR_NONE)) {
@@ -623,8 +642,8 @@ class hQuery extends hQuery\HTML_Index
     public static function gz_supported()
     {
         function_exists('zlib_decode') and $_gzdecode = 'zlib_decode' or
-        function_exists('gzdecode') and $_gzdecode    = 'gzdecode' or
-        $_gzdecode                                    = false;
+            function_exists('gzdecode') and $_gzdecode    = 'gzdecode' or
+            $_gzdecode                                    = false;
         return $_gzdecode;
     }
 
@@ -738,7 +757,6 @@ class hQuery extends hQuery\HTML_Index
                     if ('' !== $meta) {
                         $meta = self::unjsonize($meta);
                     }
-
                 }
                 if ($meta_only) {
                     $cnt = '';
@@ -749,7 +767,6 @@ class hQuery extends hQuery\HTML_Index
                         if ('' !== $cnt) {
                             $cnt = self::unjsonize($cnt);
                         }
-
                     } else {
                         $cnt = substr($cnt, $l);
                     }
@@ -758,7 +775,6 @@ class hQuery extends hQuery\HTML_Index
                 if ($meta_only) {
                     $cnt = '';
                 }
-
             }
         }
         return $cnt || $meta ? array($cnt, $meta) : false;
@@ -785,7 +801,10 @@ class hQuery extends hQuery\HTML_Index
             $n += strlen($meta);
         }
         $meta = '#' . $n . "\n" . $meta;
-        if (!is_string($cnt) || "\n" == $cnt[0]) {$cnt = "\n" . self::jsonize($cnt); ++$n;}
+        if (!is_string($cnt) || "\n" == $cnt[0]) {
+            $cnt = "\n" . self::jsonize($cnt);
+            ++$n;
+        }
         if ($n) {
             $cnt = $meta . $cnt;
         }
@@ -795,7 +814,7 @@ class hQuery extends hQuery\HTML_Index
             $gl = is_int($gzip) ? $gzip : 1024;
             // Cache as gzip only if built-in gzdecode() defined (more CPU for less IO)
             strlen($cnt) > $gl && self::gz_supported() and
-            $cnt = gzencode($cnt);
+                $cnt = gzencode($cnt);
         }
         file_exists($dn = dirname($fn)) or mkdir($dn, 0777, true);
         return self::flock_put_contents($fn, $cnt);
@@ -876,7 +895,8 @@ class hQuery extends hQuery\HTML_Index
         if ($f = fopen($fn, 'r')) {
             if (flock($f, LOCK_SH | ($block ? 0 : LOCK_NB))) {
                 $s           = 1 << 14;
-                do$ret .= $r = fread($f, $s);while (false !== $r && !feof($f));
+                do $ret .= $r = fread($f, $s);
+                while (false !== $r && !feof($f));
                 if (null == $ret && false === $r) {
                     $ret = $r;
                 }
@@ -951,7 +971,7 @@ class hQuery extends hQuery\HTML_Index
     public static function http_wr($host, $head = null, $body = null, $options = null)
     {
         self::$last_http_result      =
-        $ret                         = new \stdClass();
+            $ret                         = new \stdClass();
         empty($options) and $options = array();
 
         // If $host is a URL
@@ -974,8 +994,10 @@ class hQuery extends hQuery\HTML_Index
         }
         // If $host is not an URL, but might contain path and port
         else {
-            $p = explode('/', $host, 2);list($host, $path) = $p;
-            $p = explode(':', $host, 2);list($host, $port) = $p;
+            $p = explode('/', $host, 2);
+            list($host, $path) = $p;
+            $p = explode(':', $host, 2);
+            list($host, $port) = $p;
         }
 
         if (strncmp($path, '/', 1)) {
@@ -990,20 +1012,24 @@ class hQuery extends hQuery\HTML_Index
                 switch ($options['scheme']) {
                     case 'tls':
                     case 'ssl':
-                    case 'https':$port = 443;
+                    case 'https':
+                        $port = 443;
                         break;
-                    case 'ftp':$port = 21;
+                    case 'ftp':
+                        $port = 21;
                         break;
-                    case 'sftp':$port = 22;
+                    case 'sftp':
+                        $port = 22;
                         break;
                     case 'http':
-                    default:$port = 80;
+                    default:
+                        $port = 80;
                 }
             }
         }
 
         $ret->host =
-        $conhost   = $host;
+            $conhost   = $host;
         $_h        = array(
             'host'   => isset($options['host']) ? $options['host'] : $host,
             'accept' => 'text/html,application/xhtml+xml,application/xml;q =0.9,*/*;q=0.8',
@@ -1096,7 +1122,7 @@ class hQuery extends hQuery\HTML_Index
         // ------------------- Connection and data transfer -------------------
         $errno  = 0;
         $errstr =
-        $rsps   = '';
+            $rsps   = '';
         $h      = $_rh      = null;
         $fs     = @fsockopen($conhost, $port, $errno, $errstr, $timeout);
         if (!$fs) {
@@ -1265,9 +1291,11 @@ class hQuery extends hQuery\HTML_Index
 
         fclose($fs);
 
-        if ('' != $rsps &&
+        if (
+            '' != $rsps &&
             isset($options['decode']) && 'gzip' == $options['decode'] &&
-            isset($_rh['CONTENT_ENCODING']) && 'gzip' == $_rh['CONTENT_ENCODING']) {
+            isset($_rh['CONTENT_ENCODING']) && 'gzip' == $_rh['CONTENT_ENCODING']
+        ) {
             $r = self::gzdecode($rsps);
             if (false !== $r) {
                 unset($_rh['CONTENT_ENCODING']);

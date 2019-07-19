@@ -16,7 +16,7 @@ use duzun\hQuery\Parser\HTML as HTMLParser;
 abstract class Node implements \Iterator, \Countable
 {
     // ------------------------------------------------------------------------
-    const VERSION = '3.0.2';
+    const VERSION = '3.0.3';
     // ------------------------------------------------------------------------
     /**
      * Response details of last request
@@ -117,7 +117,7 @@ abstract class Node implements \Iterator, \Countable
             self::$selected_doc = self::$_nl_;
         }
 
-        $this->ids = self::$_nl_; // If any reference exists, destroy its contents! P.S. Might be buggy, but hey, I own this property. Sincerly yours, hQuery_Node class.
+        $this->ids = self::$_nl_; // If any reference exists, destroy its contents! P.S. Might be buggy, but hey, I own this property. Sincerely yours, hQuery_Node class.
         unset($this->doc, $this->ids);
     }
 
