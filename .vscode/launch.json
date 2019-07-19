@@ -1,0 +1,45 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "php",
+      "request": "launch",
+      "name": "test hQuery",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/vendor/bin/phpunit",
+      "args": [
+        "./tests/hQuery.Test.php"
+      ],
+    },
+    {
+      "type": "php",
+      "request": "launch",
+      "name": "Start examples on localhost:8000",
+      "cwd": "${workspaceFolder}/examples/",
+      "program": "${workspaceFolder}/examples/",
+      "runtimeArgs": [
+        "-S",
+        "localhost:8000",
+        "-t"
+      ],
+      "port": 9000
+    },
+    {
+      "name": "Listen for XDebug",
+      "type": "php",
+      "request": "launch",
+      "port": 9000
+    },
+    {
+      "name": "Launch currently open script",
+      "type": "php",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${fileDirname}",
+      "port": 9000
+    }
+  ]
+}
