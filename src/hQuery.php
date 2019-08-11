@@ -953,7 +953,7 @@ class hQuery extends hQuery\HTML_Index
      *
      *                              timeout - connection timeout in seconds
      *                              host    - goes to headers, overrides $host (ex. $host == '127.0.0.1', $options['host'] == 'www.example.com')
-     *                              port    - usefull when $host is not a full URL
+     *                              port    - useful when $host is not a full URL
      *                              scheme  - http, ssl, tls, udp, ...
      *                              close   - whether to close connection o not
      *                              redirects - number of allowed redirects
