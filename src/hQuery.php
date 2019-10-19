@@ -971,7 +971,7 @@ class hQuery extends hQuery\HTML_Index
     public static function http_wr($host, $head = null, $body = null, $options = null)
     {
         self::$last_http_result      =
-            $ret                         = new \stdClass();
+        $ret                         = new \stdClass();
         empty($options) and $options = array();
 
         // If $host is a URL
@@ -1029,7 +1029,7 @@ class hQuery extends hQuery\HTML_Index
         }
 
         $ret->host =
-            $conhost   = $host;
+        $conhost   = $host;
         $_h        = array(
             'host'   => isset($options['host']) ? $options['host'] : $host,
             'accept' => 'text/html,application/xhtml+xml,application/xml;q =0.9,*/*;q=0.8',
@@ -1122,7 +1122,7 @@ class hQuery extends hQuery\HTML_Index
         // ------------------- Connection and data transfer -------------------
         $errno  = 0;
         $errstr =
-            $rsps   = '';
+        $rsps   = '';
         $h      = $_rh      = null;
         $fs     = @fsockopen($conhost, $port, $errno, $errstr, $timeout);
         if (!$fs) {
@@ -1216,6 +1216,8 @@ class hQuery extends hQuery\HTML_Index
                             }
                         }
                     }
+
+                    fclose($fs);
                     return self::http_wr($loc, $_h, $body, $options);
                 }
                 break;
