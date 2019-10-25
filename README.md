@@ -39,7 +39,7 @@ or using `npm install hquery.php`, `require_once 'node_modules/hquery.php/hquery
 // Optionally use namespaces
 use duzun\hQuery;
 
-// Either use commposer, or include this file:
+// Either use composer, or include this file:
 include_once '/path/to/libs/hquery.php';
 
 // Set the cache path - must be a writable folder
