@@ -35,7 +35,7 @@ class_exists('duzun\\hQuery'              , false) or require_once __DIR__ . DIR
 
 class_exists('hQuery_Node'        , false) or class_alias('duzun\\hQuery\\Node'        , 'hQuery_Node');
 class_exists('hQuery_Context'     , false) or class_alias('duzun\\hQuery\\Context'     , 'hQuery_Context');
-class_exists('hQuery_HTML_Index'  , false) or class_alias('duzun\\hQuery\\HTML_Index'  , 'hQuery_HTML_Index');
+// class_exists('hQuery_HTML_Index'  , false) or class_alias('duzun\\hQuery\\HTML_Index'  , 'hQuery_HTML_Index');
 class_exists('hQuery_Element'     , false) or class_alias('duzun\\hQuery\\Element'     , 'hQuery_Element');
 class_exists('hQuery'             , false) or class_alias('duzun\\hQuery'              , 'hQuery');
 

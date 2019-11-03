@@ -12,6 +12,11 @@ use duzun\hQuery\Parser\HTML as HTMLParser;
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
 
 // -----------------------------------------------------
+// Extend an abstract class for testing it
+class TestParserTests extends Parser {
+    public function parse() {}
+}
+
 // Surogate class for testing, to access protected attributes of HTMLParser
 class TestHTMLParserTests extends HTMLParser
 {
@@ -42,7 +47,7 @@ class TestParser extends PHPUnit_BaseClass
     // Before any test
     public static function mySetUpBeforeClass()
     {
-        self::$inst = new Parser("tn1#id1[attr='[x]'] .cl1.cl2:first tn2:5\t, \n\ttn3.cl3 tn4#id2:eq(-1) > tn5:last-child>tn6:lt('3' ) + span[data-name] ~ a[href]", 9);
+        self::$inst = new TestParserTests("tn1#id1[attr='[x]'] .cl1.cl2:first tn2:5\t, \n\ttn3.cl3 tn4#id2:eq(-1) > tn5:last-child>tn6:lt('3' ) + span[data-name] ~ a[href]", 9);
     }
 
     // After all tests

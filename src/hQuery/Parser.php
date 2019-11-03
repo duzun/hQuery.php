@@ -8,7 +8,7 @@ namespace duzun\hQuery;
  *  @internal
  *  @license MIT
  */
-class Parser
+abstract class Parser
 {
     /**
      * @var string
@@ -50,6 +50,11 @@ class Parser
      * @var string
      */
     public $c;
+
+    /**
+     * To be implemented in extended class
+     */
+    abstract public function parse();
 
     /**
      * @param string $str

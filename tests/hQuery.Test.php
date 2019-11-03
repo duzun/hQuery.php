@@ -210,6 +210,12 @@ EOS;
 
         // And to make sure the $doc is realy ok
         $this->assertEquals('Sample HTML Doc', $doc->find('head title')->text);
+
+
+        // The empty HTML doc:
+        $emptyDoc = $doc::fromHTML('');
+        $this->assertInstanceOf(get_class($doc), $emptyDoc);
+        $this->assertEquals('', $emptyDoc->html);
     }
 
     // -----------------------------------------------------

@@ -13,7 +13,7 @@ class_exists('duzun\\hQuery\\Node', false) or require_once __DIR__ . DIRECTORY_S
  *
  *  @internal
  */
-class HTML_Index extends Node
+abstract class HTML_Index extends Node
 {
     /**
      * @var boolean
@@ -1362,4 +1362,4 @@ class HTML_Index extends Node
 
 // ------------------------------------------------------------------------
 // PSR-0 alias
-class_exists('hQuery_HTML_Index', false) or class_alias('duzun\\hQuery\\HTML_Index', 'hQuery_HTML_Index', false);
+// class_exists('hQuery_HTML_Index', false) or class_alias('duzun\\hQuery\\HTML_Index', 'hQuery_HTML_Index', false);
