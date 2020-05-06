@@ -425,7 +425,7 @@ EOS;
         $a = self::$inst->find('a#outerLink');
         $this->assertEquals('https://not-my-site.com/next.html', $a->href);
 
-        // $a->style is the parset $a->attr('style'):
+        // $a->style is the parsed $a->attr('style'):
         $this->assertNotEmpty($a->style);
         $this->assertNotEquals($a->attr('style'), $a->style);
         $this->assertTrue(is_array($a->style));

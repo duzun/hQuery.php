@@ -18,7 +18,8 @@ matrix:
     fast_finish: true
     allow_failures:
         - php: 5.3
-        - php: 7.4
+        - php: 5.4
+        - php: 7.2
         - php: nightly
 
 dist: trusty
@@ -31,7 +32,7 @@ cache:
         - $HOME/.composer/cache
 
 install:
-    # remove composer lock to allow installing env speciffic versions
+    # remove composer lock to allow installing env specific versions
     - rm -f composer.lock
     # flags to pass to install
     - flags="--prefer-dist --no-interaction --optimize-autoloader --no-suggest --no-progress"

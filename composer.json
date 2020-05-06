@@ -23,7 +23,6 @@
     "crawling",
     "PHP"
   ],
-  "main": "hquery.php",
   "minimum-stability": "RC",
   "prefer-stable": true,
   "autoload": {
@@ -41,10 +40,6 @@
     "email": "contact@duzun.me",
     "issues": "https://github.com/duzun/hQuery.php/issues",
     "source": "https://github.com/duzun/hQuery.php"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/duzun/hQuery.php.git"
   },
   "archive": {
     "exclude": [
