@@ -1149,7 +1149,7 @@ class hQuery extends hQuery\HTML_Index
         }
 
         $h                          = explode("\r\n", rtrim($rsps));
-        list($rprot, $rcode, $rmsg) = explode(' ', array_shift($h), 3);
+        @list($rprot, $rcode, $rmsg) = explode(' ', array_shift($h), 3);
         foreach ($h as $v) {
             $v = explode(':', $v, 2);
             $k = strtoupper(strtr($v[0], '- ', '__'));

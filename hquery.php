@@ -23,9 +23,9 @@
  */
 
 // ------------------------------------------------------------------------
-class_exists('duzun\\hQuery\\Parser'              , false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'Parser.php';
-class_exists('duzun\\hQuery\\Parser\\Selector'    , false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'Parser' . DIRECTORY_SEPARATOR . 'Selector.php';
-class_exists('duzun\\hQuery\\Parser\\HTMLSelector', false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'Parser' . DIRECTORY_SEPARATOR . 'HTML.php';
+class_exists('duzun\\hQuery\\Parser'          , false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'Parser.php';
+class_exists('duzun\\hQuery\\Parser\\Selector', false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'Parser' . DIRECTORY_SEPARATOR . 'Selector.php';
+class_exists('duzun\\hQuery\\Parser\\HTML'    , false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'Parser' . DIRECTORY_SEPARATOR . 'HTML.php';
 
 class_exists('duzun\\hQuery\\Node'        , false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'Node.php';
 class_exists('duzun\\hQuery\\Element'     , false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'hQuery' . DIRECTORY_SEPARATOR . 'Element.php';
