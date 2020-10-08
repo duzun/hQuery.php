@@ -5,7 +5,7 @@ use duzun\hQuery\Parser;
 
 // ------------------------------------------------------------------------
 /**
- *  CSS selector parser class.
+ *  HTML parser class
  *
  *  @internal
  *  @license MIT

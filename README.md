@@ -1,10 +1,12 @@
 hQuery.php   [![Build Status](https://travis-ci.org/duzun/hQuery.php.svg?branch=master)](https://travis-ci.org/duzun/hQuery.php) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/duzuns)
 ==========
 
-An extremely fast and efficient web scraper that parses megabytes of HTML in a blink of an eye.
+An extremely fast and efficient web scraper that can parse megabytes of invalid HTML in a blink of an eye.
+
+You can use the familiar jQuery/CSS selector syntax to easily find the data you need.
 
 In my unit tests, I demand it be at least 10 times faster than Symfony's DOMCrawler on a 3Mb HTML document.
-In reality, according to my humble tests, it is two-three orders of magnitude faster than DOMCrawler in some cases, especially when 
+In reality, according to my humble tests, it is two-three orders of magnitude faster than DOMCrawler in some cases, especially when
 selecting thousands of elements, and on average uses x2 less RAM.
 
 See [tests/README.md](https://github.com/duzun/hQuery.php/blob/master/tests/README.md).
@@ -13,20 +15,20 @@ See [tests/README.md](https://github.com/duzun/hQuery.php/blob/master/tests/READ
 
 ## 💡 Features
 
-  - Very fast parsing and lookup
-  - Parses broken HTML
-  - jQuery-like style of DOM traversal
-  - Low memory usage
-  - Can handle big HTML documents (I have tested up to 20Mb, but the limit is the amount of RAM you have)
-  - Doesn't require cURL to be installed and automatically handles redirects (see [hQuery::fromUrl()](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL))
-  - Caches response for multiple processing tasks
-  - [PSR-7](https://www.php-fig.org/psr/psr-7/) friendly (see hQuery::fromHTML($message))
-  - PHP 5.3+
-  - No dependencies
+- Very fast parsing and lookup
+- Parses broken HTML
+- jQuery-like style of DOM traversal
+- Low memory usage
+- Can handle big HTML documents (I have tested up to 20Mb, but the limit is the amount of RAM you have)
+- Doesn't require cURL to be installed and automatically handles redirects (see [hQuery::fromUrl()](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL))
+- Caches response for multiple processing tasks
+- [PSR-7](https://www.php-fig.org/psr/psr-7/) friendly (see hQuery::fromHTML($message))
+- PHP 5.3+
+- No dependencies
 
 ## 🛠 Install
 
-Just `include_once 'hquery.php';` in your project and start using `hQuery`.
+Just add this folder to your project and `include_once 'hquery.php';` and you are ready to `hQuery`.
 
 Alternatively `composer require duzun/hquery`
 
@@ -35,6 +37,7 @@ or using `npm install hquery.php`, `require_once 'node_modules/hquery.php/hquery
 ## ⚙ Usage
 
 ### Basic setup:
+
 ```php
 // Optionally use namespaces
 use duzun\hQuery;
@@ -43,15 +46,15 @@ use duzun\hQuery;
 include_once '/path/to/libs/hquery.php';
 
 // Set the cache path - must be a writable folder
-// If not set, hQuery::fromURL() whould make a new request on each call
+// If not set, hQuery::fromURL() would make a new request on each call
 hQuery::$cache_path = "/path/to/cache";
 
-// Time to keed request data in cache, seconds
-// A value of 0 disables cahce
+// Time to keep request data in cache, seconds
+// A value of 0 disables cache
 hQuery::$cache_expires = 3600; // default one hour
 ```
 
-I would recomend using [php-http/cache-plugin](http://docs.php-http.org/en/latest/plugins/cache.html)
+I would recommend using [php-http/cache-plugin](http://docs.php-http.org/en/latest/plugins/cache.html)
 with a [PSR-7 client](http://docs.php-http.org/en/latest/clients.html) for better flexibility.
 
 ### Load HTML from a file
@@ -69,7 +72,6 @@ Where `$context` is created with [stream_context_create()](https://secure.php.ne
 
 For an example of using `$context` to make a HTTP request with proxy see [#26](https://github.com/duzun/hQuery.php/issues/26#issuecomment-351032382).
 
-
 ### Load HTML from a string
 ###### [hQuery::fromHTML](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromHTML)( string `$html`, string `$url` = NULL )
 
@@ -77,12 +79,13 @@ For an example of using `$context` to make a HTTP request with proxy see [#26](h
 $doc = hQuery::fromHTML('<html><head><title>Sample HTML Doc</title><body>Contents...</body></html>');
 
 // Set base_url, in case the document is loaded from local source.
-// Note: The base_url property is used to retrive absolute URLs from relative ones.
+// Note: The base_url property is used to retrieve absolute URLs from relative ones.
 $doc->base_url = 'http://desired-host.net/path';
 ```
 
 ### Load a remote HTML document
 ###### [hQuery::fromUrl](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_fromURL)( string `$url`, array `$headers` = NULL, array|string `$body` = NULL, array `$options` = NULL )
+
 ```php
 use duzun\hQuery;
 
@@ -103,12 +106,11 @@ $doc = hQuery::fromUrl(
 ```
 
 For building advanced requests (POST, parameters etc) see [hQuery::http_wr()](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_http_wr),
-though I recomend using a specialized ([PSR-7](https://www.php-fig.org/psr/psr-7/)?) library for making requests
+though I recommend using a specialized ([PSR-7](https://www.php-fig.org/psr/psr-7/)?) library for making requests
 and `hQuery::fromHTML($html, $url=NULL)` for processing results.
 See [Guzzle](http://docs.guzzlephp.org/en/stable/) for eg.
 
 #### [PSR-7](https://www.php-fig.org/psr/psr-7/) example:
-
 
 ```sh
 composer require php-http/message php-http/discovery php-http/curl-client
@@ -127,7 +129,7 @@ $client = HttpClientDiscovery::find();
 $messageFactory = MessageFactoryDiscovery::find();
 
 $request = $messageFactory->createRequest(
-  'GET', 
+  'GET',
   'http://example.com/someDoc.html',
   ['Accept' => 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.8']
 );
@@ -143,6 +145,7 @@ to create a `$context`, then call `hQuery::fromFile($url, false, $context)`.
 
 ### Processing the results
 ###### [hQuery::find](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_find)( string `$sel`, array|string `$attr` = NULL, hQuery_Node `$ctx` = NULL )
+
 ```php
 // Find all banners (images inside anchors)
 $banners = $doc->find('a[href] > img[src]:parent');
@@ -199,7 +202,7 @@ A lot of people ask for sources of my **Live Demo** page. Here we go:
 
 ### 🏃 Run the playground
 
-You can easily run any of the `examples/` on your local machine. 
+You can easily run any of the `examples/` on your local machine.
 All you need is PHP installed in your system.
 After you clone the repo with `git clone https://github.com/duzun/hQuery.php.git`,
 you have several options to start a web-server.
@@ -230,12 +233,12 @@ If you are using VSCode, simply open the project and run debugger (`F5`).
 
 ## 🔧 TODO
 
-  - Unit tests everything
-  - Document everything
-  - ~~Cookie support~~ (implemented in mem for redirects)
-  - ~~Improve selectors to be able to select by attributes~~
-  - Add more selectors
-  - Use [HTTPlug](http://httplug.io/) internally
+- Unit tests everything
+- Document everything
+- ~~Cookie support~~ (implemented in mem for redirects)
+- ~~Improve selectors to be able to select by attributes~~
+- Add more selectors
+- Use [HTTPlug](http://httplug.io/) internally
 
 ## 💖 Support my projects
 
