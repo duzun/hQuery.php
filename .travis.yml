@@ -1,4 +1,5 @@
 language: php
+os: linux
 
 php:
   - 7.4
@@ -11,7 +12,7 @@ php:
   - 5.4
   - nightly
 
-matrix:
+jobs:
     include:
         - php: 5.3
           dist: precise
@@ -23,8 +24,6 @@ matrix:
         - php: nightly
 
 dist: trusty
-
-sudo: false
 
 cache:
     directories:
