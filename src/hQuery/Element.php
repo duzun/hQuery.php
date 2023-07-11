@@ -108,7 +108,7 @@ class Element extends Node implements \ArrayAccess
      * @param int|string $offset
      * @param mixed      $value
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (is_null($offset)) {
             // $this->_data[] = $value; // ???
@@ -124,7 +124,7 @@ class Element extends Node implements \ArrayAccess
     /**
      * @param int|string $offset
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return is_int($offset)
             ? $this->get($offset)    // an element from collection
@@ -136,7 +136,7 @@ class Element extends Node implements \ArrayAccess
      * @param  int|string $offset
      * @return boolean
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         if (is_int($offset)) {
             return 0 <= $offset && $offset < count($this->ids);
@@ -147,7 +147,7 @@ class Element extends Node implements \ArrayAccess
     /**
      * @param int|string $offset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         if (is_int($offset)) {
             $i = array_slice($this->ids, $offset, 1, true);
@@ -166,7 +166,7 @@ class Element extends Node implements \ArrayAccess
      *
      * @return hQuery_Element
      */
-    public function current()
+    public function current(): mixed
     {
         $k = key($this->ids);
         if (null === $k) {

@@ -1136,15 +1136,23 @@ abstract class Node implements \Iterator, \Countable
     }
 
     // ------------------------------------------------------------------------
-    // Countable:
-    public function count()
+    /**
+     * Countable:
+     * 
+     * {@inheritdoc}
+     */
+    public function count(): int
     {
         return isset($this->ids) ? count($this->ids) : 0;
     }
 
     // ------------------------------------------------------------------------
-    // Iterable:
-    public function current()
+    /**
+     * Iterable:
+     * 
+     * {@inheritdoc}
+     */
+    public function current(): mixed
     {
         $k = key($this->ids);
         if (null === $k) {
@@ -1154,33 +1162,46 @@ abstract class Node implements \Iterator, \Countable
         return array($k => $this->ids[$k]);
     }
 
-    public function valid()
+    /**
+     * {@inheritdoc}
+     */
+    public function valid(): bool
     {
         return current($this->ids) !== false;
     }
 
-    public function key()
+    /**
+     * {@inheritdoc}
+     */
+    public function key(): mixed
     {
         return key($this->ids);
     }
 
-    public function next()
+    /**
+     * {@inheritdoc}
+     */
+    public function next(): void
     {
-        return next($this->ids) !== false ? $this->current() : false;
+        if (is_array($this->ids) && !empty($this->ids)) {
+            next($this->ids);
+        }
     }
 
-    public function prev()
+    /**
+     * {@inheritdoc}
+     */
+    public function prev(): mixed
     {
         return prev($this->ids) !== false ? $this->current() : false;
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->ids);
-        return $this->current();
     }
 
 // - Helpers ------------------------------------------------
