@@ -303,7 +303,8 @@ abstract class Node implements \Iterator, \Countable
      */
     public function text($id = null)
     {
-        return html_entity_decode(strip_tags($this->html($id)), ENT_QUOTES); /* ??? */
+        $html = $this->html($id);
+        return !is_null($html) ? html_entity_decode(strip_tags($html), ENT_QUOTES) : ''; /* ??? */
     }
 
     /**
