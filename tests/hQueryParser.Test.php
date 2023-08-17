@@ -13,12 +13,12 @@ require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
 
 // -----------------------------------------------------
 // Extend an abstract class for testing it
-class TestParserTests extends Parser {
+class ParserTestSurrogate extends Parser {
     public function parse() {}
 }
 
-// Surogate class for testing, to access protected attributes of HTMLParser
-class TestHTMLParserTests extends HTMLParser
+// Surrogate class for testing, to access protected attributes of HTMLParser
+class HTMLParserTestSurrogate extends HTMLParser
 {
     /**
      * @param $str
@@ -31,11 +31,11 @@ class TestHTMLParserTests extends HTMLParser
 }
 
 // -----------------------------------------------------
-class TestParser extends PHPUnit_BaseClass
+class hQueryParser extends PHPUnit_BaseClass
 {
     // -----------------------------------------------------
     /**
-     * @var TestHQueryTests
+     * @var hQueryTestSurrogate
      */
     public static $inst;
 
@@ -47,7 +47,7 @@ class TestParser extends PHPUnit_BaseClass
     // Before any test
     public static function mySetUpBeforeClass()
     {
-        self::$inst = new TestParserTests("tn1#id1[attr='[x]'] .cl1.cl2:first tn2:5\t, \n\ttn3.cl3 tn4#id2:eq(-1) > tn5:last-child>tn6:lt('3' ) + span[data-name] ~ a[href]", 9);
+        self::$inst = new ParserTestSurrogate("tn1#id1[attr='[x]'] .cl1.cl2:first tn2:5\t, \n\ttn3.cl3 tn4#id2:eq(-1) > tn5:last-child>tn6:lt('3' ) + span[data-name] ~ a[href]", 9);
     }
 
     // After all tests
@@ -167,13 +167,13 @@ class TestParser extends PHPUnit_BaseClass
                  <div class='overlayLowlightoverlayBottom'>abra-kadabra</div>
                ";
 
-        $r = TestHTMLParserTests::_findTagClose($str1, 1);
+        $r = HTMLParserTestSurrogate::_findTagClose($str1, 1);
         $this->assertEquals(66, $r);
 
-        $r = TestHTMLParserTests::_findTagClose($str2, 1);
+        $r = HTMLParserTestSurrogate::_findTagClose($str2, 1);
         $this->assertEquals(66, $r);
 
-        $r = TestHTMLParserTests::_findTagClose($str3, 1);
+        $r = HTMLParserTestSurrogate::_findTagClose($str3, 1);
         $this->assertEquals(66, $r);
     }
 

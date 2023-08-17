@@ -10,10 +10,10 @@ use Symfony\Component\DomCrawler\Crawler;
  */
 // -----------------------------------------------------
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
-require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'hQuery_stress.Test.php';
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'hQueryStress.Test.php';
 // -----------------------------------------------------
 
-class TestDOMCrawler extends TestHQueryStress
+class DOMCrawlerStress extends hQueryStress
 {
     // -----------------------------------------------------
     /**

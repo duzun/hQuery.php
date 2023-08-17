@@ -14,10 +14,10 @@ use Http\Mock\Client;
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
 
 // -----------------------------------------------------
-// class_alias(hQuery::class, 'TestHQueryTests');
+// class_alias(hQuery::class, 'hQueryTestSurrogate');
 
-// Surogate class for testing, to access protected attributes of hQuery
-class TestHQueryTests extends hQuery
+// Surrogate class for testing, to access protected attributes of hQuery
+class hQueryTestSurrogate extends hQuery
 {
     /**
      * @var mixed
@@ -27,11 +27,11 @@ class TestHQueryTests extends hQuery
 
 // -----------------------------------------------------
 
-class TestHQuery extends PHPUnit_BaseClass
+class hQueryCore extends PHPUnit_BaseClass
 {
     // -----------------------------------------------------
     /**
-     * @var TestHQueryTests
+     * @var hQueryTestSurrogate
      */
     public static $inst;
 
@@ -125,9 +125,9 @@ EOS;
     // Before any test
     public static function mySetUpBeforeClass()
     {
-        hQuery::$_mockup_class = 'TestHQueryTests';
+        hQuery::$_mockup_class = 'hQueryTestSurrogate';
 
-        self::$inst = TestHQueryTests::fromHTML(self::$bodyHTML, self::$baseUrl . 'index.html');
+        self::$inst = hQueryTestSurrogate::fromHTML(self::$bodyHTML, self::$baseUrl . 'index.html');
 
         // self::log(get_class(self::$inst));
     }
@@ -177,7 +177,7 @@ EOS;
             );
 
             // Document from a Psr\Http\Message\ResponseInterface object
-            $doc = TestHQueryTests::fromHTML($response, $url);
+            $doc = hQueryTestSurrogate::fromHTML($response, $url);
             $this->assertEquals(self::$bodyHTML, $doc->html());
             $this->assertEquals($url, $doc->location());
 
@@ -189,7 +189,7 @@ EOS;
             );
 
             // Document from a Psr\Http\Message\RequestInterface object
-            $doc = TestHQueryTests::fromHTML($request);
+            $doc = hQueryTestSurrogate::fromHTML($request);
             $this->assertEquals(self::$bodyHTML, $doc->html());
             $this->assertEquals($url, $doc->location());
         } else {
@@ -201,7 +201,7 @@ EOS;
             $client = new Client();
             $client->addResponse($response);
 
-            $doc = TestHQueryTests::sendRequest($request, $client);
+            $doc = hQueryTestSurrogate::sendRequest($request, $client);
             $this->assertEquals(self::$bodyHTML, $doc->html());
             $this->assertEquals($url, $doc->location());
         } else {
@@ -225,6 +225,7 @@ EOS;
     public function test_find()
     {
         $doc = self::$inst;
+        $body = $doc->find('body');
 
         // @TODO:
         // :parent>div:last
@@ -254,9 +255,13 @@ EOS;
         $this->assertEquals(1, count($a));
         $this->assertEquals('a', $a->nodeName);
 
-        $a = $doc->find('[class="path span span-a"]');
+        $a = $doc->find($sel = '[class="path span span-a"]');
         $this->assertEquals(1, count($a));
         $this->assertEquals('a', $a->nodeName);
+
+        $b    = $body->find($sel);
+        $this->assertNotNull($b, $sel);
+        $this->assertEquals(count($a), count($b), $sel);
 
         $a = $doc->find('#outerImg');
         $this->assertNotEmpty($a);
@@ -291,7 +296,7 @@ EOS;
         $this->assertEquals(2, count($a));
 
         // 2)
-        $ff = TestHQueryTests::fromFile(self::file_exists('data/attr.html'));
+        $ff = hQueryTestSurrogate::fromFile(self::file_exists('data/attr.html'));
         $aa = $ff->find('a.aa');
         $this->assertEquals(3, count($aa));
 
@@ -326,7 +331,7 @@ EOS;
         $this->assertEquals($a->key(), $b->key());
 
         // 5)
-        $edoc = TestHQueryTests::fromHTML(self::$emptyBodyHTML, self::$baseUrl . 'index.html');
+        $edoc = hQueryTestSurrogate::fromHTML(self::$emptyBodyHTML, self::$baseUrl . 'index.html');
         $a = $edoc->find('a');
         $this->assertEmpty($a);
 
@@ -592,9 +597,9 @@ EOS;
     // -----------------------------------------------------
     // public function test_http_wr() {
     // @TODO
-    // $doc = TestHQueryTests::fromURL('http://www.nameit.com', NULL, NULL, ['redirects' => 10, 'use_cookies' => true]);
+    // $doc = hQueryTestSurrogate::fromURL('http://www.nameit.com', NULL, NULL, ['redirects' => 10, 'use_cookies' => true]);
     // self::log(gettype($doc));
-    // self::log(TestHQueryTests::$last_http_result);
+    // self::log(hQueryTestSurrogate::$last_http_result);
     // }
 
     // -----------------------------------------------------
@@ -602,22 +607,22 @@ EOS;
     public function test_unjsonize()
     {
         $ser  = self::file_get_contents('data/jsonize.ser');
-        $json = self::file_get_contents('data/jsonize.json');
+        $json = trim(self::file_get_contents('data/jsonize.json'));
 
         $ser_ = str_replace("\n", "\r\n", $ser);
 
-        $os  = TestHQueryTests::unjsonize($ser);
-        $os_ = TestHQueryTests::unjsonize($ser_);
-        $oj  = TestHQueryTests::unjsonize($json);
+        $os  = hQueryTestSurrogate::unjsonize($ser);
+        $os_ = hQueryTestSurrogate::unjsonize($ser_);
+        $oj  = hQueryTestSurrogate::unjsonize($json);
 
         $this->assertNotEmpty($os);
         $this->assertNotEmpty($os_);
         $this->assertNotEmpty($oj);
         $this->assertEquals($os, $oj);
 
-        $t = TestHQueryTests::unjsonize('{"a":1,"b":2,}');
+        $t = hQueryTestSurrogate::unjsonize('{"a":1,"b":2,}');
         $this->assertNotEmpty($t, 'should handle trailing commas in objects');
-        $t = TestHQueryTests::unjsonize('[1,2,]');
+        $t = hQueryTestSurrogate::unjsonize('[1,2,]');
         $this->assertNotEmpty($t, 'should handle trailing commas in arrays');
 
         return array($os, $ser, $json);
@@ -630,7 +635,7 @@ EOS;
     {
         list($o, $ser, $json) = $vars;
 
-        $b = TestHQueryTests::jsonize($o);
+        $b = hQueryTestSurrogate::jsonize($o);
 
         $this->assertTrue(is_string($b));
         $this->assertNotEmpty($b);

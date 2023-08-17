@@ -1137,6 +1137,7 @@ abstract class Node implements \Iterator, \Countable
 
     // ------------------------------------------------------------------------
     // Countable:
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return isset($this->ids) ? count($this->ids) : 0;
@@ -1144,6 +1145,7 @@ abstract class Node implements \Iterator, \Countable
 
     // ------------------------------------------------------------------------
     // Iterable:
+    #[\ReturnTypeWillChange]
     public function current()
     {
         $k = key($this->ids);
@@ -1154,21 +1156,25 @@ abstract class Node implements \Iterator, \Countable
         return array($k => $this->ids[$k]);
     }
 
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return current($this->ids) !== false;
     }
 
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return key($this->ids);
     }
 
+    #[\ReturnTypeWillChange]
     public function next()
     {
         return next($this->ids) !== false ? $this->current() : false;
     }
 
+    #[\ReturnTypeWillChange]
     public function prev()
     {
         return prev($this->ids) !== false ? $this->current() : false;
@@ -1177,6 +1183,7 @@ abstract class Node implements \Iterator, \Countable
     /**
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         reset($this->ids);

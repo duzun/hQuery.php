@@ -9,7 +9,7 @@ use duzun\hQuery;
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
 // -----------------------------------------------------
 
-class TestHQueryStress extends PHPUnit_BaseClass
+class hQueryStress extends PHPUnit_BaseClass
 {
     // -----------------------------------------------------
     /**
@@ -105,6 +105,7 @@ class TestHQueryStress extends PHPUnit_BaseClass
      */
     public function test_find($return)
     {
+        // $doc is 'data/big_granito_1.html'
         $doc = $return[0];
 
         $selectors = array(
