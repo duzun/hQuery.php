@@ -108,6 +108,7 @@ class Element extends Node implements \ArrayAccess
      * @param int|string $offset
      * @param mixed      $value
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         if (is_null($offset)) {
@@ -124,6 +125,7 @@ class Element extends Node implements \ArrayAccess
     /**
      * @param int|string $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return is_int($offset)
@@ -136,6 +138,7 @@ class Element extends Node implements \ArrayAccess
      * @param  int|string $offset
      * @return boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         if (is_int($offset)) {
@@ -146,7 +149,9 @@ class Element extends Node implements \ArrayAccess
 
     /**
      * @param int|string $offset
+     * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         if (is_int($offset)) {
