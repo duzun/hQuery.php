@@ -33,11 +33,65 @@ main_in_docker() {
     install_dev "$1" || return $?
     shift
 
+    local watch
+    if [ "$1" = "w" ]; then
+        watch=1
+        shift
+        if ! command -v inotifywait >/dev/null; then
+            apk -U add inotify-tools
+        fi
+    fi
+
     echo
     echo
     echo " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
     phpunit tests/ "$@"
+
+    if [ -n "$watch" ]; then
+        watchnrun "$workdir" \
+            phpunit tests/ "$@"
+    fi
+}
+
+# Watch a folder and rsync files to a destination on change
+watchnrun() {
+    local watchDir="$1"
+    shift
+    local action="$@"
+
+    if [ -z "$watchDir" ]; then
+        echo >&2 "Usage: watchnrun <watchDir> <command>"
+        return 2
+    fi
+
+    local exclude=".git|node_modules|vendor|composer.json|composer.lock"
+
+    while i=$(
+        inotifywait -qr -e modify -e create \
+            --exclude "$exclude" \
+            "$watchDir"
+    ); do
+        set -- $i
+
+        local dir=$1
+        local evt=$2
+        local file=$3
+
+        local fn="$dir$file"
+
+        echo
+        echo "$evt $fn"
+
+        case $evt in
+        MODIFY | CREATE)
+            eval "$action"
+            ;;
+        *)
+            echo >&2 "evt $evt ($i) not implemented yet"
+            ;;
+        esac
+    done
 }
 
 install_dev() {
@@ -138,6 +192,9 @@ docker_run() {
 }
 
 main() {
+    # By default test the latest PHP version
+    [ $# -eq 0 ] && set -- "8.2"
+
     case $1 in
     main_in_docker)
         shift
@@ -146,23 +203,36 @@ main() {
         ;;
 
     all)
-        echo Running tests for all supported PHP versions \
-            && main 8.2 \
-            && main 8.1 \
-            && main 7.4 \
-            && main 7.3 \
-            && main 7.2 \
-            && main 7.1 \
-            && main 7.0 \
-            && main 5.6 \
-            && main 5.5 \
-            && echo && echo "All done"
+        shift
+        echo Running tests for all supported PHP versions &&
+            main 8.2 "$@" &&
+            main 8.1 "$@" &&
+            main 7.4 "$@" &&
+            main 7.3 "$@" &&
+            main 7.2 "$@" &&
+            main 7.1 "$@" &&
+            main 7.0 "$@" &&
+            main 5.6 "$@" &&
+            main 5.5 "$@" &&
+            echo && echo "All done"
         ;;
+
+    h | help | -h | --help | \?)
+        cat <<EOH
+    $myname <php.ver>|"all" [w|sh|bash] {<phpunit_options>}
+    $myname -h|--help|?
+Eg.
+    $myname 8.2 w --filter hQueryCore
+
+EOH
+        return 0
+        ;;
+
     esac
 
     local version docker_tag
 
-    version=${1:-"8.1"}
+    version=$1
     docker_tag="$version-$(var "DOCKER_VERSION_$(ver_num $version)" 'alpine')"
 
     case $2 in
@@ -178,7 +248,7 @@ main() {
     if [ -f /.dockerenv ]; then
         main_in_docker "$@"
     else
-        docker_run "php:$docker_tag" sh "/app/$myname" "main_in_docker" "$@"
+        docker_run -it "php:$docker_tag" sh "/app/$myname" "main_in_docker" "$@"
     fi
 }
 
