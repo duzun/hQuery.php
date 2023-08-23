@@ -705,7 +705,7 @@ abstract class HTML_Index extends Node
     // ------------------------------------------------------------------------
     /**
      * @param  mixed                  $ctx
-     * @return duzun\hQuery\Context
+     * @return Context
      */
     protected function _get_ctx($ctx)
     {

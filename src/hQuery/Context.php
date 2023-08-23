@@ -16,8 +16,8 @@ class_exists('duzun\\hQuery\\Node', false) or require_once __DIR__ . DIRECTORY_S
 class Context extends Node
 {
     /**
-     * @param duzun\hQuery            $doc
-     * @param duzun\hQuery\Node|array $el_arr
+     * @param hQuery            $doc
+     * @param Node|array $el_arr
      */
     public function __construct($doc = null, $el_arr = null)
     {
@@ -37,7 +37,7 @@ class Context extends Node
     /**
      *  ctx($el) * $this
      *
-     * @return duzun\hQuery\Context ctx
+     * @return Context ctx
      */
     public function intersect($el, $eq = true)
     {
@@ -69,4 +69,4 @@ class Context extends Node
 
 // ------------------------------------------------------------------------
 // PSR-0 alias
-class_exists('hQuery_Context', false) or class_alias('duzun\\hQuery\\Context', 'hQuery_Context', false);
+// class_exists('hQuery_Context', false) or class_alias('duzun\\hQuery\\Context', 'hQuery_Context', false);

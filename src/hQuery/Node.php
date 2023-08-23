@@ -25,7 +25,7 @@ abstract class Node implements \Iterator, \Countable
 
     // ------------------------------------------------------------------------
     /**
-     * @var duzun\hQuery\Node
+     * @var Node
      */
     public static $selected_doc = null;
 
@@ -116,7 +116,7 @@ abstract class Node implements \Iterator, \Countable
             self::$selected_doc = self::$_nl_;
         }
 
-        $this->ids = self::$_nl_; // If any reference exists, destroy its contents! P.S. Might be buggy, but hey, I own this property. Sincerely yours, hQuery\Node class.
+        $this->ids = self::$_nl_; // If any reference exists, destroy its contents! P.S. Might be buggy, but hey, I own this property. Sincerely yours, Node class.
         unset($this->doc, $this->ids);
     }
 
@@ -180,7 +180,7 @@ abstract class Node implements \Iterator, \Countable
      *
      * @param  string         $sel       A valid CSS selector (some pseudo-selectors supported).
      * @param  array|string   $attr      OPTIONAL attributes as string or key-value pairs.
-     * @return hQuery\Element collection of matched elements or NULL
+     * @return Element collection of matched elements or NULL
      */
     public function find($sel, $attr = null)
     {
@@ -190,7 +190,7 @@ abstract class Node implements \Iterator, \Countable
     /**
      * @param  string           $sel  A valid CSS selector (some pseudo-selectors supported).
      * @param  array|string     $attr OPTIONAL attributes as string or key-value pairs.
-     * @return hQuery\Element
+     * @return Element
      */
     public function exclude($sel, $attr = null)
     {
@@ -1045,9 +1045,9 @@ abstract class Node implements \Iterator, \Countable
     /**
      * Filter all ids of $el that are contained in(side) $this->ids
      *
-     * @param  hQuery\Node|array $el  A node or list of ids
-     * @param  boolean           $eq  if false, filter strict contents, otherwise $el might be in $this->ids
-     * @return hQuery\Node|array same type as $el
+     * @param  Node|array $el  A node or list of ids
+     * @param  boolean    $eq  if false, filter strict contents, otherwise $el might be in $this->ids
+     * @return Node|array same type as $el
      */
     public function _filter_contains($el, $eq = false)
     {
@@ -1406,4 +1406,4 @@ abstract class Node implements \Iterator, \Countable
 
 // ------------------------------------------------------------------------
 // PSR-0 alias
-class_exists('hQuery_Node', false) or class_alias('duzun\\hQuery\\Node', 'hQuery_Node', false);
+// class_exists('hQuery_Node', false) or class_alias('duzun\\hQuery\\Node', 'hQuery_Node', false);
