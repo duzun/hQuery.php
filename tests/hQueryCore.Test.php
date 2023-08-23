@@ -93,7 +93,7 @@ class hQueryCore extends PHPUnit_BaseClass
 
     <table id="dict2">
         <tr>
-            <th>Coffee</th>
+            <th class=" ">Coffee</th>
             <td>Black hot drink</td>
         </tr>
         <tr>
@@ -258,6 +258,11 @@ EOS;
         $a = $doc->find($sel = '[class="path span span-a"]');
         $this->assertEquals(1, count($a));
         $this->assertEquals('a', $a->nodeName);
+
+        $a = $doc->find($sel = 'th[class=" "]');
+        $this->assertEquals(1, count($a));
+        $this->assertEquals('th', $a->nodeName);
+        $this->assertEquals('Coffee', trim($a->text));
 
         $b    = $body->find($sel);
         $this->assertNotNull($b, $sel);
