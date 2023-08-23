@@ -73,16 +73,7 @@
     "test": "./test.sh all",
     "test:phpunit": "phpunit ./tests/",
     "test:save": "{ echo; command -v lscpu > /dev/null && lscpu | grep -i 'model name' && echo; php -v && echo; npm run --silent test; } > ./tests/README.md",
-    "test:watch": "./watch-test.sh",
-    "test:8.1": "travis-local run --php=8.1",
-    "test:7.4": "travis-local run --php=7.4",
-    "test:7.3": "travis-local run --php=7.3",
-    "test:7.2": "travis-local run --php=7.2",
-    "test:7.1": "travis-local run --php=7.1",
-    "test:7.0": "travis-local run --php=7.0",
-    "test:5.6": "travis-local run --php=5.6",
-    "test:5.3": "travis-local run --php=5.3",
-    "test:travis-local": "npm run test:7.3 && npm run test:7.2 && npm run test:7.1 && npm run test:7.0 && npm run test:5.6 && npm run test:5.3"
+    "test:watch": "./watch-test.sh"
   },
   "extra": {
     "verup": {

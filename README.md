@@ -1,4 +1,4 @@
-hQuery.php   [![Build Status](https://travis-ci.com/duzun/hQuery.php.svg?branch=master)](https://travis-ci.com/duzun/hQuery.php) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/duzuns)
+hQuery.php  [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/duzuns)
 ==========
 
 An extremely fast and efficient web scraper that can parse megabytes of invalid HTML in a blink of an eye.
