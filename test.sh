@@ -52,6 +52,8 @@ main_in_docker() {
         watchnrun "$workdir" \
             phpunit tests/ "$@"
     fi
+
+    cd "$workdir" && [ -s 'composer.json.lock' ] && mv -f -- composer.json.lock composer.json
 }
 
 # Watch a folder and rsync files to a destination on change
@@ -65,7 +67,7 @@ watchnrun() {
         return 2
     fi
 
-    local exclude=".git|node_modules|vendor|composer.json|composer.lock"
+    local exclude=".git|node_modules|vendor|composer.json|composer.lock|composer-setup.php"
 
     while i=$(
         inotifywait -qr -e modify -e create \
@@ -77,6 +79,7 @@ watchnrun() {
         local dir=$1
         local evt=$2
         local file=$3
+        local _action
 
         local fn="$dir$file"
 
@@ -85,7 +88,27 @@ watchnrun() {
 
         case $evt in
         MODIFY | CREATE)
-            eval "$action"
+            case $file in
+            *.Test.php)
+                set -- $action
+                _action=
+                while [ $# -ne 0 ]; do
+                    if [ "$1" = "--filter" ]; then
+                        shift
+                    else
+                        _action="$_action $1"
+                    fi
+                    shift
+                done
+                i=${file%.*}
+                _action="$_action --filter ${i%.*}"
+                ;;
+            *)
+                _action="$action"
+                ;;
+            esac
+
+            eval "$_action"
             ;;
         *)
             echo >&2 "evt $evt ($i) not implemented yet"
