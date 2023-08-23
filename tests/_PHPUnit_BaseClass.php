@@ -231,6 +231,31 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
 
     // -----------------------------------------------------
     /**
+     * @param  string $filename  filename
+     * @return string duzun\hQuery
+     */
+    public static function load_doc_from_file($filename) {
+        $tmr      = self::timer();
+        $mmr      = self::memer();
+        $html     = self::file_get_contents($filename);
+        $mem      = self::memer($mmr);
+        $exe      = self::timer($tmr);
+        self::log('        load_file( ' . self::fmtNumber(strlen($html) / 1024 / 1024, 3) . "MiB )  \tin\t{$exe}\t{$mem} RAM");
+
+        $tmr = self::timer();
+        $mmr = self::memer();
+        $doc = new hQuery($html, false);
+        $mem = self::memer($mmr);
+        $exe = self::timer($tmr);
+        self::log('       new hQuery( ' . self::fmtNumber($doc->size / 1024 / 1024, 3) . "MiB )   \tin\t{$exe}\t{$mem} RAM");
+
+        $doc->location(self::fn($filename));
+
+        return array($doc, $html);
+    }
+
+    // -----------------------------------------------------
+    /**
      * @param  string $fn  filename
      * @return string file contents or false
      */

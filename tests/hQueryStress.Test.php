@@ -61,22 +61,8 @@ class hQueryStress extends PHPUnit_BaseClass
     // -----------------------------------------------------
     public function test_construct_and_index()
     {
-        $filename = 'data/big_granito_1.html';
-        $tmr      = self::timer();
-        $mmr      = self::memer();
-        $html     = self::file_get_contents($filename);
-        $mem      = self::memer($mmr);
-        $exe      = self::timer($tmr);
-        self::log('        load_file( ' . self::fmtNumber(strlen($html) / 1024 / 1024, 3) . "MiB )  \tin\t{$exe}\t{$mem} RAM");
+        list($doc) = self::load_doc_from_file('data/big_granito_1.html');
 
-        $tmr = self::timer();
-        $mmr = self::memer();
-        $doc = new hQuery($html, false);
-        $mem = self::memer($mmr);
-        $exe = self::timer($tmr);
-        self::log('       new hQuery( ' . self::fmtNumber($doc->size / 1024 / 1024, 3) . "MiB )   \tin\t{$exe}\t{$mem} RAM");
-
-        $doc->location(self::fn($filename));
         $tmr  = self::timer();
         $mmr  = self::memer();
         $tags = $doc->index();
@@ -89,15 +75,16 @@ class hQueryStress extends PHPUnit_BaseClass
 
         self::log("   Original Charset: {$doc->charset}");
 
-        $tags   = array_map('count', $tags);
-        $counts = null;
-        foreach ($tags as $k => $v) {
-            $counts[$v] = (empty($counts[$v]) ? '' : $counts[$v] . ', ') . $k;
-        }
-        krsort($counts);
+        // $tags   = array_map('count', $tags);
+        // $counts = null;
+        // foreach ($tags as $k => $v) {
+        //     $counts[$v] = (empty($counts[$v]) ? '' : $counts[$v] . ', ') . $k;
+        // }
+        // krsort($counts);
 
         // self::log('Tag counts:', $counts);
-        return array($doc, $html);
+
+        return array($doc);
     }
 
     /**
@@ -139,7 +126,6 @@ class hQueryStress extends PHPUnit_BaseClass
             'script',
         );
         self::$table_cols[0] = self::listMaxStrLen($selectors);
-        $max_len             = self::listMaxStrLen($selectors);
 
         self::print_table_header();
         $total = array(0, 0, 0, 0, 0);
