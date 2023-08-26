@@ -171,7 +171,8 @@ class Element extends Node implements \ArrayAccess
      *
      * @return Element
      */
-    public function current(): mixed
+    #[\ReturnTypeWillChange]
+    public function current()
     {
         $k = key($this->ids);
         if (null === $k) {
@@ -233,8 +234,6 @@ class Element extends Node implements \ArrayAccess
             return reset($ret);
         }
 
-      
-      
         return max($ret);
     }
 
