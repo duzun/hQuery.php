@@ -10,14 +10,14 @@ PHPUnit 7.3.5 by Sebastian Bergmann and contributors.
 
 .
 
-### -> TestHQueryStress::test_construct_and_index ()
+### -> hQueryStress::test_construct_and_index ()
   1)          load_file( 3.113MiB )  	in	  1'497µs	3'192KiB RAM
   2)         new hQuery( 3.441MiB )   	in	 15'925µs	3'537KiB RAM
   3)      hQuery->index( 50'924 tags )	in	120'900µs	19'079KiB RAM
   4)     Original Charset: WINDOWS-1251
 .
 
-### -> TestHQueryStress::test_find ()
+### -> hQueryStress::test_find ()
   1)  count($c.find('span'))         	= 10131 in     430µs ($c=doc),   1'173µs ($c=body)  mem: 640KiB
   2)  count($c.find('.ch-title'))    	=  5616 in     396µs ($c=doc),     798µs ($c=body)  mem: 320KiB
   3)  count($c.find('.even'))        	=  2808 in     267µs ($c=doc),     406µs ($c=body)  mem: 160KiB
@@ -33,7 +33,7 @@ PHPUnit 7.3.5 by Sebastian Bergmann and contributors.
  13)  count($c.find('img.click'))    	=     6 in      11µs ($c=doc),       9µs ($c=body)  mem: 0.52KiB
 .
 
-### -> TestDOMCrawler::test_construct_and_index ()
+### -> DOMCrawlerStress::test_construct_and_index ()
   1)          load_file( 3.113MiB )  	in	  1'459µs	3'192KiB RAM
   2)         new hQuery( 3.441MiB )   	in	 16'323µs	3'525KiB RAM
   3)      hQuery->index( 50'924 tags )	in	130'306µs	19'079KiB RAM
@@ -41,7 +41,7 @@ PHPUnit 7.3.5 by Sebastian Bergmann and contributors.
   5)     new DOMCrawler( 3.113MiB )  	in	189'465µs	129KiB RAM
 .
 
-### -> TestDOMCrawler::test_find ()
+### -> DOMCrawlerStress::test_find ()
   1)  #document
 
  |     Selector     | found  |   hQuery   |  Crawler   | faster |  hQuery   |  Crawler  | smaller |
@@ -77,7 +77,7 @@ PHPUnit 7.3.5 by Sebastian Bergmann and contributors.
 
 .
 
-### -> TestDOMCrawler::test_body_find ()
+### -> DOMCrawlerStress::test_body_find ()
   1)  body
 
  |     Selector     | found  |   hQuery   |  Crawler   | faster |  hQuery   |  Crawler  | smaller |

@@ -5,6 +5,8 @@ namespace duzun;
 // ------------------------------------------------------------------------
 use duzun\hQuery\Parser\HTML as HTMLParser;
 use duzun\hQuery\Parser\Selector as SelectorParser;
+use duzun\hQuery\Node;
+use duzun\hQuery\Element;
 
 // ------------------------------------------------------------------------
 use Http\Discovery\HttpClientDiscovery;
@@ -27,7 +29,7 @@ class_exists('duzun\\hQuery\\HTML_Index', false) or require_once __DIR__ . DIREC
  *
  *  Copyright (C) 2014-2018 Dumitru Uzun
  *
- *  @version 3.0.3
+ *  @version 3.1.0
  *  @author Dumitru Uzun (DUzun.ME)
  *  @license MIT
  */
@@ -56,7 +58,7 @@ class hQuery extends hQuery\HTML_Index
     /**
      * @var mixed
      */
-    public static $_mockup_class; // Used internally for teting
+    public static $_mockup_class; // Used internally for testing
 
     // ------------------------------------------------------------------------
     /**
@@ -296,8 +298,8 @@ class hQuery extends hQuery\HTML_Index
      *
      * @param  string         $sel       - A valid CSS selector (some pseudo-selectors supported).
      * @param  array|string   $attr      - OPTIONAL attributes as string or key-value pairs.
-     * @param  hQuery\Node    $ctx       - OPTIONAL the context where to search. If omitted, $this is used.
-     * @return hQuery\Element collection of matched elements or NULL
+     * @param  Node           $ctx       - OPTIONAL the context where to search. If omitted, $this is used.
+     * @return Element collection of matched elements or NULL
      */
     public function find($sel, $_attr = null, $ctx = null)
     {
@@ -306,7 +308,7 @@ class hQuery extends hQuery\HTML_Index
         for ($i = 1; $i < $c; ++$i) {
             $a = func_get_arg($i);
             if (is_object($a)) {
-                if ($a instanceof hQuery\Node) {
+                if ($a instanceof Node) {
                     $ctx = $a;
                 } else {
                     throw new \Exception('Wrong context in ' . __METHOD__);
@@ -445,7 +447,7 @@ class hQuery extends hQuery\HTML_Index
 
         if ($ra) {
             ksort($ra);
-            return new hQuery\Element($this, $ra);
+            return new Element($this, $ra);
         }
         return null;
     }
@@ -455,7 +457,7 @@ class hQuery extends hQuery\HTML_Index
      *
      * @param  string       $sel  - A valid CSS selector.
      * @param  array|string $attr - OPTIONAL attributes as string or key-value pairs.
-     * @param  hQuery\Node  $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
+     * @param  Node         $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
      * @return array        list of HTML contents of all matched elements
      */
     public function find_html($sel, $attr = null, $ctx = null)
@@ -476,7 +478,7 @@ class hQuery extends hQuery\HTML_Index
      *
      * @param  string       $sel  - A valid CSS selector.
      * @param  array|string $attr - OPTIONAL attributes as string or key-value pairs.
-     * @param  hQuery\Node  $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
+     * @param  Node         $ctx  - OPTIONAL the context where to search. If omitted, $this is used.
      * @return array        list of Text contents of all matched elements
      */
     public function find_text($sel, $attr = null, $ctx = null)
@@ -1329,4 +1331,4 @@ class hQuery extends hQuery\HTML_Index
 
 // ------------------------------------------------------------------------
 // PSR-0 alias
-class_exists('hQuery', false) or class_alias('duzun\\hQuery', 'hQuery', false);
+// class_exists('hQuery', false) or class_alias('duzun\\hQuery', 'hQuery', false);

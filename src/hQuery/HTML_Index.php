@@ -705,7 +705,7 @@ abstract class HTML_Index extends Node
     // ------------------------------------------------------------------------
     /**
      * @param  mixed                  $ctx
-     * @return duzun\hQuery\Context
+     * @return Context
      */
     protected function _get_ctx($ctx)
     {
@@ -1305,22 +1305,22 @@ abstract class HTML_Index extends Node
      * @param  array|int      $id
      * @param  array|string   $attr
      * @param  boolean        $to_str
+     * @param  boolean        $raw_values Don't interpret URL attributes
      * @return array|string
      */
-    protected function get_attr_byId($id, $attr = null, $to_str = false)
+    protected function get_attr_byId($id, $attr = null, $to_str = false, $raw_values=false)
     {
         $ret = self::$_ar_;
         if (is_array($id)) {
             foreach ($id as $id => $e) {
-                $ret[$id] = $this->get_attr_byId($id, $attr, $to_str);
+                $ret[$id] = $this->get_attr_byId($id, $attr, $to_str, $raw_values);
             }
-
         } else {
             if (!isset($this->ids[$id])) {
                 return self::$_fl_;
             }
 
-            $bu = isset($this->_prop['baseURL']);
+            $bu = !$raw_values && isset($this->_prop['baseURL']);
             if (isset($attr)) {
                 if (isset($this->idx_attr[$attr])) {
                     $ret = @$this->idx_attr[$attr][$id];
@@ -1342,12 +1342,11 @@ abstract class HTML_Index extends Node
                     }
                 }
 
-                if (!empty($bu)) {
+                if ($bu) {
                     foreach (self::$_url_attribs as $n) {
                         if (isset($ret[$n])) {
                             $ret[$n] = $this->url2abs($ret[$n]);
                         }
-
                     }
                 }
                 if ($to_str) {

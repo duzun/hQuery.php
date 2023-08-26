@@ -40,7 +40,7 @@ abstract class Parser
     public $l;
 
     /**
-     * Possition
+     * Position
      * @var int
      */
     public $i = 0;
@@ -143,6 +143,17 @@ abstract class Parser
     public function isWhitespace($char = null)
     {
         return $this->inRange(self::$spaceRange, $char);
+    }
+
+    /**
+     * Is $str containing only white-spaces?
+     *
+     * @param string $str
+     * @return bool
+     */
+    public static function is_whitespace($str)
+    {
+        return strspn($str, self::$spaceRange) == strlen($str);
     }
 
     /**

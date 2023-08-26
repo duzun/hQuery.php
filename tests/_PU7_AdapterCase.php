@@ -1,9 +1,12 @@
 <?php
+if (!class_exists('PHPUnit_Framework_TestCase')) {
+    class_alias('PHPUnit\Framework\TestCase', 'PHPUnit_Framework_TestCase');
+}
 
-abstract class PU_TestCase extends PHPUnit\Framework\TestCase
+abstract class PU_AdapterCase extends PHPUnit_Framework_TestCase
 {
     // Before any test
-    public static function setUpBeforeClass(): void
+    public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
 
@@ -13,7 +16,7 @@ abstract class PU_TestCase extends PHPUnit\Framework\TestCase
     }
 
     // After all tests
-    public static function tearDownAfterClass(): void
+    public static function tearDownAfterClass()
     {
         if (method_exists(get_called_class(), 'myTearDownAfterClass')) {
             static::myTearDownAfterClass();
@@ -24,7 +27,7 @@ abstract class PU_TestCase extends PHPUnit\Framework\TestCase
 
     // -----------------------------------------------------
     // Before every test
-    public function setUp(): void
+    public function setUp()
     {
         if (method_exists($this, 'mySetUp')) {
             $this->mySetUp();

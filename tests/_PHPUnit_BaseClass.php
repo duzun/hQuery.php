@@ -26,9 +26,9 @@ require_once ROOT_DIR . 'vendor/autoload.php';
 // We have to make some adjustments for PHPUnit_BaseClass to work with
 // PHPUnit 8.0 and still keep backward compatibility
 if (version_compare(PHPUnit_Runner_Version::id(), '8.0.0') >= 0) {
-    require_once PHPUNIT_DIR . '_PU8_TestCase.php';
+    require_once PHPUNIT_DIR . '_PU8_AdapterCase.php';
 } else {
-    require_once PHPUNIT_DIR . '_PU7_TestCase.php';
+    require_once PHPUNIT_DIR . '_PU7_AdapterCase.php';
 }
 
 // -----------------------------------------------------
@@ -37,7 +37,7 @@ if (version_compare(PHPUnit_Runner_Version::id(), '8.0.0') >= 0) {
  * @backupGlobals disabled
  */
 // -----------------------------------------------------
-abstract class PHPUnit_BaseClass extends PU_TestCase
+abstract class PHPUnit_BaseClass extends PU_AdapterCase
 {
     /**
      * @var boolean
@@ -152,7 +152,7 @@ abstract class PHPUnit_BaseClass extends PU_TestCase
     // Before every test
     public function mySetUp()
     {
-        self::$testName  = $this->getName();
+        self::$testName  = method_exists($this, 'getName') ? $this->getName() : $this->name();
         self::$className = get_class($this);
 
         // parent::mySetUp();
@@ -228,6 +228,31 @@ abstract class PHPUnit_BaseClass extends PU_TestCase
 
     // -----------------------------------------------------
     public static function deleteTestData() {}
+
+    // -----------------------------------------------------
+    /**
+     * @param  string $filename  filename
+     * @return string duzun\hQuery
+     */
+    public static function load_doc_from_file($filename) {
+        $tmr      = self::timer();
+        $mmr      = self::memer();
+        $html     = self::file_get_contents($filename);
+        $mem      = self::memer($mmr);
+        $exe      = self::timer($tmr);
+        self::log('        load_file( ' . self::fmtNumber(strlen($html) / 1024 / 1024, 3) . "MiB )  \tin\t{$exe}\t{$mem} RAM");
+
+        $tmr = self::timer();
+        $mmr = self::memer();
+        $doc = new hQuery($html, false);
+        $mem = self::memer($mmr);
+        $exe = self::timer($tmr);
+        self::log('       new hQuery( ' . self::fmtNumber($doc->size / 1024 / 1024, 3) . "MiB )   \tin\t{$exe}\t{$mem} RAM");
+
+        $doc->location(self::fn($filename));
+
+        return array($doc, $html);
+    }
 
     // -----------------------------------------------------
     /**

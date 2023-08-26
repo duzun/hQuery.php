@@ -10,10 +10,9 @@ use Symfony\Component\DomCrawler\Crawler;
  */
 // -----------------------------------------------------
 require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
-require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'hQuery_stress.Test.php';
 // -----------------------------------------------------
 
-class TestDOMCrawler extends TestHQueryStress
+class DOMCrawlerStress extends PHPUnit_BaseClass
 {
     // -----------------------------------------------------
     /**
@@ -25,7 +24,18 @@ class TestDOMCrawler extends TestHQueryStress
     // -----------------------------------------------------
     public function test_construct_and_index()
     {
-        list($doc, $html) = parent::test_construct_and_index();
+        list($doc, $html) = self::load_doc_from_file('data/big_granito_1.html');
+
+        $tmr  = self::timer();
+        $mmr  = self::memer();
+        $tags = $doc->index();
+        $mem  = self::memer($mmr);
+        $exe  = self::timer($tmr);
+        $time = version_compare(PHP_VERSION, '5.5.0') >= 0 ? 6e6 : 30e6; // travis runs PHP 5.4 slower for some reason
+        $this->assertLessThan($time, self::timer($tmr, false), 'should index 3Mb in less then ' . ($time / 1e6) . ' sec');
+        $count = self::fmtNumber(self::listSumCounts($tags));
+        self::log("    hQuery->index( {$count} tags )\tin\t{$exe}\t{$mem} RAM");
+
         $url              = $doc->location();
 
         // if ( $doc->charset != 'UTF-8' ) {

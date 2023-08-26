@@ -20,11 +20,11 @@
     {
       "type": "php",
       "request": "launch",
-      "name": "test hQuery",
+      "name": "phpunit tests/",
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/vendor/bin/phpunit",
       "args": [
-        "./tests/hQuery.Test.php"
+        "./tests/"
       ],
     },
     {

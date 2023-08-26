@@ -108,7 +108,8 @@ class Element extends Node implements \ArrayAccess
      * @param int|string $offset
      * @param mixed      $value
      */
-    public function offsetSet($offset, $value): void
+    #[\ReturnTypeWillChange]
+    public function offsetSet($offset, $value)
     {
         if (is_null($offset)) {
             // $this->_data[] = $value; // ???
@@ -124,7 +125,8 @@ class Element extends Node implements \ArrayAccess
     /**
      * @param int|string $offset
      */
-    public function offsetGet($offset): mixed
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
     {
         return is_int($offset)
             ? $this->get($offset)    // an element from collection
@@ -136,7 +138,8 @@ class Element extends Node implements \ArrayAccess
      * @param  int|string $offset
      * @return boolean
      */
-    public function offsetExists($offset): bool
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset)
     {
         if (is_int($offset)) {
             return 0 <= $offset && $offset < count($this->ids);
@@ -146,8 +149,10 @@ class Element extends Node implements \ArrayAccess
 
     /**
      * @param int|string $offset
+     * @return void
      */
-    public function offsetUnset($offset): void
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($offset)
     {
         if (is_int($offset)) {
             $i = array_slice($this->ids, $offset, 1, true);
@@ -164,7 +169,7 @@ class Element extends Node implements \ArrayAccess
     /**
      * Override current() for iterations.
      *
-     * @return hQuery_Element
+     * @return Element
      */
     public function current(): mixed
     {
@@ -228,6 +233,8 @@ class Element extends Node implements \ArrayAccess
             return reset($ret);
         }
 
+      
+      
         return max($ret);
     }
 
@@ -235,7 +242,7 @@ class Element extends Node implements \ArrayAccess
      * Get the node at $idx position in the set, using cache
      *
      * @param  int              $idx - index of an element, starts with 0.
-     * @return hQuery_Element
+     * @return Element
      */
     public function get($idx)
     {
@@ -263,7 +270,7 @@ class Element extends Node implements \ArrayAccess
      * Get the node at $idx position in the set, no cache, each call creates new instance.
      *
      * @param  int              $idx - index of an element, starts with 0.
-     * @return hQuery_Element
+     * @return Element
      */
     public function eq($idx)
     {
@@ -276,7 +283,7 @@ class Element extends Node implements \ArrayAccess
 
     /**
      * Get the first node in the set
-     * @return hQuery_Element
+     * @return Element
      */
     public function first()
     {
@@ -285,7 +292,7 @@ class Element extends Node implements \ArrayAccess
 
     /**
      * Get the last node in the set
-     * @return hQuery_Element
+     * @return Element
      */
     public function last()
     {
@@ -297,7 +304,7 @@ class Element extends Node implements \ArrayAccess
      *
      * @param  int              $idx - start index of an element, starts with 0.
      * @param  int              $len - OPTIONAL number of element to slice. Defaults to all starting at $idx
-     * @return hQuery_Element
+     * @return Element
      */
     public function slice($idx, $len = null)
     {
@@ -325,7 +332,7 @@ class Element extends Node implements \ArrayAccess
     /**
      * Get parent nodes for this collection of nodes.
      *
-     * @return hQuery_Element parent
+     * @return Element parent
      */
     public function parent()
     {
@@ -336,7 +343,7 @@ class Element extends Node implements \ArrayAccess
     /**
      * Get child nodes for this collection of nodes.
      *
-     * @return hQuery_Element children
+     * @return Element children
      */
     public function children()
     {
@@ -347,7 +354,7 @@ class Element extends Node implements \ArrayAccess
     /**
      * Get previous element siblings for each of the elements of this collection
      *
-     * @return hQuery_Element previousElementSibling
+     * @return Element previousElementSibling
      */
     public function previousElementSibling()
     {
@@ -358,7 +365,7 @@ class Element extends Node implements \ArrayAccess
     /**
      * Get next element siblings for each of the elements of this collection
      *
-     * @return hQuery_Element nextElementSibling
+     * @return Element nextElementSibling
      */
     public function nextElementSibling()
     {
@@ -370,4 +377,4 @@ class Element extends Node implements \ArrayAccess
 
 // ------------------------------------------------------------------------
 // PSR-0 alias
-class_exists('hQuery_Element', false) or class_alias('duzun\\hQuery\\Element', 'hQuery_Element', false);
+// class_exists('hQuery_Element', false) or class_alias('duzun\\hQuery\\Element', 'hQuery_Element', false);

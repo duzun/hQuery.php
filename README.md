@@ -1,4 +1,4 @@
-hQuery.php   [![Build Status](https://travis-ci.com/duzun/hQuery.php.svg?branch=master)](https://travis-ci.com/duzun/hQuery.php) [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/duzuns)
+hQuery.php  [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/duzuns)
 ==========
 
 An extremely fast and efficient web scraper that can parse megabytes of invalid HTML in a blink of an eye.
@@ -144,7 +144,7 @@ Another option is to use [stream_context_create()](https://secure.php.net/manual
 to create a `$context`, then call `hQuery::fromFile($url, false, $context)`.
 
 ### Processing the results
-###### [hQuery::find](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_find)( string `$sel`, array|string `$attr` = NULL, hQuery_Node `$ctx` = NULL )
+###### [hQuery::find](https://duzun.github.io/hQuery.php/docs/class-hQuery.html#_find)( string `$sel`, array|string `$attr` = NULL, hQuery\Node `$ctx` = NULL )
 
 ```php
 // Find all banners (images inside anchors)
@@ -156,7 +156,7 @@ $images = array();
 $titles = array();
 
 // If the result of find() is not empty
-// $banners is a collection of elements (hQuery_Element)
+// $banners is a collection of elements (hQuery\Element)
 if ( $banners ) {
 
     // Iterate over the result
