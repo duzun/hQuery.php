@@ -1147,7 +1147,11 @@ abstract class Node implements \Iterator, \Countable
     }
 
     // ------------------------------------------------------------------------
-    // Countable:
+    /**
+     * Countable
+     *
+     * {@inheritdoc}
+     */
     #[\ReturnTypeWillChange]
     public function count()
     {
@@ -1155,7 +1159,9 @@ abstract class Node implements \Iterator, \Countable
     }
 
     // ------------------------------------------------------------------------
-    // Iterable:
+    /**
+     * {@inheritdoc}
+     */
     #[\ReturnTypeWillChange]
     public function current()
     {
@@ -1167,24 +1173,36 @@ abstract class Node implements \Iterator, \Countable
         return array($k => $this->ids[$k]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     #[\ReturnTypeWillChange]
     public function valid()
     {
         return current($this->ids) !== false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     #[\ReturnTypeWillChange]
     public function key()
     {
         return key($this->ids);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     #[\ReturnTypeWillChange]
     public function next()
     {
         return next($this->ids) !== false ? $this->current() : false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     #[\ReturnTypeWillChange]
     public function prev()
     {
@@ -1192,6 +1210,7 @@ abstract class Node implements \Iterator, \Countable
     }
 
     /**
+     * {@inheritdoc}
      * @return array
      */
     #[\ReturnTypeWillChange]
