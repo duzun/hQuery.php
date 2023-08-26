@@ -62,11 +62,11 @@ class hQueryCore extends PHPUnit_BaseClass
 <!doctype html>
 <html>
 <head>
-    <meta charset="ISO-8859-2" />
+    <meta charset="ISO-8859-2">
     <!-- <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" /> -->
-    <meta content="/logo.png" property="og:image" />
+    <meta content="/logo.png" property="og:image"/>
     <title>Sample HTML Doc</title>
-    <link rel="shortcut icon" href="/favicon.ico" class="pjax" />
+    <link rel="shortcut icon" href='/favicon.ico' class=pjax />
 </head>
 <body class="test-class">
     <div id="test-div" class="test-class test-div span-div">
@@ -93,7 +93,7 @@ class hQueryCore extends PHPUnit_BaseClass
 
     <table id="dict2">
         <tr>
-            <th class=" ">Coffee</th>
+            <th class=" "  >Coffee</th>
             <td>Black hot drink</td>
         </tr>
         <tr>
@@ -513,6 +513,26 @@ EOS;
 
         $this->assertEquals("text: This is some text\n        \n            link: This is a link\n        \n         in : between tags\n        span: Span text\n        notSpan: notSpan text", trim($text));
         $this->assertEquals('text: This is some text link: This is a link in : between tags span: Span text notSpan: notSpan text', preg_replace('/\\s+/', ' ', trim($text)));
+    }
+
+    public function test_outterHtml() {
+        $inst = self::$inst;
+
+        // tag close style is preserved: ">" | "/>" | " />"
+        $meta = $inst->find('meta[charset]');
+        $this->assertEquals('<meta charset="ISO-8859-2">', $meta->outerHtml());
+
+        $meta = $inst->find('meta[property=og:image]');
+        $this->assertEquals('<meta content="/logo.png" property="og:image"/>', $meta->outerHtml());
+
+        // Attributes of the top level tag are normalized (sorted by name and properly quoted)
+        // In doc this link is:
+        //     <link rel="shortcut icon" href='/favicon.ico' class=pjax />
+        $link = $inst->find('link[rel="shortcut icon"]');
+        $this->assertEquals('<link class="pjax" href="/favicon.ico" rel="shortcut icon" />', $link->outerHtml());
+
+        $link = $inst->find('th[class=" "]');
+        $this->assertEquals('<th class=" "  >Coffee</th>', $link->outerHtml());
     }
 
     public function test_text2dl()

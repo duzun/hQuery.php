@@ -100,7 +100,7 @@ class HTML extends Parser
                 $e = $i++;
                 // open tag
                 if (!$isCloseTag) {
-                    $ids[$e]  = $e; // the end of tag attributs (>) and start of tag contents
+                    $ids[$e]  = $e; // the end of tag attributes (>) and start of tag contents
                     $tags[$e] = $n;
                     $b += $j + 1;
                     $b += strspn($html, " \n\r\t", $b);

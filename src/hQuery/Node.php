@@ -286,13 +286,25 @@ abstract class Node implements \Iterator, \Countable
         $ret = self::$_nl_;
         $map = isset($this->tag_map) ? $this->tag_map : (isset($doc->tag_map) ? $doc->tag_map : null);
         foreach ($id as $p => $q) {
-            $a = $doc->get_attr_byId($p, null, true);
+            $a = $doc->get_attr_byId($p, null, true, true);
             $n = $doc->tags[$p];
             if ($map && isset($map[$_n = strtolower($n)])) {
                 $n = $map[$_n];
             }
             $h = $p++ == $q ? false : ($p < $q ? substr($doc->html, $p, $q - $p) : '');
-            $ret .= '<' . $n . ($a ? ' ' . $a : '') . (false === $h ? ' />' : '>' . $h . '</' . $n . '>');
+
+            // Preserve the tag close style from source
+            $tc = $p - 2;
+            if($h === false && strspn($doc->html, '/', $tc) == 1) {
+                --$tc;
+            }
+            while(HTMLParser::is_whitespace(substr($doc->html, $tc, 1))) {
+                --$tc;
+            }
+            ++$tc;
+            $tc = substr($doc->html, $tc, $p - $tc);
+
+            $ret .= '<' . $n . ($a ? ' ' . $a : '') . $tc . (false === $h ? '' : $h . '</' . $n . '>');
         }
         return $ret;
     }

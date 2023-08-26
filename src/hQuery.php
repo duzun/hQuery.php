@@ -58,7 +58,7 @@ class hQuery extends hQuery\HTML_Index
     /**
      * @var mixed
      */
-    public static $_mockup_class; // Used internally for teting
+    public static $_mockup_class; // Used internally for testing
 
     // ------------------------------------------------------------------------
     /**
