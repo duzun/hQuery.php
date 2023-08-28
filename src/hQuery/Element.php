@@ -171,6 +171,7 @@ class Element extends Node implements \ArrayAccess
      *
      * @return Element
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         $k = key($this->ids);
