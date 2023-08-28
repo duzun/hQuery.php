@@ -1198,9 +1198,10 @@ abstract class Node implements \Iterator, \Countable
     #[\ReturnTypeWillChange]
     public function next()
     {
-        if (is_array($this->ids) && !empty($this->ids)) {
-            next($this->ids);
+        if (is_array($this->ids) && !empty($this->ids) && next($this->ids) !== false) {
+            return $this->current();
         }
+        return false;
     }
 
     /**
@@ -1220,6 +1221,7 @@ abstract class Node implements \Iterator, \Countable
     public function rewind()
     {
         reset($this->ids);
+        return $this->current();
     }
 
 // - Helpers ------------------------------------------------
