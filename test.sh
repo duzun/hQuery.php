@@ -21,6 +21,21 @@ DOCKER_VERSION_53=cli
 # flags to pass to install
 flags="--prefer-dist --no-interaction --optimize-autoloader --no-suggest --no-progress"
 
+usage() {
+    cat <<EOH
+    $myname <php.ver>|"all" [w] {<phpunit_options>}
+    $myname <php.ver> [sh|bash|ex]
+    $myname -h|--help|?
+Eg.
+    # Run unit-tests in PHP 8.2 with watch
+    $myname 8.2 w --filter hQueryCore
+
+    # Launch web-server in examples/ using PHP 7.4
+    $myname 7.4 ex
+
+EOH
+}
+
 var() {
     eval "echo \${$1:-$2}"
 }
@@ -46,11 +61,13 @@ main_in_docker() {
     echo
     echo " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-    phpunit tests/ "$@"
+    local c
+    [ -s "$workdir/tests/phpunit.xml" ] && c="-c $workdir/tests/phpunit.xml"
+    phpunit tests/ $c "$@"
 
     if [ -n "$watch" ]; then
         watchnrun "$workdir" \
-            phpunit tests/ "$@"
+            phpunit tests/ $c "$@"
     fi
 
     cd "$workdir" && [ -s 'composer.json.lock' ] && mv -f -- composer.json.lock composer.json
@@ -241,13 +258,7 @@ main() {
         ;;
 
     h | help | -h | --help | \?)
-        cat <<EOH
-    $myname <php.ver>|"all" [w|sh|bash] {<phpunit_options>}
-    $myname -h|--help|?
-Eg.
-    $myname 8.2 w --filter hQueryCore
-
-EOH
+        usage
         return 0
         ;;
 
@@ -256,12 +267,45 @@ EOH
     local version docker_tag
 
     version=$1
-    docker_tag="$version-$(var "DOCKER_VERSION_$(ver_num $version)" 'alpine')"
+    docker_tag="$version-$(var "DOCKER_VERSION_$(ver_num "$version")" 'alpine')"
 
     case $2 in
     bash | sh)
         shift
         docker_run -it "php:$docker_tag" "$@"
+        return $?
+        ;;
+    ex | examples)
+        shift
+        local port container browser
+
+        port="80$(ver_num "$version")"
+        container="hquery-php-$docker_tag"
+
+        echo "Running a php:$docker_tag container $container ..."
+        docker_run -it -p "127.0.0.1:$port:$port" --name "$container" -d "php:$docker_tag" \
+            sh -c "cd /app/examples && exec php -S 0.0.0.0:$port" || return $?
+        trap "echo 'Stopping $container ...' && docker stop '$container'" INT TERM EXIT
+
+        for i in xdg-open open explorer firefox google-chrome chrome; do
+            if command -v "$i" >/dev/null; then
+                browser="$i"
+                break
+            fi
+        done
+
+        if [ -n "$browser" ]; then
+            echo "Opening http://localhost:$port ..."
+            "$browser" "http://localhost:$port"
+            sleep 2
+        else
+            echo "Open http://localhost:$port in your favorite browser."
+        fi
+
+        echo
+        echo "Press Ctrl+C when done"
+        echo
+        docker logs -f "$container"
         return $?
         ;;
     esac
