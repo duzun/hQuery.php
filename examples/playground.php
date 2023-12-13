@@ -15,7 +15,7 @@
 
         // Enable cache
         hQuery::$cache_path = sys_get_temp_dir() . '/hQuery/';
-        hQuery::$cache_expires = (int)$_POST['ch'];// cache value = 0
+        $_POST['ch'] === '0' || (int)$_POST['ch'] > 0 and hQuery::$cache_expires = (int)$_POST['ch'];
 
         // Results acumulator
         $return = array();
@@ -281,7 +281,7 @@
         <form name="hquery" action="" method="post">
             <p><label>URL: <input type="url" name="url" value="<?=htmlspecialchars(@$url??'', ENT_QUOTES);?>" placeholder="e.g. https://mariauzun.com/portfolio" autofocus class="form-control" required /></label></p>
             <p><label>Selector: <input type="text" name="sel" value="<?=htmlspecialchars(@$sel??'', ENT_QUOTES);?>" placeholder="e.g. 'a[href] &gt; img[src]:parent'" class="form-control" required /></label></p>
-            <p><label>Cache: <input type="number" name="ch" value="<?=$_POST['ch']>=0?@$_POST['ch']:1800;?>" min="0" max="3600" placeholder="e.g. 1800" class="form-control" /> (seconds)</label></p>
+            <p><label>Cache: <input type="number" name="ch" value="<?=$_POST['ch']==='0'||(int)$_POST['ch']>0?@$_POST['ch']:'';?>" min="0" max="3600" placeholder="e.g. 600" class="form-control" /> (seconds) <code>default: 3600</code></label></p>
 
             <p>
                 <button type="submit" name="go" value="elements" <?=$go=='elements'?'aria-pressed="true"':''?> class="btn btn-success">Fetch elements</button>
@@ -327,7 +327,7 @@
                         hQuery::$cache_path: <code><?php echo hQuery::$cache_path ?></code>
                     </li>
                     <li class="list-group-item">
-                        hQuery::$cache_expires: <code><?php echo hQuery::$cache_expires ?></code>
+                        hQuery::$cache_expires: <code><?php echo hQuery::$cache_expires ?> s</code>
                     </li>
                     <li class="list-group-item">
                         Size: <span data-name="doc.size" class="badge"><?=empty($doc)?'':$doc->size;?></span>
