@@ -157,6 +157,10 @@
             padding: 15px 5px 10px;
             vertical-align: top;
         }
+        table>tbody>tr>td img{
+            max-width: 300px;
+            height: auto;
+        }
         td pre {
             margin: 0;
         }
