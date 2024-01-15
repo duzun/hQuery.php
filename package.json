@@ -59,7 +59,7 @@
     }
   ],
   "devDependencies": {
-    "browser-sync": "^2.26.13",
+    "browser-sync": "^3.0.2",
     "gulp": "^4.0.2",
     "gulp-connect-php": "^1.0",
     "verup": "^1.7.1"
