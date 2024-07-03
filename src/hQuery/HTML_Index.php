@@ -402,9 +402,9 @@ abstract class HTML_Index extends Node
      */
     public static function detect_charset($str)
     {
-        $l    = 1024;
-        $str  = substr($str, 0, $l);
+        $str  = substr($str, 0, 1024);
         $str_ = strtolower($str);
+        $l    = strlen($str_);
         $p    = 0;
         while ($p < $l) {
             $p = strpos($str_, '<meta', $p);

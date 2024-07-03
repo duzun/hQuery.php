@@ -18,7 +18,7 @@
         hQuery::$cache_path = sys_get_temp_dir() . '/hQuery/';
         isset($ch) && $ch !== '' and hQuery::$cache_expires = (int)$ch;
 
-        // Results acumulator
+        // Results accumulator
         $return = array();
 
         // If we have $url to parse and $sel (selector) to fetch, we a good to go

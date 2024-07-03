@@ -122,6 +122,8 @@ EOS;
     </body></html>
 EOS;
 
+    public static $badHTML1 = '<iframe><meta http-equiv="refresh" content="1;/>';
+
     // Before any test
     public static function mySetUpBeforeClass()
     {
@@ -216,6 +218,10 @@ EOS;
         $emptyDoc = $doc::fromHTML('');
         $this->assertInstanceOf(get_class($doc), $emptyDoc);
         $this->assertEquals('', $emptyDoc->html);
+
+        // Bad HTML
+        $badDoc = hQueryTestSurrogate::fromHTML(self::$badHTML1);
+        $this->assertInstanceOf(get_class($doc), $badDoc);
     }
 
     // -----------------------------------------------------
@@ -345,6 +351,14 @@ EOS;
         $this->assertEmpty($a);
 
         $b = $edoc->find('body');
+        $this->assertEquals(1, count($b));
+
+        // 6)
+        $bdoc = hQueryTestSurrogate::fromHTML(self::$badHTML1, self::$baseUrl . 'index.html');
+        $a = $bdoc->find('iframe');
+        $this->assertEquals(1, count($a));
+
+        $b = $bdoc->find('meta');
         $this->assertEquals(1, count($b));
 
         return $ff;
