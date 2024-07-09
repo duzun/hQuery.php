@@ -16,6 +16,11 @@ class_exists('duzun\\hQuery\\Node', false) or require_once __DIR__ . DIRECTORY_S
 abstract class HTML_Index extends Node
 {
     /**
+     * @var array [error]
+     */
+    public $html_errors = [];
+
+    /**
      * @var boolean
      */
     public static $del_spaces = false;
@@ -227,11 +232,31 @@ abstract class HTML_Index extends Node
             $html = (string) $html;
         }
 
+        $this->html_errors = self::$_ar_;
+        $this->tags = self::$_ar_;
+
         $c = self::detect_charset($html) or $c = null;
         if ($c) {
             $ic = self::$_icharset;
             if ($c != $ic) {
-                $html = self::convert_encoding($html, $ic, $c);
+                try {
+                    $t = self::convert_encoding($html, $ic, $c);
+                }
+                catch(\Exception $ex) {
+                    $t = false;
+                }
+                if($t === false) {
+                    $this->html_errors['convert_encoding'] = empty($ex) ?
+                        (self::is_mb_charset_supported($c) ?
+                            "Error converting encoding from \"$c\" to \"$ic\"." :
+                            "Unsupported charset detected \"$c\"."
+                        ) :
+                        $ex->getMessage();
+                }
+                else {
+                    $html = $t;
+                }
+                unset($t, $ex);
             }
 
         }
@@ -239,8 +264,6 @@ abstract class HTML_Index extends Node
         if (self::$del_spaces) {
             $html = preg_replace('#(>)?\\s+(<)?#', '$1 $2', $html); // reduce the size
         }
-        $this->tags = self::$_ar_;
-        $l          = strlen($html);
         parent::__construct($this, self::$_ar_);
         $this->html = $html;
         unset($html);

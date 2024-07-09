@@ -192,6 +192,8 @@ $charset = $doc->charset;
 $size = $doc->size;
 ```
 
+Note: In case the charset meta attribute has a wrong value or the internal conversion fails for any other reason, `hQuery` would ignore the error and continue processing with the original HTML, but would register an error message on `$doc->html_errors['convert_encoding']`.
+
 ## 🖧 Live Demo
 
 On [DUzun.Me](https://duzun.me/playground/hquery#sel=%20a%20%3E%20img%3Aparent&url=https%3A%2F%2Fgithub.com%2Fduzun)
