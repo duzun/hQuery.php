@@ -114,6 +114,7 @@ class hQueryCore extends PHPUnit_BaseClass
 EOS;
 
     public static $emptyBodyHTML = <<<EOS
+    <?xml version="1.0" encoding="windows-1251"?>
     <html>
     <head>
     <meta name="robots" content="noindex,nofollow">
@@ -217,16 +218,17 @@ EOS;
 
 
         // The empty HTML doc:
-        $emptyDoc = $doc::fromHTML('');
+        $emptyDoc = $doc::fromHTML('', $url, ['content-type' => 'text/xml; charset=ascii']);
         $this->assertInstanceOf(get_class($doc), $emptyDoc);
         $this->assertEquals('', $emptyDoc->html);
+        $this->assertEquals('ASCII', $emptyDoc->charset);
 
         // Bad HTML
         $badDoc = hQueryTestSurrogate::fromHTML(self::$badHTML1);
         $this->assertInstanceOf(get_class($doc), $badDoc);
 
         // Bad HTML charset
-        $badDoc = hQueryTestSurrogate::fromHTML(self::$badHTML2);
+        $badDoc = hQueryTestSurrogate::fromHTML(self::$badHTML2, $url, ['content-type' => 'text/html; charset=ascii']);
         $this->assertInstanceOf(get_class($doc), $badDoc);
         $this->assertEquals('UFT-8', $badDoc->charset);
         $this->assertNotEmpty($badDoc->html_errors['convert_encoding']);
@@ -653,6 +655,21 @@ EOS;
     // }
 
     // -----------------------------------------------------
+    // -----------------------------------------------------
+    public function test_detect_charset() {
+        // From HTML/XML
+        $this->assertEquals(false, hQueryTestSurrogate::detect_charset(' '));
+        $this->assertEquals('ISO-8859-2', hQueryTestSurrogate::detect_charset(self::$bodyHTML));
+        $this->assertEquals('WINDOWS-1251', hQueryTestSurrogate::detect_charset(self::$emptyBodyHTML, ['content-type' => 'text/html; charset=UTF-8']));
+        $this->assertEquals(false, hQueryTestSurrogate::detect_charset(self::$badHTML1));
+        $this->assertEquals('UFT-8', hQueryTestSurrogate::detect_charset(self::$badHTML2));
+
+        // From HTTP headers
+        $this->assertEquals('UTF-8', hQueryTestSurrogate::detect_charset('', 'Content-Type: text/html; charset=UTF-8'));
+        $this->assertEquals('UTF-8', hQueryTestSurrogate::detect_charset('', ['Content-Type' => 'text/html; charset = utf-8 ']));
+        $this->assertEquals('UTF-8', hQueryTestSurrogate::detect_charset('', ['content-type' => 'text/html; charset = "utf-8"']));
+        $this->assertEquals('UTF-8', hQueryTestSurrogate::detect_charset('', ['CONTENT_TYPE' => "text/html;charset='Utf-8'"]));
+    }
     // -----------------------------------------------------
     public function test_unjsonize()
     {

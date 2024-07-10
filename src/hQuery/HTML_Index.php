@@ -15,10 +15,22 @@ class_exists('duzun\\hQuery\\Node', false) or require_once __DIR__ . DIRECTORY_S
  */
 abstract class HTML_Index extends Node
 {
+    // ------------------------------------------------------------------------
     /**
-     * @var array [error]
+     * Response headers when using hQuery::fromURL().
+     *
+     * @var mixed
+     */
+    public $headers;
+
+    /**
+     * HTML parse errors.
+     *
+     * @var array [type => message]
      */
     public $html_errors = [];
+
+    // ------------------------------------------------------------------------
 
     /**
      * @var boolean
@@ -64,6 +76,8 @@ abstract class HTML_Index extends Node
      * @var string
      */
     protected static $_icharset = 'UTF-8'; // Internal charset
+
+    // ------------------------------------------------------------------------
 
     /**
      * @var string
@@ -223,6 +237,14 @@ abstract class HTML_Index extends Node
     }
 
     /**
+     * @return string
+     */
+    public function html($_=null)
+    {
+        return $this->html;
+    }
+
+    /**
      * @param string  $html
      * @param boolean $idx
      */
@@ -235,35 +257,6 @@ abstract class HTML_Index extends Node
         $this->html_errors = self::$_ar_;
         $this->tags = self::$_ar_;
 
-        $c = self::detect_charset($html) or $c = null;
-        if ($c) {
-            $ic = self::$_icharset;
-            if ($c != $ic) {
-                try {
-                    $t = self::convert_encoding($html, $ic, $c);
-                }
-                catch(\Exception $ex) {
-                    $t = false;
-                }
-                if($t === false) {
-                    $this->html_errors['convert_encoding'] = empty($ex) ?
-                        (self::is_mb_charset_supported($c) ?
-                            "Error converting encoding from \"$c\" to \"$ic\"." :
-                            "Unsupported charset detected \"$c\"."
-                        ) :
-                        $ex->getMessage();
-                }
-                else {
-                    $html = $t;
-                }
-                unset($t, $ex);
-            }
-
-        }
-        $this->_prop['charset'] = $c;
-        if (self::$del_spaces) {
-            $html = preg_replace('#(>)?\\s+(<)?#', '$1 $2', $html); // reduce the size
-        }
         parent::__construct($this, self::$_ar_);
         $this->html = $html;
         unset($html);
@@ -420,28 +413,44 @@ abstract class HTML_Index extends Node
     // ------------------------------------------------------------------------
     /* <meta charset="utf-8" /> */
     /* <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2" /> */
+    /* <?xml version="1.0" encoding="UTF-8"?> */
     /**
-     * @param string $str
+     * @param string $html
+     * @return string|bool
      */
-    public static function detect_charset($str)
+    public static function detect_charset($html, $headers=null)
     {
-        $str  = substr($str, 0, 1024);
-        $str_ = strtolower($str);
-        $l    = strlen($str_);
-        $p    = 0;
+        $p     = strspn($html, " \t\n\r");
+        $html  = substr($html, $p, $p + 1024);
+        $html_ = strtolower($html);
+        $l     = strlen($html_);
+
+        // XML
+        if(strncmp($html_, '<?xml', 5) == 0) {
+            $q = strpos($html_, '>', 5);
+            if($q < 0) $q = $l;
+            $a = substr($html, 0, $q - 1);
+            $a = HTMLParser::parseAttrStr($a, true);
+            if (!empty($a['encoding'])) {
+                return strtoupper($a['encoding']);
+            }
+        }
+
+        // HTML
+        $p = 0;
         while ($p < $l) {
-            $p = strpos($str_, '<meta', $p);
+            $p = strpos($html_, '<meta', $p);
             if (false === $p) {
                 break;
             }
 
             $p += 5;
-            $q = strpos($str_, '>', $p);
+            $q = strpos($html_, '>', $p);
             if ($q < $p) {
-                $q = strlen($str_);
+                $q = $l;
             }
 
-            $a = substr($str, $p, $q - $p - ('/' == $str_[$q - 1]));
+            $a = substr($html, $p, $q - $p - ('/' == $html_[$q - 1]));
             $p = $q + 2;
             $a = HTMLParser::parseAttrStr($a, true);
             if (!empty($a['charset'])) {
@@ -456,6 +465,25 @@ abstract class HTML_Index extends Node
                 return empty($a) || empty($a[1]) ? false : strtoupper(trim($a[1]));
             }
         }
+
+        // Detect from HTTP headers
+        if($headers) {
+            if(is_array($headers)) {
+                $a = @$headers['content-type'] or
+                $a = @$headers['Content-Type'] or
+                $a = @$headers['CONTENT_TYPE'];
+                $headers = $a;
+            }
+
+            if($headers) {
+                //  text/html; charset=UTF-8
+                $a = HTMLParser::parseAttrStr(strtr($headers,';',' '), true);
+                if (!empty($a['charset'])) {
+                    return strtoupper($a['charset']);
+                }
+            }
+        }
+
         return false;
     }
 
@@ -703,6 +731,8 @@ abstract class HTML_Index extends Node
 
         $this->indexed = true;
 
+        $this->_detect_charset();
+
         // Parser state object
         list($this->ids, $this->tags, $attr) = HTMLParser::exec($this->html);
 
@@ -723,6 +753,43 @@ abstract class HTML_Index extends Node
         }
 
         return $this->tag_idx;
+    }
+
+    private function _detect_charset() {
+        $html = $this->html;
+
+        $c = self::detect_charset($html, $this->headers) or $c = null;
+        if ($c) {
+            $ic = self::$_icharset;
+            if ($c != $ic) {
+                try {
+                    $t = self::convert_encoding($html, $ic, $c);
+                } catch (\Exception $ex) {
+                    $t = false;
+                }
+                if ($t === false) {
+                    $this->html_errors['convert_encoding'] = empty($ex) ?
+                        (self::is_mb_charset_supported($c) ?
+                            "Error converting encoding from \"$c\" to \"$ic\"." :
+                            "Unsupported charset detected \"$c\"."
+                        ) :
+                        $ex->getMessage();
+                } else {
+                    $this->html =
+                    $html = $t;
+                }
+                unset($t, $ex);
+            }
+        }
+
+        $this->_prop['charset'] = $c;
+
+        if (self::$del_spaces) {
+            $this->html =
+            $html = preg_replace('#(>)?\\s+(<)?#', '$1 $2', $html); // reduce the size
+        }
+
+        return $c;
     }
 
     // ------------------------------------------------------------------------

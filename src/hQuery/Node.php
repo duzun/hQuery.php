@@ -214,7 +214,7 @@ abstract class Node implements \Iterator, \Countable
     {
         // doc
         if ($this->isDoc()) {
-            return $this->html;
+            return $this->html();
         }
 
         $ret = '';
@@ -274,7 +274,7 @@ abstract class Node implements \Iterator, \Countable
     {
         $dm = $this->isDoc() && !isset($id);
         if ($dm) {
-            return $this->html;
+            return $this->html();
         }
         // doc
 

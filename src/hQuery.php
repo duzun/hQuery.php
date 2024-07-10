@@ -35,13 +35,6 @@ class_exists('duzun\\hQuery\\HTML_Index', false) or require_once __DIR__ . DIREC
  */
 class hQuery extends hQuery\HTML_Index
 {
-    // ------------------------------------------------------------------------
-    // Response headers when using self::fromURL()
-    /**
-     * @var mixed
-     */
-    public $headers;
-
     /**
      * Optional cache path to store HTTP responses (see fromURL())
      * @var string
@@ -66,9 +59,10 @@ class hQuery extends hQuery\HTML_Index
      *
      * @param  string|Psr\Http\Message\MessageInterface $html  - source of some HTML document
      * @param  string                                   $url   - OPTIONAL location of the document. Used for relative URLs inside the document.
+     * @param  array                                    $headers - OPTIONAL HTTP headers. Used for detecting charset, if not defined in the HTML.
      * @return hQuery                                   $doc
      */
-    public static function fromHTML($html, $url = null)
+    public static function fromHTML($html, $url = null, $headers = null)
     {
         if ($html instanceof MessageInterface) {
             $message = $html;
@@ -97,6 +91,10 @@ class hQuery extends hQuery\HTML_Index
                 self::$last_http_result->body = $html;
             }
         }
+        elseif($headers) {
+            $doc->headers = $headers;
+        }
+
         $doc->index();
         $index_time      = microtime(true) - $index_time;
         $doc->index_time = $index_time * 1000;
@@ -215,9 +213,8 @@ class hQuery extends hQuery\HTML_Index
             return false;
         }
 
-        $doc = self::fromHTML($html, $url);
+        $doc = self::fromHTML($html, $url, $hdrs);
         if ($doc) {
-            $doc->headers                         = $hdrs;
             $doc->source_type                     = $source_type;
             isset($read_time) and $doc->read_time = $read_time * 1e3;
             if (!empty($cch_meta)) {
@@ -262,12 +259,13 @@ class hQuery extends hQuery\HTML_Index
 
         $code = $response->getStatusCode();
         $url  = $request->getUri() . '';
+        $headers = $response->getHeaders();
 
         self::$last_http_result = (object) array(
             'body'     => '', // to be set in fromHTML() - this avoids double call to __toString() on body
             'code'     => $code,
             'url'      => $url,
-            'headers'  => $response->getHeaders(),
+            'headers'  => $headers,
             // 'cached'  => false,
             'request'  => $request,
             'response' => $response,
@@ -277,7 +275,7 @@ class hQuery extends hQuery\HTML_Index
             return false;
         }
 
-        $doc = self::fromHTML($response, $url);
+        $doc = self::fromHTML($response, $url, $headers);
         if ($doc) {
             // Set $doc url if not set yet
             if (!$doc->baseURI() and $url) {
