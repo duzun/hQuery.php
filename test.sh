@@ -3,6 +3,7 @@
 workdir=$(pwd)
 myname=$(basename "$0")
 
+PHPUNIT_VERSION_83=^10.2
 PHPUNIT_VERSION_82=^10.2
 PHPUNIT_VERSION_81=^10.2
 PHPUNIT_VERSION_74=^9.6
@@ -245,6 +246,7 @@ main() {
     all)
         shift
         echo Running tests for all supported PHP versions &&
+            main 8.3 "$@" &&
             main 8.2 "$@" &&
             main 8.1 "$@" &&
             main 7.4 "$@" &&

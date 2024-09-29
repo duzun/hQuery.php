@@ -1,4 +1,5 @@
 <?php
+
 namespace duzun\hQuery;
 
 // ------------------------------------------------------------------------
@@ -14,18 +15,21 @@ abstract class Parser
      * @var string
      */
     public static $spaceRange = " \t\n\r\0\x0B\f";
+    public static $spaceRangeArr;
 
     /**
      * Call ::_init_class() to init
      * @var string
      */
     public static $nameStartRange;
+    public static $nameStartRangeArr;
 
     /**
      * Call ::_init_class() to init
      * @var string
      */
     public static $nameRange;
+    public static $nameRangeArr;
 
     /**
      * The string to parse
@@ -80,10 +84,14 @@ abstract class Parser
     protected static function _init_class()
     {
         // first letter chars
-        self::$nameStartRange = self::str_range('a-zA-Z_' . chr(128) . '-' . chr(255));
+        $nameStartRange = 'a-zA-Z_' . chr(128) . '-' . chr(255);
+        self::$nameStartRange = self::str_range($nameStartRange);
+        self::$nameStartRangeArr = self::arr_range($nameStartRange);
 
         // tag name chars
-        self::$nameRange = self::str_range('0-9\-') . self::$nameStartRange;
+        $nameRange = '\-0-9';
+        self::$nameRange = self::str_range($nameRange) . self::$nameStartRange;
+        self::$nameRangeArr = self::arr_range($nameRange.$nameStartRange);
     }
 
     /**
@@ -332,13 +340,9 @@ abstract class Parser
         $b = "\x0";
         while ($pos < $len) {
             switch ($c = $comp[$pos++]) {
-                case '\\':{
-                        $b       = substr($comp, $pos, 1);
-                        $ret[$b] = $pos++;
-                    }break;
-
-                case '-':{
-                        $c_ = ord($c = substr($comp, $pos, 1));
+                case '-': {
+                        $c = substr($comp, $pos++, 1);
+                        $c_ = ord($c);
                         $b  = ord($b);
                         while ($b++ < $c_) {
                             $ret[chr($b)] = $pos;
@@ -347,15 +351,82 @@ abstract class Parser
                         while ($b-- > $c_) {
                             $ret[chr($b)] = $pos;
                         }
-
-                    }break;
-
-                default:{
-                        $ret[$b = $c] = $pos;
                     }
+                    break;
+
+                case '\\':
+                    $c = substr($comp, $pos++, 1);
+
+                default:
+                    $ret[$b = $c] = $pos;
             }
         }
         return implode('', array_keys($ret));
+    }
+
+    // ------------------------------------------------------------------------
+    /**
+     * Expand a string with ranges to a sorted array of ranges.
+     * Ex: 'a-f' -> ['a' => 'f'],
+     *     '12345789' => ['1' => '5', '7' => '9']
+     *
+     * @param string $comp A compact string with ranges
+     * @param int    $pos  Start with this position in $comp
+     * @param int    $len  If defined, expand ranges only up to position $len in $comp.
+     */
+    public static function arr_range($comp, $pos = 0, $len = null)
+    {
+        $ret = array();
+        $b   = strlen($comp);
+        if (!isset($len) || $len > $b) {
+            $len = $b;
+        }
+
+        $k =
+        $b = "\x0";
+        while ($pos < $len) {
+            switch ($c = $comp[$pos++]) {
+                case '-':
+                    $c = substr($comp, $pos++, 1);
+                    if ($b < $c) {
+                        $ret[$k] = $c;
+                    } else {
+                        $ret[$k = $c] = $b;
+                    }
+                    break;
+
+                case '\\':
+                    $c = substr($comp, $pos++, 1);
+
+                default:
+                    ++$b;
+                    if ($b == $c) {
+                        $ret[$k] = $c;
+                    } else {
+                        $k = $b = $c;
+                        $ret[$b] = $c;
+                    }
+            }
+        }
+        ksort($ret, SORT_STRING);
+        $k = $l = '';
+        foreach ($ret as $b => $c) {
+            is_int($b) && $b .= '';
+            if ($k !== '') {
+                $l = chr(ord($l)+1);
+                if ($b <= $l) {
+                    if ($c >= $l) {
+                        $ret[$k] = $l = $c;
+                    }
+                    unset($ret[$b]);
+                    continue;
+                }
+            }
+            $k = $b;
+            $l = $c;
+        }
+
+        return $ret;
     }
 
     // ------------------------------------------------------------------------

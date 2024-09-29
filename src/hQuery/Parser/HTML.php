@@ -46,8 +46,10 @@ class HTML extends Parser
      */
     public function parse()
     {
+        class_exists('\hQueryStress', false) and $tmr = \hQueryStress::timer();
         // Index comments first, so than we can safely ignore them
         $this->_index_comments();
+        if (class_exists('\hQueryStress', false)) { echo '_index_comments: ', (\hQueryStress::timer($tmr)), PHP_EOL; $tmr =\hQueryStress::timer(); }
 
         $firstLetterChars = self::$nameStartRange;  // first letter chars
         $tagLettersChars  = self::$nameRange . ':'; // tag name chars
@@ -59,10 +61,14 @@ class HTML extends Parser
         $html = $this->s;
         $i    = $this->i;
         $l    = $this->l;
+        $_html = strtolower($html);
 
         $stack = $tags = $ids = $attr = array();
 
+        $_iter = 0;
+
         while ($i < $l) {
+            ++$_iter;
             $i = strpos($html, '<', $i);
             if (false === $i) {
                 // no more tags in $html
@@ -83,10 +89,10 @@ class HTML extends Parser
             if (false !== strpos($firstLetterChars, $c)) {
                 ++$i; // possibly second letter of tagName
                 $j = strspn($html, $tagLettersChars, $i);
-                $n = substr($html, $i - 1, $j + 1);
+                $n = substr($_html, $i - 1, $j + 1);
                 $i += $j;
                 if ($utn) {
-                    $n = strtolower($n);
+                    // $n = strtolower($n);
                     if ($utn !== $n || !$isCloseTag) {
                         continue;
                     }
@@ -119,7 +125,7 @@ class HTML extends Parser
                     }
                     // Not an empty tag
                     if ('/' != $html[$e - 1]) {
-                        $n = strtolower($n);
+                        // $n = strtolower($n);
                         if (isset($unparsedTags[$n])) {
                             $utn = $n;
                         }
@@ -128,7 +134,7 @@ class HTML extends Parser
                 }
                 // close tag
                 else {
-                    $n = strtolower($n);
+                    // $n = strtolower($n);
                     $s = &$stack[$n];
                     if (empty($s)); // error - tag not opened, but closed - ???
                     else {
@@ -158,6 +164,10 @@ class HTML extends Parser
 
                 $e = $i++;
             }
+        }
+        if (class_exists('\hQueryStress', false)) {
+            echo 'while: ', $_iter, ' - ', (\hQueryStress::timer($tmr)), PHP_EOL;
+            $tmr = \hQueryStress::timer();
         }
 
         foreach ($stack as $n => $st) {

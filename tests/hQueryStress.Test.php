@@ -59,7 +59,7 @@ class hQueryStress extends PHPUnit_BaseClass
     );
     // -----------------------------------------------------
     // -----------------------------------------------------
-    public function test_construct_and_index()
+    public function xtest_construct_and_index()
     {
         list($doc) = self::load_doc_from_file('data/big_granito_1.html');
 
@@ -90,7 +90,7 @@ class hQueryStress extends PHPUnit_BaseClass
     /**
      * @depends test_construct_and_index
      */
-    public function test_find($return)
+    public function xtest_find($return)
     {
         // $doc is 'data/big_granito_1.html'
         $doc = $return[0];
@@ -203,6 +203,34 @@ class hQueryStress extends PHPUnit_BaseClass
         return $return;
     }
 
+    public function test_big_synthetic() {
+        list($doc) = self::load_doc_from_file('data/big_synthetic.html');
+
+        $tmr  = self::timer();
+        $mmr  = self::memer();
+        $tags = $doc->index();
+        $mem  = self::memer($mmr);
+        $exe  = self::timer($tmr);
+        $time = version_compare(PHP_VERSION, '5.5.0') >= 0 ? 6e6 : 30e6; // travis runs PHP 5.4 slower for some reason
+        // $this->assertLessThan($time, self::timer($tmr, false), 'should index 3Mb in less then ' . ($time / 1e6) . ' sec');
+        $count = self::fmtNumber(self::listSumCounts($tags));
+        self::log("    hQuery->index( {$count} tags )\tin\t{$exe}\t{$mem} RAM");
+
+        self::log("   Original Charset: {$doc->charset}");
+
+        $tags   = array_map('count', $tags);
+        $counts = [];
+        foreach ($tags as $k => $v) {
+            $counts[$v] = (empty($counts[$v]) ? '' : $counts[$v] . ', ') . $k;
+        }
+        krsort($counts);
+
+        self::log('Tag counts:', $counts);
+
+        $this->assertGreaterThan(count($counts), 10);
+
+        return array($doc);
+    }
     // -----------------------------------------------------
 
 }

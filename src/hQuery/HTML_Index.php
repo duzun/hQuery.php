@@ -733,9 +733,11 @@ abstract class HTML_Index extends Node
         $this->indexed = true;
 
         $this->_detect_charset();
+        class_exists('\hQueryStress', false) and $tmr = \hQueryStress::timer();
 
         // Parser state object
         list($this->ids, $this->tags, $attr) = HTMLParser::exec($this->html);
+        if (class_exists('\hQueryStress', false)) echo 'HTMLParser::exec: ', (\hQueryStress::timer($tmr)), PHP_EOL;
 
         $this->_index_tags();
         $this->_index_attribs($attr);unset($attr);
