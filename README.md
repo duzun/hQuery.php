@@ -161,16 +161,18 @@ if ( $banners ) {
 
     // Iterate over the result
     foreach($banners as $pos => $a) {
-        $links[$pos] = $a->attr('href'); // get absolute URL from href property
+        // $a->href property is the resolved $a->attr('href') relative to the
+        // documents <base href=...>, if present, or $doc->baseURL.
+        $links[$pos] = $a->href; // get absolute URL from href property
         $titles[$pos] = trim($a->text()); // strip all HTML tags and leave just text
 
         // Filter the result
         if ( !$a->hasClass('logo') ) {
-            // $a->style property is the parsed $a->attr('style')
+            // $a->style property is the parsed $a->attr('style'), same as $a->attr('style', true)
             if ( strtolower($a->style['position']) == 'fixed' ) continue;
 
             $img = $a->find('img')[0]; // ArrayAccess
-            if ( $img ) $images[$pos] = $img->src; // short for $img->attr('src')
+            if ( $img ) $images[$pos] = $img->src; // short for $img->attr('src', true)
         }
     }
 
@@ -190,6 +192,13 @@ $charset = $doc->charset;
 
 // Get the size of the document ( strlen($html) )
 $size = $doc->size;
+
+// The URL at which the document was requested
+$requestUri = $doc->href;
+
+// <base href=...>, if present, or the origin + dir path part from $doc->href.
+// The .href and .src props are resolved using this value.
+$baseURL = $doc->baseURL;
 ```
 
 Note: In case the charset meta attribute has a wrong value or the internal conversion fails for any other reason, `hQuery` would ignore the error and continue processing with the original HTML, but would register an error message on `$doc->html_errors['convert_encoding']`.

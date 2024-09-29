@@ -15,7 +15,7 @@ use duzun\hQuery\Parser\HTML as HTMLParser;
 abstract class Node implements \Iterator, \Countable
 {
     // ------------------------------------------------------------------------
-    const VERSION = '3.2.0';
+    const VERSION = '3.3.0';
     // ------------------------------------------------------------------------
     /**
      * Response details of last request
@@ -125,17 +125,27 @@ abstract class Node implements \Iterator, \Countable
      * Get and attribute or all attributes of first element in the collection.
      *
      * @param  string       $attr   attribute name, or NULL to get all
+     * @param  boolean      $eval if true, evaluate the attribute as a property,
+     *                            e.g. resolve .href & .src using document's baseURL
+     *                            or parse the .style property as an assoc arrays.
      * @param  boolean      $to_str When $attr is NULL, if true, get the list of attributes as string
      * @return array|string If no $attr, return a list of attributes, or attribute's value otherwise.
      */
-    public function attr($attr = null, $to_str = false)
+    public function attr($attr = null, $eval = false, $to_str = false)
     {
         $k = key($this->ids);
         if (null === $k) {
             reset($this->ids);
             $k = key($this->ids);
         }
-        return isset($k) ? $this->doc()->get_attr_byId($k, $attr, $to_str) : null;
+        if (!isset($k)) return null;
+
+        $val = $this->doc()->get_attr_byId($k, $attr, $to_str, !$eval);
+        if($eval && $attr == 'style') {
+            if (!$val) return self::$_ar_;
+            return HTMLParser::parseCssStr($val);
+        }
+        return $val;
     }
 
     // ------------------------------------------------------------------------
@@ -1114,7 +1124,13 @@ abstract class Node implements \Iterator, \Countable
             return $this->_prop[$name];
         }
 
-        return $this->attr($name);
+        $val = $this->attr($name, true);
+
+        if($val && $name == 'style') {
+            $this->_prop[$name] = $val;
+        }
+
+        return $val;
     }
 
     /**

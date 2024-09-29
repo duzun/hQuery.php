@@ -1,7 +1,6 @@
 <?php
 namespace duzun\hQuery;
 
-use duzun\hQuery\Parser\HTML;
 // ------------------------------------------------------------------------
 class_exists('duzun\\hQuery\\Node', false) or require_once __DIR__ . DIRECTORY_SEPARATOR . 'Node.php';
 
@@ -79,10 +78,6 @@ class Element extends Node implements \ArrayAccess
 
         switch ($name) {
             case 'style':
-                $style = $this->attr('style');
-                if ( !$style ) return self::$_ar_;
-                return $this->_prop[$name] = HTML::parseCssStr($style);
-
             case 'id':
             case 'class':
             case 'alt':
@@ -97,7 +92,7 @@ class Element extends Node implements \ArrayAccess
             // case 'search':
             // case 'hash':
             default:
-                return $this->attr($name);
+                return $this->attr($name, true);
         }
     }
 

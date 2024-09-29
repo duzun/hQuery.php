@@ -82,7 +82,7 @@ class hQueryCore extends PHPUnit_BaseClass
         href="//not-my-site.com/next.html"
         style="Color:blue;padding: 1px 2pt 3em 0; background-image:url(/path/to/img.jpg?url=param&and=another&one);"
     >Not My Site</a>
-    <img id="outerImg" src="https://cdn.duzun.me/images/logo.png" />
+    <img id="outerImg" src="//cdn.duzun.me/images/logo.png" />
 
     <dl id="dict1">
       <dt>Coffee</dt>
@@ -126,6 +126,21 @@ EOS;
     public static $badHTML1 = '<iframe><meta http-equiv="refresh" content="1;/>';
 
     public static $badHTML2 = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=uft-8" /></head><body><a>A</a></body></html>';
+
+    public static $baseTag1 = '<!doctype html>
+<html>
+<head>
+    <meta content="/logo.png" property="og:image"/>
+    <base href="/base/path.html?how=rewrite#hash" />
+    <link rel="shortcut icon" href="/favicon.ico" class=pjax />
+</head>
+<body class="test-class">
+    <a href="rel-path/index.html" id="rel_path">relative path</a>
+    <a href="/abs-path/index.html" id="rel_origin">relative origin</a>
+    <a href="//not-my-site.com/next.html" id="rel_schema">relative schema</a>
+    <img id="rel_img" src="/images/logo.png" />
+</body>
+</html>';
 
     // Before any test
     public static function mySetUpBeforeClass()
@@ -258,7 +273,8 @@ EOS;
         $this->assertTrue($a instanceof Element);
         $this->assertEquals('a', $a->nodeName);
         $this->assertEquals('link: This is a link', trim($a->text));
-        $this->assertEquals('https://DUzun.Me/path', $a->attr('href'));
+        $this->assertEquals('https://DUzun.Me/path', $a->href);
+        $this->assertEquals('/path', $a->attr('href'));
         $this->assertEquals('div', $a->parent->nodeName);
         $this->assertEquals('test-div', $a->parent->attr('id'));
 
@@ -438,29 +454,48 @@ EOS;
     /**
      * @depends test_hQuery_Element_ArrayAccess
      */
-    public function test_attr($doc)
+    public function test_attr_and_prop($doc)
     {
+        // Note: there is no baseURI for $doc at this point.
         $e = $doc->find('#img1');
+        $a = $doc->find('a.aa:last');
 
         // It's magic!
         $this->assertEquals($e->src, $e->attr('src'));
         $this->assertEquals($e->src1, $e->attr('src1'));
         $this->assertEquals($e->src2, $e->attr('src2'));
+        $this->assertEquals($a->href, $a->attr('href'));
 
         // Standard way of accessing attributes:
         $this->assertEquals('/path/to/img.png', $e->attr('src'));
         $this->assertEquals('other/img/here.jpg', $e->attr('src2'));
         $this->assertEquals('//example.com/full/path.gif', $e->attr('src3'));
+        $this->assertEquals('#test', $a->attr('href'));
+
+        // $doc was loaded from the file "data/attr.html" and has no baseURI associated.
+        // Set the baseURI from document location, so that .href and .src props
+        // would be resolved.
+        $doc->location(self::$baseUrl);
+
+        // Properties are evaluated semantically:
+        $this->assertEquals(self::$baseUrl . 'path/to/img.png', $e->src);
+        $this->assertEquals('other/img/here.jpg', $e->src2); // .src2 ain't special
+
+        $this->assertEquals(self::$baseUrl . '#test', $a->href);
+        $this->assertEquals('#test', $a->attr('href'));
+
 
         // Relative vs Absolute URL paths
 
         // a[href] relative URL
         $a = self::$inst->find('a:first');
         $this->assertEquals(self::$baseUrl . 'path', $a->href);
+        $this->assertEquals('/path', $a->attr('href'));
 
         // a[href] absolute URL
         $a = self::$inst->find('a#outerLink');
         $this->assertEquals('https://not-my-site.com/next.html', $a->href);
+        $this->assertEquals('//not-my-site.com/next.html', $a->attr('href'));
 
         // $a->style is the parsed $a->attr('style'):
         $this->assertNotEmpty($a->style);
@@ -474,10 +509,12 @@ EOS;
         // img[src] absolute URL
         $a = self::$inst->find('img#outerImg');
         $this->assertEquals('https://cdn.duzun.me/images/logo.png', $a->src);
+        $this->assertEquals('//cdn.duzun.me/images/logo.png', $a->attr('src'));
 
         // link[href] relative URL
         $a = self::$inst->find('link', array('rel' => 'shortcut icon'));
         $this->assertEquals(self::$baseUrl . 'favicon.ico', $a->href);
+        $this->assertEquals('/favicon.ico', $a->attr('href'));
 
         // meta[content] - not a URL
         $m = self::$inst->find('meta', array('property' => 'og:image'));
@@ -493,7 +530,7 @@ EOS;
 
     // -----------------------------------------------------
     /**
-     * @depends test_attr
+     * @depends test_attr_and_prop
      */
     public function test_prop_charset($doc)
     {
@@ -515,20 +552,61 @@ EOS;
     {
         $baseURL = self::$inst->baseURL;
         $this->assertEquals(self::$baseUrl, $baseURL);
+
+        $doc = hQueryTestSurrogate::fromHTML(self::$baseTag1, self::$baseUrl . 'index.html');
+        $baseURL = $doc->baseURL;
+        $this->assertEquals(self::$baseUrl . 'base/', $baseURL);
+
+        $a = $doc->find('a#rel_path');
+        $this->assertEquals('rel-path/index.html', $a->attr('href'));
+        $this->assertEquals(self::$baseUrl . 'base/rel-path/index.html', $a->href);
+
+        $a = $doc->find('a#rel_origin');
+        $this->assertEquals('/abs-path/index.html', $a->attr('href'));
+        $this->assertEquals(self::$baseUrl . 'abs-path/index.html', $a->href);
+
+        $a = $doc->find('a#rel_schema');
+        $this->assertEquals('//not-my-site.com/next.html', $a->attr('href'));
+        $this->assertEquals('https://not-my-site.com/next.html', $a->href);
+
+        $img = $doc->find('img#rel_img');
+        $this->assertEquals('/images/logo.png', $img->attr('src'));
+        $this->assertEquals(self::$baseUrl . 'images/logo.png', $img->src);
+
+        return $doc;
     }
 
     // -----------------------------------------------------
-    public function test_prop_baseURI()
+    /**
+     * Either the <base href=...> or the location()
+     *
+     * @depends test_prop_baseURL
+     */
+    public function test_prop_baseURI($doc)
     {
         $baseURI = self::$inst->baseURI;
         $this->assertEquals(self::$baseUrl . 'index.html', $baseURI);
+
+        $baseURI = $doc->baseURI;
+        $this->assertEquals(self::$baseUrl . 'base/path.html?how=rewrite#hash', $baseURI);
+
+        return $doc;
     }
 
     // -----------------------------------------------------
-    // Alias of baseURI
-    public function test_prop_href()
+    /**
+     * URI at which the doc was accessed/loaded.
+     *
+     * @depends test_prop_baseURI
+     */
+    public function test_prop_href($doc)
     {
         $href = self::$inst->href;
+        $location = self::$inst->location();
+        $this->assertEquals($location, $href);
+        $this->assertEquals(self::$baseUrl . 'index.html', $href);
+
+        $href = $doc->href;
         $this->assertEquals(self::$baseUrl . 'index.html', $href);
     }
 

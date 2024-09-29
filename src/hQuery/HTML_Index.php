@@ -546,7 +546,8 @@ abstract class HTML_Index extends Node
             $lev[$b] = count($st);
         }
         foreach ($nm as $b => &$n) {
-            $n = str_repeat(' -', $lev[$b]) . ' < ' . $n . ' ' . $this->get_attr_byId($b, null, true) . ' >';
+            $n = str_repeat(' -', $lev[$b]) .
+                ' < ' . $n . ' ' . $this->get_attr_byId($b, null, true, false) . ' >';
         }
         $nm           = implode("\n", $nm);
         $inf['struc'] = $nm;
@@ -745,7 +746,7 @@ abstract class HTML_Index extends Node
         // Read <base href="..." /> tag
         if (!empty($this->tag_idx['base'])) {
             foreach ($this->tag_idx['base'] as $b => $e) {
-                if ($a = $this->get_attr_byId($b, 'href', false)) {
+                if ($a = $this->get_attr_byId($b, 'href', false, false)) {
                     $this->baseURI($a);
                     break;
                 }
