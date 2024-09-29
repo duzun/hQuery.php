@@ -282,6 +282,7 @@
 
             <p>
                 <button type="submit" name="go" value="elements" <?=$go=='elements'?'aria-pressed="true"':''?> class="btn btn-success">Fetch elements</button>
+                <button type="submit" name="go" value="elements_props" <?= $go == 'elements_props' ? 'aria-pressed="true"' : '' ?> class="btn btn-success">Fetch elements props</button>
                 <button type="submit" name="go" value="meta" <?=$go=='meta'?'aria-pressed="true"':''?> class="btn btn-success">Fetch meta</button>
                 <button type="submit" name="go" value="source" <?=$go=='source'?'aria-pressed="true"':''?> class="btn btn-success">Fetch source</button>
             </p>
@@ -297,21 +298,34 @@
 
     <section class="result">
         <?php switch ($go) {
+            case 'elements_props':
             case 'elements': if( !empty($elements) ):?>
                 <table style="width: 100%">
                     <thead><tr>
                         <th>Pos.</th>
                         <th>HTML</th>
-                        <th>View</th>
+                        <?php if ($go == 'elements_props'): ?>
+                            <th width="60%">Props</th>
+                        <?php else: ?>
+                            <th>View</th>
+                        <?php endif; ?>
                     </tr></thead>
                     <tbody>
-            <?php foreach($elements as $pos => $el): ?>
-                        <tr>
-                            <td><i class="col-xs-1"><?=$pos;?></i></td>
-                            <td><pre style="word-break:break-word;"><?=htmlspecialchars($el->outerHtml(), ENT_QUOTES);?></pre></td>
-                            <td><?=$el->outerHtml();?></td>
-                        </tr>
-            <?php endforeach;?>
+                        <?php foreach ($elements as $pos => $el): ?>
+                            <tr>
+                                <td><i class="col-xs-1"><?= $pos; ?></i></td>
+                                <td>
+                                    <pre style="word-break:break-word;"><?= htmlspecialchars($el->outerHtml(), ENT_QUOTES); ?></pre>
+                                </td>
+                                <td>
+                                    <?php if ($go == 'elements_props'): ?>
+                                        <pre><?= htmlspecialchars(json_encode($el->attr(null, true), JSON_PRETTY_PRINT)) ?></pre>
+                                    <?php else: ?>
+                                        <?= $el->outerHtml(null, true); ?>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             <?php

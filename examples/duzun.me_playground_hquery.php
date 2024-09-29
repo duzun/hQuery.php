@@ -86,8 +86,8 @@
                 if ( $elements ) foreach($elements as $pos => $el) {
                     $els[] = array(
                         'nodeName'  => $el->nodeName,
-                        'attr'      => $el->attr(),
-                        'outerHtml' => $el->outerHtml(),
+                        'attr'      => $el->attr(null, true),
+                        'outerHtml' => $el->outerHtml(null, true),
                         'pos'       => $pos,
                     );
                 }

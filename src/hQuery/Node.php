@@ -280,7 +280,7 @@ abstract class Node implements \Iterator, \Countable
     /**
      * @return string .outerHtml
      */
-    public function outerHtml($id = null)
+    public function outerHtml($id = null, $eval_attr=false)
     {
         $dm = $this->isDoc() && !isset($id);
         if ($dm) {
@@ -296,7 +296,7 @@ abstract class Node implements \Iterator, \Countable
         $ret = self::$_nl_;
         $map = isset($this->tag_map) ? $this->tag_map : (isset($doc->tag_map) ? $doc->tag_map : null);
         foreach ($id as $p => $q) {
-            $a = $doc->get_attr_byId($p, null, true, true);
+            $a = $doc->get_attr_byId($p, null, true, !$eval_attr);
             $n = $doc->tags[$p];
             if ($map && isset($map[$_n = strtolower($n)])) {
                 $n = $map[$_n];
