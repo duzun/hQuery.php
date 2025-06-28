@@ -46,7 +46,7 @@ class HTML extends Parser
      */
     public function parse()
     {
-        // Index comments first, so than we can safely ignore them
+        // Index comments first, so that we can safely ignore them
         $this->_index_comments();
 
         $firstLetterChars = self::$nameStartRange;  // first letter chars
@@ -62,6 +62,20 @@ class HTML extends Parser
 
         $stack = $tags = $ids = $attr = array();
 
+        // Process edge case.
+        if(!$this->isEOF()) {
+            $c = $html[$l-1];
+            // remove last '<' if it is not a tag
+            if ($c == '<') {
+                $l--;
+            }
+            // remove last '</' if it is not a tag
+            elseif ($c == '/' && $l > 1 && $html[$l - 2] == '<') {
+                $l -= 2;
+            }
+        }
+
+        // Find all tags.
         while ($i < $l) {
             $i = strpos($html, '<', $i);
             if (false === $i) {

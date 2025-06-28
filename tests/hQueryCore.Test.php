@@ -125,7 +125,8 @@ EOS;
 
     public static $badHTML1 = '<iframe><meta http-equiv="refresh" content="1;/>';
 
-    public static $badHTML2 = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=uft-8" /></head><body><a>A</a></body></html>';
+    public static $badHTML2 = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=uft-8" /></head><body><a>A</a></body></html>'
+                            . '<';
 
     public static $baseTag1 = '<!doctype html>
 <html>
@@ -241,15 +242,16 @@ EOS;
         // Bad HTML
         $badDoc = hQueryTestSurrogate::fromHTML(self::$badHTML1);
         $this->assertInstanceOf(get_class($doc), $badDoc);
+        $this->assertEquals(2, count($badDoc));
 
         // Bad HTML charset
         $badDoc = hQueryTestSurrogate::fromHTML(self::$badHTML2, $url, ['content-type' => 'text/html; charset=ascii']);
         $this->assertInstanceOf(get_class($doc), $badDoc);
         $this->assertEquals('UFT-8', $badDoc->charset);
         $this->assertNotEmpty($badDoc->html_errors['convert_encoding']);
+        $this->assertEquals(5, count($badDoc));
         $a = $badDoc->find('a');
         $this->assertEquals('A', $a->text);
-
     }
 
     // -----------------------------------------------------
