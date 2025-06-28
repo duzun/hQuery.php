@@ -4,7 +4,7 @@ use duzun\hQuery;
 use duzun\hQuery\Element;
 use Http\Discovery\MessageFactoryDiscovery;
 use Http\Mock\Client;
-
+use PHPUnit\Framework\Attributes\Depends;
 // -----------------------------------------------------
 /**
  *  @TODO: Test all methods
@@ -433,6 +433,7 @@ EOS;
     /**
      * @depends test_find
      */
+     #[Depends('test_find')]
     public function test_hQuery_Element_ArrayAccess($doc)
     {
         $e = $doc->find('input');
@@ -454,6 +455,7 @@ EOS;
     /**
      * @depends test_hQuery_Element_ArrayAccess
      */
+     #[Depends('test_hQuery_Element_ArrayAccess')]
     public function test_attr_and_prop($doc)
     {
         // Note: there is no baseURI for $doc at this point.
@@ -532,6 +534,7 @@ EOS;
     /**
      * @depends test_attr_and_prop
      */
+     #[Depends('test_attr_and_prop')]
     public function test_prop_charset($doc)
     {
         $this->assertEquals('utf-8', strtolower($doc->charset));
@@ -582,6 +585,7 @@ EOS;
      *
      * @depends test_prop_baseURL
      */
+     #[Depends('test_prop_baseURL')]
     public function test_prop_baseURI($doc)
     {
         $baseURI = self::$inst->baseURI;
@@ -599,6 +603,7 @@ EOS;
      *
      * @depends test_prop_baseURI
      */
+     #[Depends('test_prop_baseURI')]
     public function test_prop_href($doc)
     {
         $href = self::$inst->href;
@@ -776,6 +781,7 @@ EOS;
     /**
      * @depends test_unjsonize
      */
+     #[Depends('test_unjsonize')]
     public function test_jsonize($vars)
     {
         list($o, $ser, $json) = $vars;

@@ -1,6 +1,7 @@
 <?php
 use duzun\hQuery;
 use Symfony\Component\DomCrawler\Crawler;
+use PHPUnit\Framework\Attributes\Depends;
 
 // -----------------------------------------------------
 /**
@@ -96,6 +97,7 @@ class DOMCrawlerStress extends PHPUnit_BaseClass
     /**
      * @depends test_construct_and_index
      */
+     #[Depends('test_construct_and_index')]
     public function test_find($ctx)
     {
         list($hdoc, $cdoc) = $ctx;
@@ -221,6 +223,7 @@ class DOMCrawlerStress extends PHPUnit_BaseClass
     // /**
     //  * @depends test_find
     //  */
+    // #[Depends('test_find')]
     // public function test_body_find($ctx)
     // {
     //     list($hdoc, $cdoc) = $ctx;

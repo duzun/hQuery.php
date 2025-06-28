@@ -534,13 +534,17 @@ abstract class HTML_Index extends Node
         $l   = 0;
         foreach ($this->ids as $b => $e) {
             if ($pb < $b && $b < $pe) {
-                $st[]          = array($pb, $pe);
-                list($pb, $pe) = array($b, $e);
+                $st[] = array($pb, $pe);
             } else {
                 while ($pe < $b && $st) {
                     list($pb, $pe) = array_pop($st);
+                    if ($pb < $b && $b < $pe) {
+                        $st[] = array($pb, $pe);
+                        break;
+                    }
                 }
             }
+            list($pb, $pe) = array($b, $e);
 
             $nm[$b]  = $this->tags[$b];
             $lev[$b] = count($st);
@@ -552,6 +556,11 @@ abstract class HTML_Index extends Node
         $nm           = implode("\n", $nm);
         $inf['struc'] = $nm;
         unset($lev, $st, $nm);
+        foreach($inf as $k => $v) {
+            if (is_array($v) && count($v) == 0) {
+                unset($inf[$k]);
+            }
+        }
         return $inf;
     }
 
