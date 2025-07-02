@@ -69,7 +69,7 @@ class hQueryStress extends PHPUnit_BaseClass
         $mem  = self::memer($mmr);
         $exe  = self::timer($tmr);
         $time = version_compare(PHP_VERSION, '5.5.0') >= 0 ? 6e6 : 30e6; // travis runs PHP 5.4 slower for some reason
-        $this->assertLessThan($time, self::timer($tmr, false), 'should index 3Mb in less then ' . ($time / 1e6) . ' sec');
+        assertLessThan($time, self::timer($tmr, false), 'should index 3Mb in less then ' . ($time / 1e6) . ' sec');
         $count = self::fmtNumber(self::listSumCounts($tags));
         self::log("    hQuery->index( {$count} tags )\tin\t{$exe}\t{$mem} RAM");
 
@@ -143,7 +143,7 @@ class hQueryStress extends PHPUnit_BaseClass
             $a    = $doc->find($sel);
             $amem = self::memer($mmr, false);
             $aexe = self::timer($tmr, false);
-            $this->assertNotNull($a, $sel);
+            assertNotNull($a, $sel);
 
             $b    = null; // Free mem, call __destruct()
             $tmr  = self::timer();
@@ -151,9 +151,9 @@ class hQueryStress extends PHPUnit_BaseClass
             $b    = $body->find($sel);
             $bmem = self::memer($mmr, false);
             $bexe = self::timer($tmr, false);
-            $this->assertNotNull($b, $sel);
+            assertNotNull($b, $sel);
 
-            $this->assertEquals(count($a), count($b), $sel);
+            assertEquals(count($a), count($b), $sel);
 
             $total[0] += count($a);
             $total[1] += $aexe;
@@ -219,7 +219,7 @@ class hQueryStress extends PHPUnit_BaseClass
         $mem  = self::memer($mmr);
         $exe  = self::timer($tmr);
         $time = version_compare(PHP_VERSION, '5.5.0') >= 0 ? 5e6 : 25e6; // travis runs PHP 5.4 slower for some reason
-        $this->assertLessThan($time, self::timer($tmr, false), 'should index 3Mb in less then ' . ($time / 1e6) . ' sec');
+        assertLessThan($time, self::timer($tmr, false), 'should index 3Mb in less then ' . ($time / 1e6) . ' sec');
         $count = self::fmtNumber(self::listSumCounts($tags));
         self::log("    hQuery->index( {$count} tags )\tin\t{$exe}\t{$mem} RAM");
 
@@ -232,7 +232,7 @@ class hQueryStress extends PHPUnit_BaseClass
 
         // self::log('Tag counts:', $counts);
 
-        $this->assertGreaterThan(10000, array_sum(array_map('count', $tags)));
+        assertGreaterThan(10000, array_sum(array_map('count', $tags)));
 
         return array($doc);
     }

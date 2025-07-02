@@ -23,6 +23,8 @@ class HTMLParserTestSurrogate extends HTMLParser
     /**
      * @param $str
      * @param $p
+     * @param $l
+     * @return int
      */
     public static function _findTagClose($str, $p, $l=null)
     {
@@ -35,7 +37,7 @@ class hQueryParser extends PHPUnit_BaseClass
 {
     // -----------------------------------------------------
     /**
-     * @var hQueryTestSurrogate
+     * @var ParserTestSurrogate
      */
     public static $inst;
 
@@ -97,7 +99,7 @@ class hQueryParser extends PHPUnit_BaseClass
         self::log('n1: ' . $n1 . ' in ' . $e1 . ' at ' . $i1);
         self::log('n2: ' . $n2 . ' in ' . $e2 . ' at ' . $i2);
 
-        $this->assertEquals($n1, $n2);
+        assertEquals($n1, $n2);
         // }}}
         return;
 
@@ -122,7 +124,7 @@ class hQueryParser extends PHPUnit_BaseClass
         self::log('n1', $n1 . ' in ' . $e1);
         self::log('n2', $n2 . ' in ' . $e2);
 
-        $this->assertEquals($n1, $n2);
+        assertEquals($n1, $n2);
         // }}}
         return;
     }
@@ -132,25 +134,25 @@ class hQueryParser extends PHPUnit_BaseClass
     {
         $p = self::$inst;
         $a = SelectorParser::exec($p->s);
-        $this->assertEquals('tn1', $a[0][0]['n']);
-        $this->assertEquals('id1', $a[0][0]['i']);
-        $this->assertEquals(array('attr' => '[x]'), $a[0][0]['a']);
-        $this->assertTrue(empty($a[0][1]['a']));
+        assertEquals('tn1', $a[0][0]['n']);
+        assertEquals('id1', $a[0][0]['i']);
+        assertEquals(array('attr' => '[x]'), $a[0][0]['a']);
+        assertTrue(empty($a[0][1]['a']));
 
-        $this->assertEquals('tn3', $a[1][0]['n']);
-        $this->assertEquals(array('cl3'), $a[1][0]['c']);
+        assertEquals('tn3', $a[1][0]['n']);
+        assertEquals(array('cl3'), $a[1][0]['c']);
 
-        $this->assertEquals('tn4', $a[1][1]['n']);
-        $this->assertEquals('id2', $a[1][1]['i']);
-        $this->assertNotEmpty($a[1][1]['p']);
+        assertEquals('tn4', $a[1][1]['n']);
+        assertEquals('id2', $a[1][1]['i']);
+        assertNotEmpty($a[1][1]['p']);
 
-        $this->assertEquals('tn5', $a[1][2]['n']);
-        $this->assertEquals('>', $a[1][2]['x']);
-        $this->assertNotEmpty($a[1][2]['p']);
+        assertEquals('tn5', $a[1][2]['n']);
+        assertEquals('>', $a[1][2]['x']);
+        assertNotEmpty($a[1][2]['p']);
 
-        $this->assertEquals('tn6', $a[1][3]['n']);
-        // $this->assertNotEmpty($a[1][3]['p']);
-        $this->assertEquals(array(array('<' => 3)), $a[1][3]['p']);
+        assertEquals('tn6', $a[1][3]['n']);
+        // assertNotEmpty($a[1][3]['p']);
+        assertEquals(array(array('<' => 3)), $a[1][3]['p']);
     }
 
     // -----------------------------------------------------
@@ -168,13 +170,13 @@ class hQueryParser extends PHPUnit_BaseClass
                ";
 
         $r = HTMLParserTestSurrogate::_findTagClose($str1, 1);
-        $this->assertEquals(66, $r);
+        assertEquals(66, $r);
 
         $r = HTMLParserTestSurrogate::_findTagClose($str2, 1);
-        $this->assertEquals(66, $r);
+        assertEquals(66, $r);
 
         $r = HTMLParserTestSurrogate::_findTagClose($str3, 1);
-        $this->assertEquals(66, $r);
+        assertEquals(66, $r);
     }
 
     // -----------------------------------------------------
@@ -185,7 +187,7 @@ class hQueryParser extends PHPUnit_BaseClass
         $p->skipWhitespace();
 
         $n = $p->readTo('#');
-        $this->assertEquals('tn3.cl3 tn4', $n);
+        assertEquals('tn3.cl3 tn4', $n);
 
     }
 
@@ -196,14 +198,14 @@ class hQueryParser extends PHPUnit_BaseClass
 
         $p->i = $i = strpos($p->s, ':last-child') + 1;
         $n1   = $p->readName();
-        $this->assertEquals($n1, 'last-child');
-        $this->assertEquals($i + 10, $p->i);
+        assertEquals($n1, 'last-child');
+        assertEquals($i + 10, $p->i);
 
         $p->i = $i;
         $n2   = $p->readWhile($p::$nameRange);
-        $this->assertEquals($i + 10, $p->i);
+        assertEquals($i + 10, $p->i);
 
-        $this->assertEquals($n1, $n2, 'last-child');
+        assertEquals($n1, $n2, 'last-child');
     }
 
     // -----------------------------------------------------

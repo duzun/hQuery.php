@@ -33,7 +33,7 @@ class DOMCrawlerStress extends PHPUnit_BaseClass
         $mem  = self::memer($mmr);
         $exe  = self::timer($tmr);
         $time = version_compare(PHP_VERSION, '5.5.0') >= 0 ? 6e6 : 30e6; // travis runs PHP 5.4 slower for some reason
-        $this->assertLessThan($time, self::timer($tmr, false), 'should index 3Mb in less then ' . ($time / 1e6) . ' sec');
+        assertLessThan($time, self::timer($tmr, false), 'should index 3Mb in less then ' . ($time / 1e6) . ' sec');
         $count = self::fmtNumber(self::listSumCounts($tags));
         self::log("    hQuery->index( {$count} tags )\tin\t{$exe}\t{$mem} RAM");
 
@@ -153,7 +153,7 @@ class DOMCrawlerStress extends PHPUnit_BaseClass
             $a    = $hdoc->find($sel);
             $amem = self::memer($mmr, false);
             $aexe = self::timer($tmr, false);
-            $this->assertNotNull($a);
+            assertNotNull($a);
 
             // DOMCrawler:
 
@@ -166,8 +166,8 @@ class DOMCrawlerStress extends PHPUnit_BaseClass
             $bexe = self::timer($tmr, false);
 
             // Compare:
-            // $this->assertGreaterThan($aexe, $bexe, $sel);
-            $this->assertEquals(count($a), count($b), $sel);
+            // assertGreaterThan($aexe, $bexe, $sel);
+            assertEquals(count($a), count($b), $sel);
 
             $total[0] += count($a);
             $total[1] += $aexe;
@@ -215,7 +215,7 @@ class DOMCrawlerStress extends PHPUnit_BaseClass
 
         echo PHP_EOL;
 
-        $this->assertGreaterThan($total[1] * 5, $total[2], 'hQuery should be at least x10 faster than DOMCrawler');
+        assertGreaterThan($total[1] * 5, $total[2], 'hQuery should be at least x10 faster than DOMCrawler');
 
         return $ctx;
     }

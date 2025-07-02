@@ -17,6 +17,7 @@ if (!class_exists('PHPUnit_Runner_Version')) {
 // if ( PHP_IS_NEW ) {
 require_once ROOT_DIR . 'autoload.php';
 require_once ROOT_DIR . 'vendor/autoload.php';
+require_once PHPUNIT_DIR . 'assert.php';
 // }
 // else {
 //     require_once ROOT_DIR . 'hquery.php';
@@ -156,26 +157,6 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
         self::$className = get_class($this);
 
         // parent::mySetUp();
-    }
-
-    // -----------------------------------------------------
-    /**
-     * Asserts that a method exists.
-     *
-     * @param  string                                   $methodName
-     * @param  string|object                            $className
-     * @throws PHPUnit_Framework_AssertionFailedError
-     */
-    public static function assertMehodExists($methodName, $className, $message = '')
-    {
-        self::assertThat(method_exists($className, $methodName), self::isTrue(), $message);
-    }
-
-    // Alias to $this->assertMehodExists()
-    public function assertClassHasMethod()
-    {
-        $args = func_get_args();
-        return call_user_func_array(array($this, 'assertMehodExists'), $args);
     }
 
     // -----------------------------------------------------
