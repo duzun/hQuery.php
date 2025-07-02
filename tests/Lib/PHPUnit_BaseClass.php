@@ -1,38 +1,15 @@
 <?php
+namespace Tests\Lib;
+
 use duzun\hQuery;
 
 // -----------------------------------------------------
 /**
- *  @author Dumitru Uzun (DUzun.Me)
+ * Base test-case class for PHPUnit tests.
+ * It abstracts old and new PHPUnit versions.
+ *
+ * @author Dumitru Uzun (DUzun.Me)
  */
-// -----------------------------------------------------
-define('PHPUNIT_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR);
-define('ROOT_DIR', strtr(dirname(PHPUNIT_DIR), '\\', '/') . '/');
-if (!class_exists('PHPUnit_Runner_Version')) {
-    class_alias('PHPUnit\Runner\Version', 'PHPUnit_Runner_Version');
-}
-
-// define('PHP_IS_NEW', version_compare(PHP_VERSION, '5.3.0') >= 0);
-// -----------------------------------------------------
-// if ( PHP_IS_NEW ) {
-require_once ROOT_DIR . 'autoload.php';
-require_once ROOT_DIR . 'vendor/autoload.php';
-require_once PHPUNIT_DIR . 'assert.php';
-// }
-// else {
-//     require_once ROOT_DIR . 'hquery.php';
-// }
-// -----------------------------------------------------
-
-// We have to make some adjustments for PHPUnit_BaseClass to work with
-// PHPUnit 8.0 and still keep backward compatibility
-if (version_compare(PHPUnit_Runner_Version::id(), '8.0.0') >= 0) {
-    require_once PHPUNIT_DIR . '_PU8_AdapterCase.php';
-} else {
-    require_once PHPUNIT_DIR . '_PU7_AdapterCase.php';
-}
-
-// -----------------------------------------------------
 // -----------------------------------------------------
 /**
  * @backupGlobals disabled
@@ -252,7 +229,7 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
      */
     public static function file_exists($fn)
     {
-        $ffn = PHPUNIT_DIR . $fn;
+        $ffn = TESTS_DIR . $fn;
         if (!file_exists($ffn)) {
             $zfn = $ffn . '.gz';
             if (!file_exists($zfn)) {
@@ -388,5 +365,5 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
 }
 // -----------------------------------------------------
 // Delete the temp test user after all tests have fired
-register_shutdown_function('PHPUnit_BaseClass::deleteTestData');
+register_shutdown_function([PHPUnit_BaseClass::class, 'deleteTestData']);
 // -----------------------------------------------------

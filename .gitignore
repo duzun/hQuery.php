@@ -28,6 +28,7 @@ tests/data/*
 
 *.log
 phpunit*.phar
+.phpunit.result.cache
 
 *.url
 

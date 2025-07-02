@@ -1,6 +1,9 @@
 <?php
+namespace Tests\Lib;
 
-abstract class PU_AdapterCase extends PHPUnit\Framework\TestCase
+use PHPUnit\Framework\TestCase;
+
+abstract class PU_AdapterCase extends TestCase
 {
     // Before any test
     public static function setUpBeforeClass(): void

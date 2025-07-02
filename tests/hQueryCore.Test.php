@@ -1,20 +1,23 @@
 <?php
+namespace Tests;
 
 use duzun\hQuery;
 use duzun\hQuery\Element;
 use Http\Discovery\MessageFactoryDiscovery;
 use Http\Mock\Client;
 use PHPUnit\Framework\Attributes\Depends;
+use Tests\Lib\PHPUnit_BaseClass;
+
 // -----------------------------------------------------
 /**
  *  @TODO: Test all methods
  *  @author DUzun.Me
  */
 // -----------------------------------------------------
-require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 // -----------------------------------------------------
-// class_alias(hQuery::class, 'hQueryTestSurrogate');
+// class_alias(hQuery::class, 'Tests\Lib\hQueryTestSurrogate');
 
 // Surrogate class for testing, to access protected attributes of hQuery
 class hQueryTestSurrogate extends hQuery
@@ -145,7 +148,7 @@ EOS;
     // Before any test
     public static function mySetUpBeforeClass()
     {
-        hQuery::$_mockup_class = 'hQueryTestSurrogate';
+        hQuery::$_mockup_class = hQueryTestSurrogate::class;
 
         self::$inst = hQueryTestSurrogate::fromHTML(self::$bodyHTML, self::$baseUrl . 'index.html');
 
@@ -167,7 +170,7 @@ EOS;
         assertMehodExists('fromFile', self::$className);
         assertMehodExists('fromURL', self::$className);
 
-        // $f = glob(PHPUNIT_DIR . 'data/*');
+        // $f = glob(TESTS_DIR . 'data/*');
         // foreach($f as $k => $v) if(is_file($v) && substr($v, -3) != '.gz') {
         // $g = gzencode(file_get_contents($v), 9);
         // file_put_contents($v.'.gz', $g);

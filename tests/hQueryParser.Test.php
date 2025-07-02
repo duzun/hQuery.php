@@ -1,7 +1,10 @@
 <?php
+namespace Tests;
+
 use duzun\hQuery\Parser;
 use duzun\hQuery\Parser\Selector as SelectorParser;
 use duzun\hQuery\Parser\HTML as HTMLParser;
+use Tests\Lib\PHPUnit_BaseClass;
 
 // -----------------------------------------------------
 /**
@@ -9,7 +12,7 @@ use duzun\hQuery\Parser\HTML as HTMLParser;
  *  @author DUzun.Me
  */
 // -----------------------------------------------------
-require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
 
 // -----------------------------------------------------
 // Extend an abstract class for testing it

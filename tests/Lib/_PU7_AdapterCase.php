@@ -1,9 +1,7 @@
 <?php
-if (!class_exists('PHPUnit_Framework_TestCase')) {
-    class_alias('PHPUnit\Framework\TestCase', 'PHPUnit_Framework_TestCase');
-}
+namespace Tests\Lib;
 
-abstract class PU_AdapterCase extends PHPUnit_Framework_TestCase
+abstract class PU_AdapterCase extends \PHPUnit_Framework_TestCase
 {
     // Before any test
     public static function setUpBeforeClass()

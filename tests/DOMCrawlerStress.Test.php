@@ -1,7 +1,10 @@
 <?php
+namespace Tests;
+
 use duzun\hQuery;
 use Symfony\Component\DomCrawler\Crawler;
 use PHPUnit\Framework\Attributes\Depends;
+use Tests\Lib\PHPUnit_BaseClass;
 
 // -----------------------------------------------------
 /**
@@ -10,7 +13,7 @@ use PHPUnit\Framework\Attributes\Depends;
  *  @author DUzun.Me
  */
 // -----------------------------------------------------
-require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '_PHPUnit_BaseClass.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'bootstrap.php';
 // -----------------------------------------------------
 
 class DOMCrawlerStress extends PHPUnit_BaseClass
