@@ -573,7 +573,7 @@ class hQuery extends hQuery\HTML_Index
                     $data = json_decode($str, true);
                     // Check for errors only if $data is NULL
                     if (is_null($data)) {
-                        // If can't decode JSON, try to remove trailing commans in arrays and objects:
+                        // If can't decode JSON, try to remove trailing commas in arrays and objects:
                         if (0 == $_json_support ? 'null' !== $str : json_last_error() != JSON_ERROR_NONE) {
                             $t    = preg_replace('/,\s*([\]\}])/m', '$1', $str) and
                                 $data = json_decode($t, true);
@@ -966,7 +966,7 @@ class hQuery extends hQuery\HTML_Index
      * @param  array  $head      - list off HTTP headers to be sent along with the request to $host
      * @param  mixed  $body      - data to be sent as the contents of the request. If is array or object, a http query is built.
      * @param  array  $options   - list of option as key-value:
-     * @return array  [contents, headers, http-status-code, http-status-message]
+     * @return \stdClass  {code, msg, headers, body, url, options, host, port, path, request}
      */
     public static function http_wr($host, $head = null, $body = null, $options = null)
     {
