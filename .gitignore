@@ -18,6 +18,7 @@ npm-debug.log
 
 ## Commposer
 vendor/
+tmp/
 
 ## Test data should be archived
 tests/data/*
