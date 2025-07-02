@@ -51,6 +51,8 @@ class HTML extends Parser
 
         $firstLetterChars = self::$nameStartRange;  // first letter chars
         $tagLettersChars  = self::$nameRange . ':'; // tag name chars
+        $tagLettersArr    = self::arr_range('\-\0-9:a-z_' . chr(128) . '-' . chr(255));
+        // var_export($tagLettersArr);
 
         $specialTags  = array('!' => 1, '?' => 2); // special tags
         $unparsedTags = array_flip(self::$_unparsedTags);
@@ -97,6 +99,8 @@ class HTML extends Parser
             if (false !== strpos($firstLetterChars, $c)) {
                 ++$i; // possibly second letter of tagName
                 $j = strspn($html, $tagLettersChars, $i, $l-$i);
+                // $j = self::arrspn($html, $tagLettersArr, $i, $l);
+                // $j = self::tagnamespn($html, $i, $l);
                 $n = substr($html, $i - 1, $j + 1);
                 $i += $j;
                 if ($utn) {
@@ -119,6 +123,9 @@ class HTML extends Parser
                     $tags[$e] = $n;
                     $b += $j + 1;
                     $b += strspn($html, " \n\r\t", $b, $e - $b);
+                    // $b += self::arrspn($html, self::$spaceRangeArr, $b);
+                    // $b += self::spacespn($html, $b, $l);
+                    // $b += self::wsspn($html, $b, $l);
                     if ($b < $e) {
                         $at = trim(substr($html, $b, $e - $b));
                         if ($at) {
