@@ -125,8 +125,7 @@ EOS;
 
     public static $badHTML1 = '<iframe><meta http-equiv="refresh" content="1;/>';
 
-    public static $badHTML2 = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=uft-8" /></head><body><a>A</a></body></html>'
-                            . '<';
+    public static $badHTML2 = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=uft-8" /></head><body><a>A</a></body></html><';
 
     public static $baseTag1 = '<!doctype html>
 <html>

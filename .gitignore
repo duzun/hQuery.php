@@ -22,6 +22,7 @@ vendor/
 ## Test data should be archived
 tests/data/*
 !tests/data/*.gz
+!tests/data/*.sh
 
 ## Other
 

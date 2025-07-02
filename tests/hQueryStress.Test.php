@@ -1,5 +1,4 @@
 <?php
-use duzun\hQuery;
 use PHPUnit\Framework\Attributes\Depends;
 
 // -----------------------------------------------------
@@ -77,7 +76,7 @@ class hQueryStress extends PHPUnit_BaseClass
         self::log("   Original Charset: {$doc->charset}");
 
         // $tags   = array_map('count', $tags);
-        // $counts = null;
+        // $counts = [];
         // foreach ($tags as $k => $v) {
         //     $counts[$v] = (empty($counts[$v]) ? '' : $counts[$v] . ', ') . $k;
         // }
@@ -205,6 +204,38 @@ class hQueryStress extends PHPUnit_BaseClass
         return $return;
     }
 
+    /**
+     * Test a file with a lot of tags.
+     */
+    public function test_big_synthetic()
+    {
+        ini_set('memory_limit', '148M');
+
+        list($doc) = self::load_doc_from_file('data/big_synthetic.html');
+
+        $tmr  = self::timer();
+        $mmr  = self::memer();
+        $tags = $doc->index();
+        $mem  = self::memer($mmr);
+        $exe  = self::timer($tmr);
+        $time = version_compare(PHP_VERSION, '5.5.0') >= 0 ? 5e6 : 25e6; // travis runs PHP 5.4 slower for some reason
+        $this->assertLessThan($time, self::timer($tmr, false), 'should index 3Mb in less then ' . ($time / 1e6) . ' sec');
+        $count = self::fmtNumber(self::listSumCounts($tags));
+        self::log("    hQuery->index( {$count} tags )\tin\t{$exe}\t{$mem} RAM");
+
+        // $tags   = array_map('count', $tags);
+        // $counts = [];
+        // foreach ($tags as $k => $v) {
+        //     $counts[$v] = (empty($counts[$v]) ? '' : $counts[$v] . ', ') . $k;
+        // }
+        // krsort($counts);
+
+        // self::log('Tag counts:', $counts);
+
+        $this->assertGreaterThan(10000, array_sum(array_map('count', $tags)));
+
+        return array($doc);
+    }
     // -----------------------------------------------------
 
 }

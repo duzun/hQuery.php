@@ -15,7 +15,7 @@ use duzun\hQuery\Parser\HTML as HTMLParser;
 abstract class Node implements \Iterator, \Countable
 {
     // ------------------------------------------------------------------------
-    const VERSION = '3.3.1';
+    const VERSION = '3.4.0';
     // ------------------------------------------------------------------------
     /**
      * Response details of last request

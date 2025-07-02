@@ -96,7 +96,7 @@ class HTML extends Parser
             // regular tag
             if (false !== strpos($firstLetterChars, $c)) {
                 ++$i; // possibly second letter of tagName
-                $j = strspn($html, $tagLettersChars, $i);
+                $j = strspn($html, $tagLettersChars, $i, $l-$i);
                 $n = substr($html, $i - 1, $j + 1);
                 $i += $j;
                 if ($utn) {
@@ -118,7 +118,7 @@ class HTML extends Parser
                     $ids[$e]  = $e; // the end of tag attributes (>) and start of tag contents
                     $tags[$e] = $n;
                     $b += $j + 1;
-                    $b += strspn($html, " \n\r\t", $b);
+                    $b += strspn($html, " \n\r\t", $b, $e - $b);
                     if ($b < $e) {
                         $at = trim(substr($html, $b, $e - $b));
                         if ($at) {
@@ -230,7 +230,7 @@ class HTML extends Parser
         $l = strlen($str);
         while ($i = $p < $l ? strpos($str, '>', $p) : $l) {
             $e = $p; // save pos
-            $p += strcspn($str, '"\'', $p, $i);
+            $p += strcspn($str, '"\'', $p, $i - $p);
 
             // If closest quote is after '>', return pos of '>'
             if ($p >= $i) {
@@ -244,12 +244,12 @@ class HTML extends Parser
             ++$p;
 
             // is there a '=' before first quote?
-            $e += strcspn($str, '=', $e, $p);
+            $e += strcspn($str, '=', $e, $p - $e);
 
             // is this the attr_name (like in "attr_name"="attr_value") ?
             if ($e >= $p) {
                 // Attribute name should not have '>'
-                $p += strcspn($str, '>' . $q, $p, $l);
+                $p += strcspn($str, '>' . $q, $p, $l - $p);
                 // but if it has '>', it is the tag closing char
                 if ('>' == $str[$p]) {
                     return $p;
@@ -257,7 +257,7 @@ class HTML extends Parser
             }
             // else, its attr_value
             else {
-                $p += strcspn($str, $q, $p, $l);
+                $p += strcspn($str, $q, $p, $l - $p);
             }
 
             ++$p; // next char after the quote

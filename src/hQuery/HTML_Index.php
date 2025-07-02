@@ -302,7 +302,7 @@ abstract class HTML_Index extends Node
     public static function get_url_path($url)
     {
         $p = strpos($url, '//');
-        if (false === $p || $p && !preg_match('|^[a-z]+\:$|', substr($url, 0, $p))) {
+        if (false === $p || $p && !preg_match('|^[a-z]++\:$|', substr($url, 0, $p))) {
             return false;
         }
 
@@ -348,7 +348,7 @@ abstract class HTML_Index extends Node
      */
     public static function is_url_path($path)
     {
-        return preg_match('/^[a-zA-Z]+\:\/\//', $path);
+        return preg_match('/^[a-zA-Z]++\:\/\//', $path);
     }
 
     /**

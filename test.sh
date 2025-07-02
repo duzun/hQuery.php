@@ -247,6 +247,8 @@ main() {
     all)
         shift
         echo Running tests for all supported PHP versions &&
+            main 8.4 "$@" &&
+            main 8.3 "$@" &&
             main 8.2 "$@" &&
             main 8.1 "$@" &&
             main 7.4 "$@" &&

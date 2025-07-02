@@ -83,7 +83,7 @@ abstract class Parser
         self::$nameStartRange = self::str_range('a-zA-Z_' . chr(128) . '-' . chr(255));
 
         // tag name chars
-        self::$nameRange = self::str_range('0-9\-') . self::$nameStartRange;
+        self::$nameRange = self::str_range('\-0-9') . self::$nameStartRange;
     }
 
     /**
@@ -163,10 +163,11 @@ abstract class Parser
     {
         $i = $this->i;
         $s = $this->s;
-        $j = strspn($s, self::$spaceRange, $i);
+        $l = $this->l;
+        $j = strspn($s, self::$spaceRange, $i, $l-$i);
         if ($j) {
             $this->i = $i += $j;
-            $this->c = $i >= $this->l ? '' : $s[$i];
+            $this->c = $i >= $l ? '' : $s[$i];
         }
         return $this->i;
     }
@@ -178,10 +179,11 @@ abstract class Parser
     {
         $i = $this->i;
         $s = $this->s;
-        $j = strcspn($s, self::$spaceRange, $i);
+        $l = $this->l;
+        $j = strcspn($s, self::$spaceRange, $i, $l-$i);
         if ($j) {
             $this->i = $i += $j;
-            $this->c = $i >= $this->l ? '' : $s[$i];
+            $this->c = $i >= $l ? '' : $s[$i];
         }
         return $this->i;
     }
@@ -221,11 +223,12 @@ abstract class Parser
     {
         $i = $this->i;
         $s = $this->s;
-        $j = strspn($s, $range, $i);
+        $l = $this->l;
+        $j = strspn($s, $range, $i, $l-$i);
         if ($j) {
             $n       = substr($s, $i, $j);
             $this->i = $i += $j;
-            $this->c = $i >= $this->l ? '' : $s[$i];
+            $this->c = $i >= $l ? '' : $s[$i];
         } else {
             $n = '';
         }
@@ -240,12 +243,13 @@ abstract class Parser
     {
         $i = $this->i;
         $s = $this->s;
-        $j = strcspn($s, $range, $i);
+        $l = $this->l;
+        $j = strcspn($s, $range, $i, $l-$i);
 
         if ($j) {
             $n       = substr($s, $i, $j);
             $this->i = $i += $j;
-            $this->c = $i >= $this->l ? '' : $s[$i];
+            $this->c = $i >= $l ? '' : $s[$i];
         } else {
             $n = '';
         }
@@ -332,13 +336,9 @@ abstract class Parser
         $b = "\x0";
         while ($pos < $len) {
             switch ($c = $comp[$pos++]) {
-                case '\\':{
-                        $b       = substr($comp, $pos, 1);
-                        $ret[$b] = $pos++;
-                    }break;
-
-                case '-':{
-                        $c_ = ord($c = substr($comp, $pos, 1));
+                case '-': {
+                        $c = substr($comp, $pos++, 1);
+                        $c_ = ord($c);
                         $b  = ord($b);
                         while ($b++ < $c_) {
                             $ret[chr($b)] = $pos;
@@ -347,12 +347,14 @@ abstract class Parser
                         while ($b-- > $c_) {
                             $ret[chr($b)] = $pos;
                         }
-
-                    }break;
-
-                default:{
-                        $ret[$b = $c] = $pos;
                     }
+                    break;
+
+                case '\\':
+                    $c = substr($comp, $pos++, 1);
+
+                default:
+                    $ret[$b = $c] = $pos;
             }
         }
         return implode('', array_keys($ret));
