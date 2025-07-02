@@ -210,6 +210,7 @@ class hQueryStress extends PHPUnit_BaseClass
     public function test_big_synthetic()
     {
         ini_set('memory_limit', '148M');
+        // hQuery::$del_spaces = true;
 
         list($doc) = self::load_doc_from_file('data/big_synthetic.html');
 
