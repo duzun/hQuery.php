@@ -232,7 +232,7 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
     // -----------------------------------------------------
     /**
      * @param  string $filename  filename
-     * @return string [duzun\hQuery, string]
+     * @return array [duzun\hQuery, string]
      */
     public static function load_doc_from_file($filename) {
         $tmr      = self::timer();

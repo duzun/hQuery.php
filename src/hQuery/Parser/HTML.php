@@ -78,7 +78,7 @@ class HTML extends Parser
         // Find all tags.
         while ($i < $l) {
             $i = strpos($html, '<', $i);
-            if (false === $i) {
+            if (false === $i || $i >= $l) {
                 // no more tags in $html
                 break;
             }
@@ -106,7 +106,7 @@ class HTML extends Parser
                     }
                     $utn = null;
                 }
-                $i = self::_findTagClose($html, $i);
+                $i = self::_findTagClose($html, $i, $l);
                 if (false === $i) {
                     // this tag never closes - malformed HTML?
                     break;
@@ -166,7 +166,7 @@ class HTML extends Parser
                 }
                 // not a tag
                 $i = strpos($html, '>', $i);
-                if (false === $i) {
+                if (false === $i || $i >= $l) {
                     break;
                 }
 
@@ -225,9 +225,9 @@ class HTML extends Parser
      * @param  int    $p         position
      * @return int    position
      */
-    protected static function _findTagClose($str, $p)
+    protected static function _findTagClose($str, $p, $l=null)
     {
-        $l = strlen($str);
+        isset($l) or $l = strlen($str);
         while ($i = $p < $l ? strpos($str, '>', $p) : $l) {
             $e = $p; // save pos
             $p += strcspn($str, '"\'', $p, $i - $p);

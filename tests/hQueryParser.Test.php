@@ -24,9 +24,9 @@ class HTMLParserTestSurrogate extends HTMLParser
      * @param $str
      * @param $p
      */
-    public static function _findTagClose($str, $p)
+    public static function _findTagClose($str, $p, $l=null)
     {
-        return parent::_findTagClose($str, $p);
+        return parent::_findTagClose($str, $p, $l);
     }
 }
 
