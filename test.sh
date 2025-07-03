@@ -230,7 +230,8 @@ docker_run() {
 
     # we don't want to edit composer.json accidentally
     [ -s "$vendorDir/composer.json" ] || \
-    cp -- "$workdir/composer.json" "$vendorDir/composer.json"
+    cat "$workdir/composer.json" | grep -v 'apigen/apigen' \
+        > "$vendorDir/composer.json"
 
     # Each container has its own composer.lock file
     # to avoid conflicts between different PHP versions.
@@ -241,8 +242,8 @@ docker_run() {
     docker run --rm "-i$(tty -s && echo t)" \
         -u "0:$(id -g)" \
         -e "HOME=/app/vendor" \
-        -e "USER=$(id -un)" \
         -e "UID=$(id -u)" \
+        -e "USER=$(id -un)" \
         -v "$workdir:/app" \
         -v "$vendorDir/composer.json:/app/composer.json" \
         -v "$vendorDir/composer.lock:/app/composer.lock" \
