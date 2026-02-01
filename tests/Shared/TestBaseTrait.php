@@ -1,21 +1,12 @@
 <?php
-namespace Tests\Lib;
+namespace Tests\Shared;
 
 use duzun\hQuery;
 
-// -----------------------------------------------------
 /**
- * Base test-case class for PHPUnit tests.
- * It abstracts old and new PHPUnit versions.
- *
- * @author Dumitru Uzun (DUzun.Me)
+ * Base trait for test functionality
  */
-// -----------------------------------------------------
-/**
- * @backupGlobals disabled
- */
-// -----------------------------------------------------
-abstract class PHPUnit_BaseClass extends PU_AdapterCase
+trait TestBaseTrait
 {
     /**
      * @var boolean
@@ -33,9 +24,24 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
     public static $className;
 
     /**
-     * @var string
+     * @var mixed
      */
-    public static $thausandsSeparator = "'";
+    public static $inst;
+
+    /**
+     * @var array
+     */
+    protected static $_data = array();
+
+    /**
+     * @var array
+     */
+    protected static $_tmpFiles = array();
+
+    /**
+     * @var array
+     */
+    protected static $_tmpDirs = array();
 
     /**
      * @var array
@@ -62,7 +68,116 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
      */
     public static $ROW_SEP = '---------------------';
 
-    // -----------------------------------------------------
+    /**
+     * @var int
+     */
+    private static $_idx = 0;
+
+    /**
+     * @var string
+     */
+    private static $_lastTest;
+
+    /**
+     * @var string
+     */
+    private static $_lastClass;
+
+    /**
+     * Log a message
+     */
+    public static function log()
+    {
+        if (empty(self::$log)) {
+            return;
+        }
+
+        if (self::$_lastTest != self::$testName || self::$_lastClass != self::$className) {
+            echo PHP_EOL, PHP_EOL, '### -> ', self::$className . '::' . self::$testName, ' ()', PHP_EOL;
+            self::$_lastTest  = self::$testName;
+            self::$_lastClass = self::$className;
+            self::$_idx       = 0;
+        }
+        $args = func_get_args();
+        foreach ($args as $k => $v) {
+            is_string($v) or is_int($v) or is_float($v) or $args[$k] = var_export($v, true);
+        }
+
+        echo ''
+        , str_pad(++self::$_idx, 3, ' ', STR_PAD_LEFT)
+        , ')  '
+        , implode(' ', $args)
+        , PHP_EOL;
+    }
+
+    /**
+     * Create a temporary file
+     */
+    public static function tmpfile($contents = null, $ext = null)
+    {
+        $dir = sys_get_temp_dir();
+        $ext = $ext ? '.' . ltrim($ext, '.') : '';
+        $file = tempnam($dir, 'test_');
+        if ($file === false) {
+            throw new \RuntimeException("Could not create temporary file in {$dir}");
+        }
+        if ($ext) {
+            rename($file, $file .= $ext);
+        }
+        self::$_tmpFiles[] = $file;
+        if (isset($contents)) {
+            file_put_contents($file, $contents);
+        }
+        return $file;
+    }
+
+    /**
+     * Create a temporary directory
+     */
+    public static function tmpdir($prefix = 'test_')
+    {
+        $dir = sys_get_temp_dir();
+        $path = $dir . DIRECTORY_SEPARATOR . uniqid($prefix);
+        if (!mkdir($path)) {
+            throw new \RuntimeException("Could not create temporary directory {$path}");
+        }
+        self::$_tmpDirs[] = $path;
+        return $path;
+    }
+
+    /**
+     * Delete test data
+     */
+    public static function deleteTestData()
+    {
+        foreach (self::$_tmpFiles as $file) {
+            if (file_exists($file)) {
+                unlink($file);
+            }
+        }
+        foreach (self::$_tmpDirs as $dir) {
+            if (is_dir($dir)) {
+                self::rmdir($dir);
+            }
+        }
+    }
+
+    /**
+     * Recursively remove a directory
+     */
+    protected static function rmdir($dir)
+    {
+        if (is_dir($dir)) {
+            $files = array_diff(scandir($dir), array('.', '..'));
+            foreach ($files as $file) {
+                $path = $dir . DIRECTORY_SEPARATOR . $file;
+                is_dir($path) ? self::rmdir($path) : unlink($path);
+            }
+            return rmdir($dir);
+        }
+        return false;
+    }
+
     /**
      * @param $header
      * @param NULL      $cols
@@ -126,71 +241,9 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
         echo implode(static::$CEL_SEP, $a), PHP_EOL;
     }
 
-    // -----------------------------------------------------
-    // Before every test
-    public function mySetUp()
-    {
-        self::$testName  = method_exists($this, 'getName') ? $this->getName() : $this->name();
-        self::$className = get_class($this);
-
-        // parent::mySetUp();
-    }
-
-    // -----------------------------------------------------
-    // Helper methods:
-
-    /**
-     * @var int
-     */
-    private static $_idx = 0;
-
-    /**
-     * @var string
-     */
-    private static $_lastTest;
-
-    /**
-     * @var string
-     */
-    private static $_lastClass;
-
-    /**
-     * Log a message to console
-     */
-    public static function log()
-    {
-        if (empty(self::$log)) {
-            return;
-        }
-
-        if (self::$_lastTest != self::$testName || self::$_lastClass != self::$className) {
-            echo PHP_EOL, PHP_EOL, '### -> ', self::$className . '::' . self::$testName, ' ()', PHP_EOL;
-            self::$_lastTest  = self::$testName;
-            self::$_lastClass = self::$className;
-            self::$_idx       = 0;
-        }
-        $args = func_get_args();
-        foreach ($args as $k => $v) {
-            is_string($v) or is_int($v) or is_float($v) or $args[$k] = var_export($v, true);
-        }
-
-        echo ''
-        // , PHP_EOL
-        , ''
-        , str_pad(++self::$_idx, 3, ' ', STR_PAD_LEFT)
-        , ')  '
-        , implode(' ', $args)
-        , PHP_EOL
-        ;
-    }
-
-    // -----------------------------------------------------
-    public static function deleteTestData() {}
-
-    // -----------------------------------------------------
     /**
      * @param  string $filename  filename
-     * @return array [duzun\hQuery, string]
+     * @return string duzun\hQuery
      */
     public static function load_doc_from_file($filename) {
         $tmr      = self::timer();
@@ -212,7 +265,6 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
         return array($doc, $html);
     }
 
-    // -----------------------------------------------------
     /**
      * @param  string $fn  filename
      * @return string file contents or false
@@ -229,7 +281,7 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
      */
     public static function file_exists($fn)
     {
-        $ffn = TESTS_DIR . $fn;
+        $ffn = dirname(__FILE__, 3) . DIRECTORY_SEPARATOR . $fn;
         if (!file_exists($ffn)) {
             $zfn = $ffn . '.gz';
             if (!file_exists($zfn)) {
@@ -255,9 +307,6 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
         return $ret;
     }
 
-    // -----------------------------------------------------
-    // Helpers:
-
     /**
      * @param  float    $num
      * @param  int      $dec
@@ -265,7 +314,7 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
      */
     public static function fmtNumber($num, $dec = 0)
     {
-        return number_format($num, $dec, '.', self::$thausandsSeparator);
+        return number_format($num, $dec, '.', "'");
     }
 
     /**
@@ -332,14 +381,12 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
         return str_pad($input, $pad_length + $diff, $pad_string, $pad_type);
     }
 
-    // -----------------------------------------------------
     /**
      * @param  array $list
      * @return int
      */
     public static function listMaxStrLen($list)
     {
-        // return array_reduce($list, function ($i, $v) { return max($i, strlen($v)); }, 0);
         $ret = 0;
         foreach ($list as $v) {
             $ret = max($ret, strlen($v));
@@ -353,17 +400,10 @@ abstract class PHPUnit_BaseClass extends PU_AdapterCase
      */
     public static function listSumCounts($list)
     {
-        // return array_reduce($list, function ($cary, $item) { return $cary + count($item); }, 0);
         $cary = 0;
         foreach ($list as $item) {
             $cary += count($item);
         }
         return $cary;
     }
-
-    // -----------------------------------------------------
 }
-// -----------------------------------------------------
-// Delete the temp test user after all tests have fired
-register_shutdown_function([PHPUnit_BaseClass::class, 'deleteTestData']);
-// -----------------------------------------------------

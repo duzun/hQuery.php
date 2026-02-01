@@ -51,6 +51,12 @@
       "hquery.php"
     ]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/",
+      "Tests\\Shared\\": "tests/shared/"
+    }
+  },
   "support": {
     "email": "contact@duzun.me",
     "issues": "https://github.com/duzun/hQuery.php/issues",
@@ -85,6 +91,7 @@
   },
   "config": {
     "allow-plugins": {
+      "pestphp/pest-plugin": true,
       "php-http/discovery": true
     }
   }

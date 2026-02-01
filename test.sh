@@ -3,6 +3,14 @@
 workdir=$(pwd)
 myname=$(basename "$0")
 
+# PHP 7.3+ can use Pest
+USE_PEST_73=1
+USE_PEST_74=1
+USE_PEST_81=1
+USE_PEST_82=1
+USE_PEST_83=1
+
+# PHPUnit versions for older PHP
 PHPUNIT_VERSION_84=^12.0
 PHPUNIT_VERSION_83=^12.0
 PHPUNIT_VERSION_82=^11.0
@@ -47,29 +55,55 @@ ver_num() {
 }
 
 main_in_docker() {
-    install_dev "$1" || return $?
+    version=${1:?}
     shift
+    version_num=$(ver_num "$version")
+    echo "PHP ver: $version"
 
-    local watch
-    if [ "$1" = "w" ]; then
-        watch=1
-        shift
-        if ! command -v inotifywait >/dev/null; then
-            apk -U add inotify-tools
-        fi
-    fi
+    watch=
+    pest="$(var "USE_PEST_$version_num" '')"
+    while [ "$#" -gt 0 ]; do case "$1" in
+        w)
+            watch=1
+            shift
+            if ! command -v inotifywait >/dev/null; then
+                apk -U add inotify-tools
+            fi
+        ;;
+        p|pest)
+            pest=1;
+            shift
+        ;;
+        u|unit)
+            pest=0;
+            shift
+        ;;
+        *) break ;;
+    esac done
+
+    install_dev "$version_num" "${pest:-0}" || return $?
 
     echo
     echo
     echo " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo
-    local c
-    [ -s "$workdir/tests/phpunit.xml" ] && c="-c $workdir/tests/phpunit.xml"
-    phpunit tests/ $c "$@"
+    local c test_cmd test_dir
+
+    if [ "$pest" -eq 1 ]; then
+        test_cmd="pest"
+        test_dir="$workdir/tests/pest"
+        [ -s "$test_dir/phpunit.xml" ] && c="-c $test_dir/phpunit.xml"
+    else
+        test_cmd="phpunit"
+        test_dir="$workdir/tests/phpunit"
+        [ -s "$test_dir/phpunit.xml" ] && c="-c $test_dir/phpunit.xml"
+    fi
+
+    ( cd "$test_dir" && "$test_cmd" $c "$@" )
 
     if [ -n "$watch" ]; then
-        watchnrun "$workdir" \
-            phpunit tests/ $c "$@"
+        ( cd "$test_dir" && watchnrun "$workdir" \
+            "$test_cmd" $c "$@" )
     fi
 }
 
@@ -135,19 +169,21 @@ watchnrun() {
 }
 
 install_dev() {
-    local version version_num phpunit_ver preinstall composer
+    local version_num phpunit_ver preinstall composer
+    version_num=${1:?}
+    pest=${2:?}
 
-    version=${1:?}
-    version_num=$(ver_num "$version")
-    phpunit_ver=$(var "PHPUNIT_VERSION_$version_num")
-    shift
+    if [ "$pest" -eq 1 ]; then
+        echo "Using Pest for PHP $version_num"
+    else
+        phpunit_ver=$(var "PHPUNIT_VERSION_$version_num")
 
-    echo "PHP ver: $version"
-    echo "PHPUnit ver: $phpunit_ver"
+        echo "PHPUnit ver: $phpunit_ver"
 
-    if [ -z "$phpunit_ver" ]; then
-        echo >&2 "No PHPUnit version associated with this version of PHP"
-        return 2
+        if [ -z "$phpunit_ver" ]; then
+            echo >&2 "No PHPUnit version associated with this version of PHP"
+            return 2
+        fi
     fi
 
     # On exit, give the ownership of the vendor directory to the user
@@ -174,10 +210,8 @@ install_dev() {
     if [ ! -s "$composer" ]; then
         # Install composer
         [ -d "$(dirname "$composer")" ] || mkdir -p "$(dirname "$composer")"
-        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-        php composer-setup.php
-        # php composer-setup.php --disable-tls
-        mv -- composer.phar "$composer"
+        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
+        php composer-setup.php --install-dir="$(dirname "$composer")" --filename="$(basename "$composer")" &&
         php -r "unlink('composer-setup.php');"
     fi
     export PATH="$(realpath "$workdir/vendor/bin"):$PATH"
@@ -253,7 +287,7 @@ docker_run() {
 
 main() {
     # By default test the latest PHP version
-    [ $# -eq 0 ] && set -- "8.2"
+    [ $# -eq 0 ] && set -- "8.4"
 
     case $1 in
     main_in_docker)
