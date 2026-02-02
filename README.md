@@ -26,13 +26,35 @@ See [tests/README.md](https://github.com/duzun/hQuery.php/blob/master/tests/READ
 - PHP 5.3+
 - No dependencies
 
+## Requirements
+
+- PHP 5.3 or newer (PHP 7.4+ recommended)
+- `mbstring` extension is recommended for reliable charset handling and conversions
+- Ensure a sufficient `memory_limit` when working with very large documents
+
 ## 🛠 Install
 
-Just add this folder to your project and `include_once 'hquery.php';` and you are ready to `hQuery`.
+Add the library to your project and include it, or install via Composer/npm.
 
-Alternatively `composer require duzun/hquery`
+Using Composer (recommended):
 
-or using `npm install hquery.php`, `require_once 'node_modules/hquery.php/hquery.php';`.
+```sh
+composer require duzun/hquery
+```
+
+Or include manually:
+
+```php
+include_once '/path/to/hquery.php/hquery.php';
+```
+
+Or via npm:
+
+```sh
+npm install hquery.php
+```
+
+Then require the file from `node_modules` if needed.
 
 ## ⚙ Usage
 
@@ -160,11 +182,11 @@ $titles = array();
 if ( $banners ) {
 
     // Iterate over the result
-    foreach($banners as $pos => $a) {
+    foreach($banners as $id => $a) {
         // $a->href property is the resolved $a->attr('href') relative to the
         // documents <base href=...>, if present, or $doc->baseURL.
-        $links[$pos] = $a->href; // get absolute URL from href property
-        $titles[$pos] = trim($a->text()); // strip all HTML tags and leave just text
+        $links[$id] = $a->href; // get absolute URL from href property
+        $titles[$id] = trim($a->text()); // strip all HTML tags and leave just text
 
         // Filter the result
         if ( !$a->hasClass('logo') ) {
@@ -172,7 +194,7 @@ if ( $banners ) {
             if ( strtolower($a->style['position']) == 'fixed' ) continue;
 
             $img = $a->find('img')[0]; // ArrayAccess
-            if ( $img ) $images[$pos] = $img->src; // short for $img->attr('src', true)
+            if ( $img ) $images[$id] = $img->src; // short for $img->attr('src', true)
         }
     }
 
@@ -201,7 +223,12 @@ $requestUri = $doc->href;
 $baseURL = $doc->baseURL;
 ```
 
-Note: In case the charset meta attribute has a wrong value or the internal conversion fails for any other reason, `hQuery` would ignore the error and continue processing with the original HTML, but would register an error message on `$doc->html_errors['convert_encoding']`.
+Charset and positions:
+
+- The document is converted internally to UTF-8 for parsing. 
+- Element positions (the numeric offsets used internally and returned by APIs that expose byte offsets) refer to the internal UTF-8 string bytes. 
+
+Note: In case the charset meta attribute has a wrong value or the internal conversion fails for any other reason, `hQuery` will continue processing with the original HTML, but will register an error message on `$doc->html_errors['convert_encoding']`.
 
 ## 🖧 Live Demo
 
