@@ -3,7 +3,6 @@
     $url = @$_POST['url'] ?: @$_GET['url'];
     $sel = @$_POST['sel'] ?: @$_GET['sel'];
     $go  = @$_POST['go']  ?: @$_GET['go'];
-    $ch  = @$_POST['ch']  ?: @$_GET['ch'];
     $rm = strtoupper(getenv('REQUEST_METHOD') ?: $_SERVER['REQUEST_METHOD']);
     // var_export(compact('url', 'sel', 'go')+[$rm]+$_SERVER);
     if ( $rm == 'POST' ) {
@@ -16,7 +15,7 @@
 
         // Enable cache
         hQuery::$cache_path = sys_get_temp_dir() . '/hQuery/';
-        isset($ch) && $ch !== '' and hQuery::$cache_expires = (int)$ch;
+        $_POST['ch'] === '0' || (int)$_POST['ch'] > 0 and hQuery::$cache_expires = (int)$_POST['ch'];
 
         // Results accumulator
         $return = array();
@@ -157,6 +156,10 @@
             padding: 15px 5px 10px;
             vertical-align: top;
         }
+        table>tbody>tr>td img{
+            max-width: 300px;
+            height: auto;
+        }
         td pre {
             margin: 0;
         }
@@ -255,7 +258,7 @@
             color: #428bca;
             background-color: #fff;
         }
-
+        
         .text-center {
             text-align: center;
         }
@@ -278,7 +281,7 @@
         <form name="hquery" action="" method="post">
             <p><label>URL: <input type="url" name="url" value="<?=htmlspecialchars(@$url??'', ENT_QUOTES);?>" placeholder="e.g. https://mariauzun.com/portfolio" autofocus class="form-control" required /></label></p>
             <p><label>Selector: <input type="text" name="sel" value="<?=htmlspecialchars(@$sel??'', ENT_QUOTES);?>" placeholder="e.g. 'a[href] &gt; img[src]:parent'" class="form-control" required /></label></p>
-            <p><label>Cache: <input type="number" name="ch" value="<?=$ch?>" min="0" max="3600" step="1" placeholder="e.g. 600" class="form-control" /> (seconds)</label></p>
+            <p><label>Cache: <input type="number" name="ch" value="<?=$_POST['ch']==='0'||(int)$_POST['ch']>0?@$_POST['ch']:'';?>" min="0" max="3600" placeholder="e.g. 600" class="form-control" /> (seconds) <code>default: 3600</code></label></p>
 
             <p>
                 <button type="submit" name="go" value="elements" <?=$go=='elements'?'aria-pressed="true"':''?> class="btn btn-success">Fetch elements</button>
@@ -338,7 +341,7 @@
                         hQuery::$cache_path: <code><?php echo hQuery::$cache_path ?></code>
                     </li>
                     <li class="list-group-item">
-                        hQuery::$cache_expires: <code><?php echo hQuery::$cache_expires ?></code>
+                        hQuery::$cache_expires: <code><?php echo hQuery::$cache_expires ?> s</code>
                     </li>
                     <li class="list-group-item">
                         Size: <span data-name="doc.size" class="badge"><?=empty($doc)?'':$doc->size;?></span>
